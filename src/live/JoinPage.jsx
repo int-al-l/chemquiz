@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import PageHeader from "../components/PageHeader";
@@ -32,6 +32,21 @@ function JoinForm({ onGameLang }) {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+
+  // Scanned the QR code: ask the game for its language, so the name step
+  // already speaks it. A bad PIN still fails on Join.
+  useEffect(() => {
+    if (!pinFromUrl) return undefined;
+    let active = true;
+    peekLiveGame(pinFromUrl)
+      .then((game) => {
+        if (active) onGameLang(game.lang ?? null);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [pinFromUrl, onGameLang]);
 
   // Already in this game on this phone (a reload, or the QR scanned twice).
   if (pinFromUrl && playerToken(pinFromUrl)) {
@@ -133,7 +148,10 @@ function JoinForm({ onGameLang }) {
             <button className="primary-button" type="submit" disabled={busy || !name.trim()}>
               {busy ? t("live.join.joining") : t("live.join.join")}
             </button>
-            <button className="text-button" type="button" onClick={() => setCheckedPin(null)}>
+            <button className="text-button" type="button" onClick={() => {
+                setCheckedPin(null);
+                onGameLang(null);
+              }}>
               {t("live.join.otherPin")}
             </button>
           </form>

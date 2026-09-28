@@ -13,6 +13,8 @@ on:
       - "package.json"
       - "package-lock.json"
       - "backend/seed_data.py"
+      - "backend/content_ru.py"
+      - "backend/app/messages.py"
       - "backend/static/**"
       - "tools/make_demo_data.py"
   workflow_dispatch:

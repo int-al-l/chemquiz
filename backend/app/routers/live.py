@@ -49,9 +49,11 @@ class LockIn(BaseModel):
 
 def _fail(db: Session, exc: AppError, room: Optional[live.Room] = None) -> AppError:
     """Undo whatever the request started; errors about a known game speak its language."""
-    db.rollback()
+    # Read before the rollback: afterwards it would be a fresh query, and the
+    # game may have been closed in between.
     if room is not None:
-        exc.lang = getattr(room.game, "lang", None)
+        exc.lang = room.game.lang
+    db.rollback()
     return exc
 
 
