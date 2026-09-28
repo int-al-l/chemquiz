@@ -45,7 +45,12 @@ API is replaced by `src/demo/backend.js`, which follows the same rules as the
 FastAPI backend and keeps everything (accounts included) in the browser's
 localStorage. No email is sent -- the verification code is shown on screen.
 The output in `dist-demo/` is plain static files (hash-based URLs), so it can be
-hosted anywhere. After changing `backend/seed_data.py`, refresh the demo's
+hosted anywhere.
+
+`npm run build:pages` writes the same build into `docs/`, which GitHub Pages
+serves (Settings -> Pages -> branch `main`, folder `/docs`) at
+https://int-al-l.github.io/chemquiz/ . Re-run it and commit `docs/` after
+changing the site. After changing `backend/seed_data.py`, refresh the demo's
 copy of the content with `python tools/make_demo_data.py`.
 
 ## Layout

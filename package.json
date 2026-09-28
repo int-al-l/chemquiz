@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:pages": "vite build --mode demo --base ./ --outDir docs --emptyOutDir && node -e \"const fs=require('fs');fs.cpSync('backend/static','docs/static',{recursive:true});fs.writeFileSync('docs/.nojekyll','')\""
   },
   "dependencies": {
     "react": "^19.2.8",
