@@ -174,27 +174,12 @@ def create_quiz_session(
     db.add(session)
     db.flush()
 
-    for position, item in enumerate(asked, start=1):
-        distractors = _pick_distractors(db, item, pool, CHOICES_PER_QUESTION - 1, rng)
-        options = [item, *distractors]
-        rng.shuffle(options)
+    for position, drawn in enumerate(draw_questions(db, asked, pool, mode, rng), start=1):
+        item, options, photo, picks = drawn
         choice_ids = ",".join(str(o.id) for o in options)
-
-        # Show one of this item's photographs, chosen now and remembered, so a
-        # refresh does not swap the picture mid-question.
-        photo = rng.choice(item.photos) if item.photos else None
-
-        choice_photo_ids = ""
-        if mode == "inverted":
-            # One picture per option, fixed now for the same reason.
-            picks = []
-            for option in options:
-                if option.id == item.id:
-                    picks.append(photo)
-                else:
-                    picks.append(rng.choice(option.photos) if option.photos else None)
-            choice_photo_ids = ",".join(str(p.id) if p else "" for p in picks)
-
+        choice_photo_ids = (
+            ",".join(str(p.id) if p else "" for p in picks) if mode == "inverted" else ""
+        )
         db.add(
             models.QuizQuestion(
                 session_id=session.id,
@@ -209,6 +194,42 @@ def create_quiz_session(
     db.commit()
     db.refresh(session)
     return session
+
+
+def draw_questions(
+    db: Session,
+    asked: Sequence[models.Item],
+    pool: Sequence[models.Item],
+    mode: str,
+    rng: random.Random,
+) -> list[tuple]:
+    """Options and photographs for each asked item, fixed up front.
+
+    Returns (item, options, photo, option_photos) per question. Shared by the
+    solo quiz and the live classroom game, so both ask the same kind of
+    question.
+    """
+    drawn = []
+    for item in asked:
+        distractors = _pick_distractors(db, item, pool, CHOICES_PER_QUESTION - 1, rng)
+        options = [item, *distractors]
+        rng.shuffle(options)
+
+        # Show one of this item's photographs, chosen now and remembered, so a
+        # refresh does not swap the picture mid-question.
+        photo = rng.choice(item.photos) if item.photos else None
+
+        picks: list = []
+        if mode == "inverted":
+            # One picture per option, fixed now for the same reason.
+            for option in options:
+                if option.id == item.id:
+                    picks.append(photo)
+                else:
+                    picks.append(rng.choice(option.photos) if option.photos else None)
+
+        drawn.append((item, options, photo, picks))
+    return drawn
 
 
 def get_quiz_session(db: Session, token: str) -> Optional[models.QuizSession]:

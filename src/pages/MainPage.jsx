@@ -42,6 +42,18 @@ function MainPage() {
       blurb: "Learn with flashcards, deck by deck",
     },
     {
+      to: "/join",
+      icon: "phone_iphone",
+      title: "Join a class game",
+      blurb: "Enter the PIN from the board",
+    },
+    {
+      to: "/live",
+      icon: "cast_for_education",
+      title: "Host a class game",
+      blurb: "Put questions on the board, the class answers on phones",
+    },
+    {
       to: "/list",
       icon: "star",
       title: "My list",

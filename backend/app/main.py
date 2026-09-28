@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 from . import crud, migrate, models, schemas, seeding
 from .config import CORS_ORIGINS, IMAGES_DIR, STATIC_DIR
 from .database import Base, SessionLocal, engine, get_db
-from .routers import account, content, quiz
+from .routers import account, content, live, quiz
 
 
 @asynccontextmanager
@@ -82,6 +82,7 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.include_router(content.router)
 app.include_router(quiz.router)
 app.include_router(account.router)
+app.include_router(live.router)
 
 
 @app.get("/api/health", response_model=schemas.HealthOut, tags=["meta"])

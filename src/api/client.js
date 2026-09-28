@@ -170,6 +170,50 @@ export function fetchResults(token) {
   return request(`/api/quiz/${token}/results`);
 }
 
+// --- live classroom game -----------------------------------------------------
+//
+// The host and each player hold a secret token from create/join; the PIN on
+// its own only finds the room.
+
+function live(path, token, options = {}) {
+  return request(`/api/live${path}`, {
+    ...options,
+    headers: token ? { "X-Live-Token": token } : {},
+  });
+}
+
+export function createLiveGame({ categorySlug, mode, questionCount, timeLimit }) {
+  return live("", null, {
+    method: "POST",
+    body: JSON.stringify({
+      category_slug: categorySlug ?? null,
+      mode,
+      question_count: questionCount,
+      time_limit: timeLimit,
+    }),
+  });
+}
+
+export const liveNetwork = () => live("/network");
+export const peekLiveGame = (pin) => live(`/${pin}`);
+export const fetchLiveHost = (pin, token) => live(`/${pin}/host`, token);
+export const liveNext = (pin, token) => live(`/${pin}/next`, token, { method: "POST" });
+export const liveFinish = (pin, token) => live(`/${pin}/finish`, token, { method: "POST" });
+export const liveClose = (pin, token) => live(`/${pin}`, token, { method: "DELETE" });
+export const liveLock = (pin, token, locked) =>
+  live(`/${pin}/lock`, token, { method: "POST", body: JSON.stringify({ locked }) });
+export const liveRemovePlayer = (pin, token, playerId) =>
+  live(`/${pin}/players/${playerId}/remove`, token, { method: "POST" });
+
+export const joinLiveGame = (pin, name) =>
+  live(`/${pin}/join`, null, { method: "POST", body: JSON.stringify({ name }) });
+export const fetchLivePlayer = (pin, token) => live(`/${pin}/me`, token);
+export const liveAnswer = (pin, token, { position, choiceId }) =>
+  live(`/${pin}/answer`, token, {
+    method: "POST",
+    body: JSON.stringify({ position, choice_id: choiceId }),
+  });
+
 // --- account ---------------------------------------------------------------
 
 function post(path, body) {

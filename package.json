@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:class": "vite --host",
     "build": "vite build",
     "build:demo": "vite build --mode demo --base ./ --outDir dist-demo && node -e \"require('fs').cpSync('backend/static', 'dist-demo/static', {recursive: true})\"",
     "lint": "eslint .",
@@ -14,6 +15,7 @@
     "build:pages": "vite build --mode demo --base ./ --outDir docs --emptyOutDir && node -e \"const fs=require('fs');fs.cpSync('backend/static','docs/static',{recursive:true});fs.writeFileSync('docs/.nojekyll','')\""
   },
   "dependencies": {
+    "qrcode-generator": "^2.0.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.3"
