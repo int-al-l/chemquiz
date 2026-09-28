@@ -48,34 +48,59 @@ def send(to: str, subject: str, text: str, html: str | None = None) -> None:
         server.send_message(msg)
 
 
-def code_email(purpose: str, name: str, code: str, link: str) -> tuple[str, str, str]:
-    """Subject, plain text and HTML for a verification or reset email."""
-    if purpose == "verify":
-        subject = f"{code} is your ChemQuiz verification code"
-        intro = "Welcome to ChemQuiz! Confirm your email address to finish creating your account."
-        action = "Verify my email"
-    else:
-        subject = f"{code} is your ChemQuiz password reset code"
-        intro = "Someone (hopefully you) asked to reset your ChemQuiz password."
-        action = "Choose a new password"
+_EMAIL = {
+    "en": {
+        "verify": ("{code} is your ChemQuiz verification code",
+                   "Welcome to ChemQuiz! Confirm your email address to finish creating your account.",
+                   "Verify my email"),
+        "reset": ("{code} is your ChemQuiz password reset code",
+                  "Someone (hopefully you) asked to reset your ChemQuiz password.",
+                  "Choose a new password"),
+        "hi": "Hi {name},",
+        "your_code": "Your code: {code}",
+        "or_link": "Or open this link:",
+        "expires": "The code and the link expire in {minutes} minutes.",
+        "ignore": "If you did not ask for this, ignore this email.",
+    },
+    "ru": {
+        "verify": ("{code} — ваш код подтверждения ChemQuiz",
+                   "Добро пожаловать в ChemQuiz! Подтвердите адрес почты, чтобы закончить регистрацию.",
+                   "Подтвердить почту"),
+        "reset": ("{code} — ваш код для сброса пароля ChemQuiz",
+                  "Кто-то (надеемся, вы) попросил сбросить пароль в ChemQuiz.",
+                  "Задать новый пароль"),
+        "hi": "Здравствуйте, {name}!",
+        "your_code": "Ваш код: {code}",
+        "or_link": "Или откройте ссылку:",
+        "expires": "Код и ссылка действуют {minutes} минут.",
+        "ignore": "Если вы ничего не запрашивали, просто не обращайте внимания на это письмо.",
+    },
+}
 
+
+def code_email(purpose: str, name: str, code: str, link: str, lang: str = "en") -> tuple[str, str, str]:
+    """Subject, plain text and HTML for a verification or reset email, in `lang`."""
+    t = _EMAIL.get(lang, _EMAIL["en"])
+    subject, intro, action = t["verify" if purpose == "verify" else "reset"]
+    subject = subject.format(code=code)
     minutes = config.CODE_TTL_MINUTES
+    hi = t["hi"].format(name=name)
+    expires = t["expires"].format(minutes=minutes)
     text = (
-        f"Hi {name},\n\n{intro}\n\n"
-        f"Your code: {code}\n\n"
-        f"Or open this link:\n{link}\n\n"
-        f"The code and the link expire in {minutes} minutes. "
-        "If you did not ask for this, ignore this email.\n"
+        f"{hi}\n\n{intro}\n\n"
+        f"{t['your_code'].format(code=code)}\n\n"
+        f"{t['or_link']}\n{link}\n\n"
+        f"{expires} {t['ignore']}\n"
     )
     html = f"""\
 <div style="font-family:Roboto,Arial,sans-serif;max-width:480px;margin:auto;color:#1D1B20">
   <h2 style="color:#6750A4;font-weight:500">ChemQuiz</h2>
-  <p>Hi {name},</p>
+  <p>{hi}</p>
   <p>{intro}</p>
   <p style="font-size:34px;letter-spacing:8px;font-weight:700;margin:24px 0">{code}</p>
   <p><a href="{link}" style="display:inline-block;background:#6750A4;color:#fff;
      padding:12px 22px;border-radius:20px;text-decoration:none">{action}</a></p>
-  <p style="color:#49454F;font-size:13px">The code and the link expire in {minutes} minutes.
-  If you did not ask for this, ignore this email.</p>
+  <p style="color:#49454F;font-size:13px">{expires}
+  {t['ignore']}</p>
 </div>"""
     return subject, text, html

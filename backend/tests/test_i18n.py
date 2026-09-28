@@ -94,3 +94,22 @@ def test_a_quiz_speaks_the_request_language(client, db_session):
     # the same quiz read in English
     again = client.get(f"/api/quiz/{quiz['token']}").json()
     assert again["category_name"] == "Condensers"
+
+
+from app import mailer  # noqa: E402
+
+
+def test_the_email_follows_the_request_language(client):
+    res = client.post("/api/auth/register", headers=RU,
+                      json={"name": "Аня", "email": "anya@example.com", "password": "flask-2024"})
+    assert res.status_code == 202
+    mail = next(m for m in reversed(mailer.OUTBOX) if m["to"] == "anya@example.com")
+    assert "ChemQuiz" in mail["subject"] and "код" in mail["subject"]
+    assert "Ваш код: " in mail["text"]
+
+    client.post("/api/auth/register",
+                json={"name": "Ann", "email": "ann@example.com", "password": "flask-2024"})
+    mail = next(m for m in reversed(mailer.OUTBOX) if m["to"] == "ann@example.com")
+    assert mail["text"].startswith("Hi Ann,\n\n")
+    assert "Your code: " in mail["text"]
+    assert "The code and the link expire in " in mail["text"]

@@ -109,7 +109,7 @@ def _find_user(db: Session, email: str) -> models.User | None:
     ).scalar_one_or_none()
 
 
-def _send_code(db: Session, user: models.User, purpose: str) -> None:
+def _send_code(db: Session, user: models.User, purpose: str, lang: str = "en") -> None:
     """Mail a fresh code + link, replacing any earlier unused one.
 
     Rate limited per user and purpose: a second request inside the cooldown is
@@ -148,7 +148,7 @@ def _send_code(db: Session, user: models.User, purpose: str) -> None:
 
     path = "verify-email" if purpose == "verify" else "reset-password"
     link = f"{config.PUBLIC_URL}/{path}?token={link_token}"
-    subject, text, html = mailer.code_email(purpose, user.name, code, link)
+    subject, text, html = mailer.code_email(purpose, user.name, code, link, lang)
     try:
         mailer.send(user.email, subject, text, html)
     except Exception as exc:  # noqa: BLE001
@@ -205,7 +205,8 @@ def _redeem(db: Session, payload: schemas.VerifyIn, purpose: str) -> models.User
 
 
 @router.post("/auth/register", response_model=schemas.PendingOut, status_code=202)
-def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
+def register(payload: schemas.RegisterIn, db: Session = Depends(get_db),
+             lang: str = Depends(request_lang)):
     """Create an account and mail a verification code.
 
     An address that registered but never verified can register again -- the
@@ -234,7 +235,7 @@ def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
 
-    _send_code(db, user, "verify")
+    _send_code(db, user, "verify", lang)
     return {"email": email, "purpose": "verify"}
 
 
@@ -246,16 +247,18 @@ def verify(payload: schemas.VerifyIn, db: Session = Depends(get_db)):
 
 
 @router.post("/auth/resend", response_model=schemas.PendingOut, status_code=202)
-def resend(payload: schemas.EmailIn, db: Session = Depends(get_db)):
+def resend(payload: schemas.EmailIn, db: Session = Depends(get_db),
+           lang: str = Depends(request_lang)):
     email = _check_email(payload.email)
     user = _find_user(db, email)
     if user is not None and not user.email_verified:
-        _send_code(db, user, "verify")
+        _send_code(db, user, "verify", lang)
     return {"email": email, "purpose": "verify"}
 
 
 @router.post("/auth/login", response_model=schemas.SignedInUser)
-def login(payload: schemas.LoginIn, db: Session = Depends(get_db)):
+def login(payload: schemas.LoginIn, db: Session = Depends(get_db),
+          lang: str = Depends(request_lang)):
     email = _check_email(payload.email)
     user = _find_user(db, email)
 
@@ -265,7 +268,7 @@ def login(payload: schemas.LoginIn, db: Session = Depends(get_db)):
         raise AppError("wrong_password", status=401)
 
     if not user.email_verified:
-        _send_code(db, user, "verify")
+        _send_code(db, user, "verify", lang)
         raise AppError("verify_first", status=403)
 
     user.last_seen_at = models.utcnow()
@@ -275,13 +278,14 @@ def login(payload: schemas.LoginIn, db: Session = Depends(get_db)):
 
 
 @router.post("/auth/forgot", response_model=schemas.PendingOut, status_code=202)
-def forgot(payload: schemas.EmailIn, db: Session = Depends(get_db)):
+def forgot(payload: schemas.EmailIn, db: Session = Depends(get_db),
+           lang: str = Depends(request_lang)):
     """Mail a reset code. Answers the same whether or not the account exists,
     so this cannot be used to find out who has an account."""
     email = _check_email(payload.email)
     user = _find_user(db, email)
     if user is not None:
-        _send_code(db, user, "reset")
+        _send_code(db, user, "reset", lang)
     return {"email": email, "purpose": "reset"}
 
 
