@@ -38,6 +38,31 @@ npm run dev
 http://localhost:5173. Vite proxies `/api` and `/static` through to port 8000,
 so the browser only ever sees one origin and CORS never comes up.
 
+## Class game (live, like Kahoot)
+
+The teacher's screen is the board; students answer on their phones.
+
+1. Start the backend as above, then the frontend with `npm run dev:class`
+   (the same as `npm run dev`, but reachable from other devices on the
+   network).
+2. On the board, open **Host a class game**, pick a deck, the mode, the number
+   of questions and the time per question, and open the room.
+3. Students scan the QR code, or go to the address shown and type the 6-digit
+   PIN, then pick a nickname. The host can remove a player or lock the room.
+4. Press **Start** (or Space). Each question is on the board for 3 seconds
+   before answers open; it closes when time runs out or everyone has answered.
+   Then the board shows the right answer and how the class voted, then the
+   standings. A right answer scores 500-1000 points depending on speed, plus
+   100 per answer in a row (up to 500).
+
+The phones and the teacher's laptop must be on the same network, and the
+firewall must allow port 5173. If the board is opened as `localhost`, it asks
+the server for the laptop's network address and puts that in the QR code.
+
+Rooms live in the backend's memory (`backend/app/live.py`), so run it as a
+single process (no `--workers`); restarting it ends the game. The browser-only
+demo on GitHub Pages cannot connect phones, so it explains that instead.
+
 ## Demo build (no backend)
 
 `npm run build:demo` builds a version that runs entirely in the browser: the
@@ -73,6 +98,7 @@ src/
   hooks/useApi.js      loading and error state for a fetch
   components/          PageHeader, Thumbnail, StatusMessage
   pages/               one file per route
+  live/                the class game: setup, board, join, phone
 backend/
   app/models.py        Category, Item, ItemPhoto, ItemAlias, User, SavedItem,
                        QuizSession, QuizQuestion

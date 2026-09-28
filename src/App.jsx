@@ -12,6 +12,10 @@ import SignInPage from "./pages/SignInPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
+import LiveSetupPage from "./live/LiveSetupPage";
+import LiveHostPage from "./live/LiveHostPage";
+import JoinPage from "./live/JoinPage";
+import LivePlayPage from "./live/LivePlayPage";
 import Toaster from "./components/Toaster";
 
 import { AuthProvider } from "./auth/AuthProvider";
@@ -20,6 +24,7 @@ import { SavedProvider } from "./saved/SavedProvider";
 
 import "./App.css";
 import "./learn.css";
+import "./live/live.css";
 
 /**
  * Every screen has a URL, so the browser's back button, a refresh mid-quiz and
@@ -38,6 +43,10 @@ import "./learn.css";
  *   /quiz/setup[/:slug]      choose mode and length
  *   /quiz/:token             a quiz in progress
  *   /quiz/:token/results     the score afterwards
+ *   /live                    set up a class game (the board)
+ *   /live/host/:pin          the board during a class game
+ *   /join[/:pin]             a student joins with the PIN (the QR code fills it in)
+ *   /play/:pin               a student's phone during the game
  */
 function App() {
   return (
@@ -58,6 +67,12 @@ function App() {
             <Route path="/quiz/setup/:slug" element={<QuizSetupPage />} />
             <Route path="/quiz/:token" element={<QuizPage />} />
             <Route path="/quiz/:token/results" element={<QuizResultsPage />} />
+
+            <Route path="/live" element={<LiveSetupPage />} />
+            <Route path="/live/host/:pin" element={<LiveHostPage />} />
+            <Route path="/join" element={<JoinPage />} />
+            <Route path="/join/:pin" element={<JoinPage />} />
+            <Route path="/play/:pin" element={<LivePlayPage />} />
 
             <Route path="/sign-in" element={<SignInPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
