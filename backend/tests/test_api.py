@@ -66,6 +66,8 @@ def client():
                     models.ItemPhoto(
                         item=item,
                         filename=f"condenser-{index}-{variant}.jpeg",
+                        # One openly licensed photo per condenser needs a credit.
+                        credit="Jane Doe, CC BY-SA 4.0, via Wikimedia Commons" if variant == 2 else None,
                         sort_order=variant,
                     )
                 )
@@ -152,6 +154,12 @@ def test_items_filtered_by_category(client):
     assert len(client.get("/api/items?category=bubblers").json()) == 3
     assert len(client.get("/api/items?category=labware").json()) == 9
     assert len(client.get("/api/items?category=labware&include_descendants=false").json()) == 0
+
+
+def test_items_carry_photo_credits_parallel_to_photos(client):
+    item = client.get("/api/items?category=condensers").json()[0]
+    assert len(item["photo_credits"]) == len(item["photo_urls"]) == 3
+    assert item["photo_credits"] == [None, None, "Jane Doe, CC BY-SA 4.0, via Wikimedia Commons"]
 
 
 # --- quiz: starting -------------------------------------------------------

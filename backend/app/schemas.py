@@ -36,6 +36,8 @@ class ItemOut(BaseModel):
     # Every photograph of this concept; the quiz shows one at a time.
     photo_urls: list[str] = Field(default_factory=list)
     photo_count: int = 0
+    # Parallel to photo_urls; None where the photo needs no attribution.
+    photo_credits: list[Optional[str]] = Field(default_factory=list)
     category_slug: Optional[str] = None
 
 

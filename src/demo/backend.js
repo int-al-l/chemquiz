@@ -72,6 +72,7 @@ function itemOut(i) {
     image_url: i.photos[0] ?? null,
     photo_urls: i.photos,
     photo_count: i.photos.length,
+    photo_credits: i.credits ?? i.photos.map(() => null),
     category_slug: i.category,
   };
 }

@@ -103,6 +103,10 @@ class ItemPhoto(Base):
     filename: Mapped[str] = mapped_column(String(255))
     # Where in the source catalog this particular picture came from.
     source_page: Mapped[Optional[int]] = mapped_column(Integer, default=None)
+    # Attribution for photographs under an open licence (Wikimedia Commons),
+    # e.g. "Jane Doe, CC BY-SA 4.0, via Wikimedia Commons". Empty for the
+    # catalogue's own product shots.
+    credit: Mapped[Optional[str]] = mapped_column(String(300), default=None)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
 
     item: Mapped["Item"] = relationship(back_populates="photos")

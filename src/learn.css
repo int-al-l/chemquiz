@@ -317,6 +317,13 @@
   color: var(--on-surface);
   text-align: left;
 }
+.flip-back-credit {
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--on-surface-variant);
+  text-align: center;
+}
 .flip-back-text.is-muted { color: var(--on-surface-variant); text-align: center; }
 .flip-back-turn {
   align-self: center;
