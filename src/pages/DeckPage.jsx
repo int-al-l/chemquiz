@@ -247,6 +247,7 @@ function BrowseView({ items, doc, progress, hideNames, has, toggle, startAt }) {
     onSwipe: (dir) => go(dir === "left" ? 1 : -1),
   });
 
+
   function go(step) {
     if (swipe.leaving) return false;
     const next = index + step;
@@ -267,7 +268,7 @@ function BrowseView({ items, doc, progress, hideNames, has, toggle, startAt }) {
 
   return (
     <>
-      <CardStage swipe={swipe} cardKey={item.slug}>
+      <CardStage swipe={swipe} cardKey={item.slug} scrollable={flipped}>
         <FlipCard
           key={item.slug}
           item={item}
@@ -442,7 +443,7 @@ function StudyView({ items, bySlug, doc, progress, hideNames, has, toggle, quizT
         </span>
       </div>
 
-      <CardStage swipe={swipe} cardKey={`${round}-${slug}`}>
+      <CardStage swipe={swipe} cardKey={`${round}-${slug}`} scrollable={flipped}>
         <FlipCard
           key={`${round}-${slug}`}
           item={item}
@@ -508,7 +509,7 @@ function GridView({ items, doc, onOpen }) {
 // --- shared --------------------------------------------------------------------
 
 /** The area the card lives in: follows the finger, flies off, springs in. */
-function CardStage({ swipe, cardKey, children }) {
+function CardStage({ swipe, cardKey, scrollable = false, children }) {
   const { dx, dragging, leaving, handlers } = swipe;
   let transform = `translateX(${dx}px) rotate(${dx * 0.04}deg)`;
   if (leaving === "left") transform = "translateX(-130%) rotate(-8deg)";
@@ -518,7 +519,7 @@ function CardStage({ swipe, cardKey, children }) {
     <div className="card-stage">
       <div
         key={cardKey}
-        className={`card-mover ${dragging ? "is-dragging" : ""} ${leaving ? "is-leaving" : "is-entering"}`}
+        className={`card-mover ${scrollable ? "can-scroll" : ""} ${dragging ? "is-dragging" : ""} ${leaving ? "is-leaving" : "is-entering"}`}
         style={{ transform }}
         {...handlers}
       >
