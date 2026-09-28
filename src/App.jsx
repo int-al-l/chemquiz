@@ -21,6 +21,7 @@ import LiveGamePage from "./live/LiveGamePage";
 import Toaster from "./components/Toaster";
 
 import { AuthProvider } from "./auth/AuthProvider";
+import { LanguageProvider } from "./i18n/LanguageProvider";
 import { ProgressProvider } from "./progress/ProgressProvider";
 import { SavedProvider } from "./saved/SavedProvider";
 
@@ -54,6 +55,7 @@ import "./live/live.css";
  */
 function App() {
   return (
+    <LanguageProvider>
     <AuthProvider>
       <SavedProvider>
         <ProgressProvider>
@@ -90,6 +92,7 @@ function App() {
         </ProgressProvider>
       </SavedProvider>
     </AuthProvider>
+    </LanguageProvider>
   );
 }
 

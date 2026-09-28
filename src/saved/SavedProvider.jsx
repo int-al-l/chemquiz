@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ApiError, fetchMyList, saveItem, unsaveItem } from "../api/client";
 import { useAuth } from "../auth/context";
+import { useT } from "../i18n";
 import { LOCAL_STORAGE_KEY, readLocal, writeLocal } from "./localList";
 import { SavedContext } from "./context";
 
@@ -32,6 +33,7 @@ const EMPTY = Object.freeze([]);
  *    generation is discarded.
  */
 export function SavedProvider({ children }) {
+  const t = useT();
   const { user, signOut } = useAuth();
   const key = user?.token ?? null;
 
@@ -114,10 +116,7 @@ export function SavedProvider({ children }) {
 
         if (err instanceof ApiError && err.status === 401) {
           setError(
-            new ApiError(
-              "Your sign-in is no longer valid. Sign in again to save items.",
-              401,
-            ),
+            new ApiError(t("saved.expired"), 401),
           );
           signOut();
           return;
@@ -125,7 +124,7 @@ export function SavedProvider({ children }) {
         setError(err);
       }
     },
-    [slugs, key, signOut],
+    [slugs, key, signOut, t],
   );
 
   const remove = useCallback(

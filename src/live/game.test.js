@@ -27,3 +27,12 @@ describe("ordinal", () => {
     ]);
   });
 });
+
+describe("ordinal in both languages", () => {
+  it("in both languages", () => {
+    expect(ordinal(1, "en")).toBe("1st");
+    expect(ordinal(12, "en")).toBe("12th");
+    expect(ordinal(1, "ru")).toBe("1-е");
+    expect(ordinal(3, "ru")).toBe("3-е");
+  });
+});

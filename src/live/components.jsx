@@ -2,6 +2,8 @@
 import qrcode from "qrcode-generator";
 import { Link } from "react-router-dom";
 
+import { rich, useT } from "../i18n";
+
 export function Shape({ index, size = 28 }) {
   const paths = [
     <polygon key="t" points="12,3 22,20 2,20" />,
@@ -60,25 +62,23 @@ export function QrCode({ text, label }) {
 }
 
 export function DemoNotice() {
+  const t = useT();
   return (
     <div className="live-demo-note">
       <span className="material-symbols-outlined" aria-hidden="true">
         cast_for_education
       </span>
-      <p>
-        Class games connect phones to a shared board, so they need the ChemQuiz server. This demo
-        runs entirely in your browser and cannot do that. Run the site with its backend (see the
-        README) to play with a class.
-      </p>
+      <p>{t("live.demo")}</p>
     </div>
   );
 }
 
 /** Shown where a signed-out teacher would otherwise see their past games. */
 export function SignInToKeep() {
+  const t = useT();
   return (
     <p className="section-note">
-      <Link to="/sign-in">Sign in</Link> to keep the results of the class games you host.
+      {rich(t("live.signInToKeep"), { signIn: <Link to="/sign-in">{t("common.signInLink")}</Link> })}
     </p>
   );
 }

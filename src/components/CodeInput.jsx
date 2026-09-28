@@ -1,12 +1,15 @@
+import { useT } from "../i18n";
+
 /**
  * The six-digit code from an email. One field (so paste and the phone's
  * "from Messages/Mail" suggestion both work), drawn as six boxes.
  */
 function CodeInput({ value, onChange, autoFocus = true }) {
+  const t = useT();
   const digits = value.replace(/\D/g, "").slice(0, 6);
   return (
     <label className="code-input">
-      <span className="field-label">Code from the email</span>
+      <span className="field-label">{t("code.label")}</span>
       <span className="code-boxes">
         <input
           value={digits}
@@ -16,7 +19,7 @@ function CodeInput({ value, onChange, autoFocus = true }) {
           pattern="\d{6}"
           maxLength={6}
           autoFocus={autoFocus}
-          aria-label="Six-digit code"
+          aria-label={t("code.aria")}
           required
         />
         {Array.from({ length: 6 }, (_, i) => (

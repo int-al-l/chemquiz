@@ -40,6 +40,7 @@ from sqlalchemy.orm import Session
 
 from . import crud, models
 from .database import begin_write
+from .i18n import AppError, localized
 
 # --- tuning -------------------------------------------------------------------
 
@@ -72,12 +73,8 @@ TOUCH_EVERY_SECONDS = 60
 PIN_TRIES = 1000
 
 
-class LiveError(Exception):
-    """A request the game cannot accept. `status` is the HTTP status to send."""
-
-    def __init__(self, message: str, status: int = 409):
-        super().__init__(message)
-        self.status = status
+class LiveError(AppError):
+    """A request the game cannot accept (see i18n.AppError)."""
 
 
 def _now() -> float:
@@ -176,9 +173,9 @@ class Room:
 
     def start(self, now: float) -> None:
         if self.game.phase != "lobby":
-            raise LiveError("The game has already started")
+            raise LiveError("game_started")
         if not self.active_players:
-            raise LiveError("Wait for at least one player to join")
+            raise LiveError("need_player")
         self._open_question(1, now)
 
     def advance(self, now: float) -> None:
@@ -197,7 +194,7 @@ class Room:
         elif game.phase == "lobby":
             self.start(now)
         else:
-            raise LiveError("The game is over")
+            raise LiveError("game_over")
 
     def finish(self, now: float) -> None:
         if self.game.phase == "question":
@@ -226,22 +223,22 @@ class Room:
                 p.removed = True
                 self.tick(now)  # they may have been the last one to answer
                 return
-        raise LiveError("No such player", status=404)
+        raise LiveError("no_such_player", status=404)
 
     # -- player actions --
 
     def join(self, name: str, now: float) -> models.LivePlayer:
         game = self.game
         if game.phase == "finished":
-            raise LiveError("This game has finished")
+            raise LiveError("game_finished")
         if game.locked:
-            raise LiveError("The host has locked this game")
+            raise LiveError("room_locked")
         clean = clean_name(name)
         taken = {p.name.casefold() for p in self.active_players}
         if clean.casefold() in taken:
-            raise LiveError("Someone already has that name -- pick another")
+            raise LiveError("name_taken")
         if len(self.active_players) >= MAX_PLAYERS:
-            raise LiveError("The room is full")
+            raise LiveError("room_full")
         player = models.LivePlayer(
             game_id=game.id,
             token=secrets.token_urlsafe(24),
@@ -264,13 +261,13 @@ class Room:
         game = self.game
         question = self.question
         if game.phase != "question" or question is None or position != game.position:
-            raise LiveError("Too late -- this question is closed")
+            raise LiveError("too_late")
         if now < (game.starts_at or 0):
-            raise LiveError("Answers are not open yet")
+            raise LiveError("not_open_yet")
         if player.id in self.answers:
-            raise LiveError("You have already answered")
+            raise LiveError("already_answered")
         if choice_id not in {c["id"] for c in question["choices"]}:
-            raise LiveError("That is not one of the options", status=422)
+            raise LiveError("not_an_option", status=422)
 
         elapsed = max(0.0, min(now - game.starts_at, float(game.time_limit)))
         correct = choice_id == question["correct_id"]
@@ -304,9 +301,9 @@ def clean_name(name: str) -> str:
     # Control and formatting characters would let a name look empty or odd.
     clean = "".join(ch for ch in clean if ch.isprintable())
     if not clean:
-        raise LiveError("Type a name", status=422)
+        raise LiveError("type_a_name", status=422)
     if len(clean) > NAME_MAX:
-        raise LiveError(f"Names can be at most {NAME_MAX} characters", status=422)
+        raise LiveError("name_too_long", status=422, n=NAME_MAX)
     return clean
 
 
@@ -323,7 +320,7 @@ def find_game(db: Session, pin: Optional[str], *, lock: bool = False) -> models.
     """
     pin = (pin or "").strip()
     if not pin:
-        raise LiveError("No game with that PIN", status=404)
+        raise LiveError("game_not_found", status=404)
     if lock:
         begin_write(db)
     stmt = (
@@ -335,7 +332,7 @@ def find_game(db: Session, pin: Optional[str], *, lock: bool = False) -> models.
         stmt = stmt.with_for_update()
     game = db.scalars(stmt).first()
     if game is None:
-        raise LiveError("No game with that PIN", status=404)
+        raise LiveError("game_not_found", status=404)
     return game
 
 
@@ -359,7 +356,7 @@ def poll(db: Session, room: Room, now: float) -> Room:
 
 def check_host(room: Room, token: Optional[str]) -> None:
     if not token or not secrets.compare_digest(room.game.host_token, token):
-        raise LiveError("Only the host can do that", status=403)
+        raise LiveError("host_only", status=403)
 
 
 def mark_seen(db: Session, room: Room, player: models.LivePlayer, now: float) -> None:
@@ -399,8 +396,9 @@ def create_room(
     host_user: Optional[models.User] = None,
     items: Optional[list[models.Item]] = None,
     rng: Optional[random.Random] = None,
+    lang: str = "en",
 ) -> Room:
-    """Draw the questions and open a room for them.
+    """Draw the questions, in `lang`, and open a room for them.
 
     `items` fixes which items are asked (work on mistakes); otherwise
     `question_count` of the deck's items are drawn at random. The caller
@@ -409,7 +407,7 @@ def create_room(
     rng = rng or random.SystemRandom()
     pool = list(crud.list_items(db, category.id if category else None))
     if not pool:
-        raise LiveError("There are no items to ask about here")
+        raise LiveError("no_items")
     if items is None:
         asked = list(pool)
         rng.shuffle(asked)
@@ -417,7 +415,7 @@ def create_room(
     else:
         asked = list(items)
         rng.shuffle(asked)
-    questions = _draw(db, asked, pool, mode, rng)
+    questions = _draw(db, asked, pool, mode, rng, lang)
 
     # Read everything needed from these objects now: the purge commits, and
     # a commit expires them.
@@ -428,7 +426,8 @@ def create_room(
         question_count=len(questions),
         category_id=category.id if category else None,
         category_slug=category.slug if category else None,
-        category_name=category.name if category else None,
+        category_name=localized(category, "name", lang) if category else None,
+        lang=lang,
         questions=questions,
     )
     now = _now()
@@ -459,10 +458,10 @@ def create_room(
             db.rollback()
             continue
         return Room(db, game)
-    raise LiveError("No free room codes right now", status=503)
+    raise LiveError("no_free_pins", status=503)
 
 
-def _draw(db: Session, asked, pool, mode: str, rng: random.Random) -> list[dict]:
+def _draw(db: Session, asked, pool, mode: str, rng: random.Random, lang: str = "en") -> list[dict]:
     """The frozen questions: what is shown, the options, and the answer."""
     questions = []
     for position, (item, options, photo, picks) in enumerate(
@@ -475,8 +474,8 @@ def _draw(db: Session, asked, pool, mode: str, rng: random.Random) -> list[dict]
                 for option, pick in zip(options, picks)
             ]
         else:
-            choices = [{"id": o.id, "name": o.name} for o in options]
-        answer = crud.item_payload(item)
+            choices = [{"id": o.id, "name": localized(o, "name", lang)} for o in options]
+        answer = crud.item_payload(item, lang)
         # Reveal the picture that was actually asked about.
         answer["image_url"] = photo_url
         questions.append(
@@ -484,7 +483,7 @@ def _draw(db: Session, asked, pool, mode: str, rng: random.Random) -> list[dict]
                 "position": position,
                 "correct_id": item.id,
                 "image_url": photo_url if mode == "choice" else None,
-                "prompt": item.name if mode == "inverted" else None,
+                "prompt": localized(item, "name", lang) if mode == "inverted" else None,
                 "choices": choices,
                 "item": answer,
             }
@@ -584,6 +583,7 @@ def host_view(room: Room, now: float) -> dict:
     standings = room.standings()
     return {
         "pin": game.pin,
+        "lang": game.lang,
         "phase": game.phase,
         "mode": game.mode,
         "category_name": game.category_name,
@@ -634,6 +634,7 @@ def player_view(room: Room, player: models.LivePlayer, now: float) -> dict:
         }
     return {
         "pin": game.pin,
+        "lang": game.lang,
         "phase": game.phase,
         "mode": game.mode,
         "question_count": len(game.questions),

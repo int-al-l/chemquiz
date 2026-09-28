@@ -5,6 +5,7 @@ import BottomSheet from "../components/BottomSheet";
 import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { fetchQuiz, imageSrc, submitAnswer } from "../api/client";
 import { useApi } from "../hooks/useApi";
+import { useT } from "../i18n";
 import { useProgress } from "../progress/context";
 import { useSaved } from "../saved/context";
 
@@ -22,6 +23,7 @@ import { useSaved } from "../saved/context";
  * unanswered question. Answers are graded by the backend.
  */
 function QuizPage() {
+  const t = useT();
   const { token } = useParams();
   const navigate = useNavigate();
   const progress = useProgress();
@@ -134,7 +136,7 @@ function QuizPage() {
   return (
     <main className={`quiz-screen ${inverted ? "is-inverted" : ""}`}>
       <header className="quiz-top">
-        <button className="icon-button" onClick={() => navigate("/")} aria-label="Leave the quiz" type="button">
+        <button className="icon-button" onClick={() => navigate("/")} aria-label={t("quiz.leave")} type="button">
           <span className="material-symbols-outlined">close</span>
         </button>
         <div
@@ -143,7 +145,7 @@ function QuizPage() {
           aria-valuenow={position}
           aria-valuemin={1}
           aria-valuemax={session.question_count}
-          aria-label={`Question ${position} of ${session.question_count}`}
+          aria-label={t("quiz.progress", { n: position, total: session.question_count })}
         >
           <div
             className="quiz-progress-fill"
@@ -153,7 +155,7 @@ function QuizPage() {
         <span className="quiz-count">
           {position}/{session.question_count}
         </span>
-        <span className={`combo-pill ${combo >= 2 ? "is-hot" : ""}`} title="Correct in a row">
+        <span className={`combo-pill ${combo >= 2 ? "is-hot" : ""}`} title={t("quiz.combo")}>
           <span className="material-symbols-outlined" aria-hidden="true">local_fire_department</span>
           {combo}
         </span>
@@ -162,7 +164,7 @@ function QuizPage() {
       {inverted ? (
         <section className="quiz-stage">
           <div className="quiz-prompt">
-            <span className="quiz-prompt-label">Find the</span>
+            <span className="quiz-prompt-label">{t("quiz.findThe")}</span>
             <span className="quiz-prompt-name">{question.prompt}</span>
           </div>
           <div className="photo-options">
@@ -172,7 +174,7 @@ function QuizPage() {
                 className={`photo-option ${stateOf(choice.id)}`}
                 onClick={() => send(choice.id)}
                 disabled={answered || submitting}
-                aria-label={`Photo ${i + 1}`}
+                aria-label={t("quiz.photoN", { n: i + 1 })}
                 type="button"
               >
                 <img src={imageSrc(choice.image_url)} alt="" draggable="false" />
@@ -190,7 +192,7 @@ function QuizPage() {
       ) : (
         <section className="quiz-stage">
           <div className="quiz-photo">
-            <img src={imageSrc(question.image_url)} alt="Name this piece of glassware" draggable="false" />
+            <img src={imageSrc(question.image_url)} alt={t("quiz.namePhoto")} draggable="false" />
           </div>
           <div className="name-options">
             {question.choices.map((choice, i) => (
@@ -227,25 +229,25 @@ function QuizPage() {
                 <strong>
                   {feedback.is_correct
                     ? combo >= 3
-                      ? `${combo} in a row!`
-                      : "Correct!"
-                    : "Not quite"}
+                      ? t("quiz.inARow", { n: combo })
+                      : t("quiz.correct")
+                    : t("quiz.wrong")}
                 </strong>
                 <span className="verdict-answer">{item.name}</span>
               </span>
               <button className="why-button" onClick={() => setSheetOpen(true)} type="button">
                 <span className="material-symbols-outlined" aria-hidden="true">info</span>
-                Why?
+                {t("quiz.why")}
               </button>
             </>
           ) : (
             <span className="verdict-hint">
-              {inverted ? "Tap the matching photo" : "Tap the right name"}
+              {inverted ? t("quiz.hintPhoto") : t("quiz.hintName")}
             </span>
           )}
         </div>
         <button className="next-button" onClick={handleNext} disabled={!answered} type="button">
-          {feedback?.is_complete ? "See results" : "Next"}
+          {feedback?.is_complete ? t("quiz.seeResults") : t("quiz.next")}
           <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
         </button>
       </footer>
@@ -254,7 +256,7 @@ function QuizPage() {
         {item && (
           <div className="why-body">
             {item.image_url && <img className="why-photo" src={imageSrc(item.image_url)} alt="" />}
-            <p>{item.description ?? "No description yet."}</p>
+            <p>{item.description ?? t("common.noDescription")}</p>
             <button
               className={`secondary-button ${has(item.slug) ? "is-on" : ""}`}
               onClick={() => toggle(item.slug)}
@@ -263,7 +265,7 @@ function QuizPage() {
               <span className="material-symbols-outlined" aria-hidden="true">
                 {has(item.slug) ? "star" : "star_outline"}
               </span>
-              {has(item.slug) ? "In my list" : "Save to my list"}
+              {has(item.slug) ? t("common.inList") : t("common.saveToList")}
             </button>
           </div>
         )}

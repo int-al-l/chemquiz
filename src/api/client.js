@@ -7,6 +7,8 @@
  * build at a backend on a different host.
  */
 
+import { translate } from "../i18n";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 /**
@@ -18,6 +20,13 @@ let authToken = null;
 
 export function setAuthToken(token) {
   authToken = token ?? null;
+}
+
+/** The interface language, sent with every request so the server answers in it. */
+let requestLanguage = "en";
+
+export function setRequestLanguage(lang) {
+  requestLanguage = lang;
 }
 
 /** Thrown for any non-2xx response, carrying the server's message. */
@@ -36,6 +45,7 @@ async function demo(path, options) {
   const { demoRequest } = await import("../demo/backend.js");
   const result = await demoRequest(path, {
     ...options,
+    lang: requestLanguage,
     headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
   });
   if (result && result.__error) {
@@ -61,16 +71,14 @@ async function request(path, options = {}) {
       ...options,
       headers: {
         "Content-Type": "application/json",
+        "Accept-Language": requestLanguage,
         ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
         ...options.headers,
       },
     });
   } catch {
     // fetch only rejects when the request never got a reply at all.
-    throw new ApiError(
-      "Could not reach the server. Is the backend running?",
-      0,
-    );
+    throw new ApiError(translate(requestLanguage, "api.unreachable"), 0);
   }
 
   if (response.status === 204) {
@@ -100,22 +108,18 @@ function describeFailure(status, body) {
   }
 
   if (status === 502 || status === 503 || status === 504) {
-    return (
-      "The backend is not responding. Start it with " +
-      "`uvicorn app.main:app --reload --port 8000` from the backend folder, " +
-      "then try again."
-    );
+    return translate(requestLanguage, "api.gateway");
   }
 
   if (status === 404) {
-    return "That is not on the server. It may have been renamed or removed.";
+    return translate(requestLanguage, "api.notFound");
   }
 
   if (status >= 500) {
-    return "The server hit an error. Check the terminal running uvicorn for the traceback.";
+    return translate(requestLanguage, "api.serverError");
   }
 
-  return `Request failed (${status}).`;
+  return translate(requestLanguage, "api.failed", { status });
 }
 
 /** Turn an API-relative image path into something an <img> can load. */
@@ -182,7 +186,7 @@ function live(path, token, options = {}) {
   });
 }
 
-export function createLiveGame({ categorySlug, mode, questionCount, timeLimit }) {
+export function createLiveGame({ categorySlug, mode, questionCount, timeLimit, lang }) {
   return live("", null, {
     method: "POST",
     body: JSON.stringify({
@@ -190,6 +194,7 @@ export function createLiveGame({ categorySlug, mode, questionCount, timeLimit })
       mode,
       question_count: questionCount,
       time_limit: timeLimit,
+      lang,
     }),
   });
 }
@@ -231,7 +236,10 @@ export async function fetchLiveGameCsv(id) {
   let response;
   try {
     response = await fetch(`${BASE_URL}/api/me/live-games/${id}/results.csv`, {
-      headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+      headers: {
+        "Accept-Language": requestLanguage,
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      },
     });
   } catch {
     throw new ApiError("Could not reach the server. Is the backend running?", 0);

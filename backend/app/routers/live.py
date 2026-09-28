@@ -10,9 +10,9 @@ would be read again one at a time.
 from __future__ import annotations
 
 import socket
-from typing import Optional
+from typing import Literal, Optional
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header
 from pydantic import BaseModel, Field
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 from .. import crud, live, models
 from ..config import MAX_QUESTION_COUNT, QUIZ_MODES
 from ..database import get_db
+from ..i18n import AppError
 from .account import optional_user
 
 router = APIRouter(prefix="/api/live", tags=["live"])
@@ -30,6 +31,7 @@ class CreateIn(BaseModel):
     mode: str = "choice"
     question_count: int = Field(10, ge=1, le=MAX_QUESTION_COUNT)
     time_limit: int = live.DEFAULT_TIME_LIMIT
+    lang: Literal["en", "ru"] = "en"
 
 
 class JoinIn(BaseModel):
@@ -45,10 +47,14 @@ class LockIn(BaseModel):
     locked: bool
 
 
-def _fail(db: Session, exc: live.LiveError) -> HTTPException:
-    """Undo whatever the request started, and say why."""
+def _fail(db: Session, exc: AppError, room: Optional[live.Room] = None) -> AppError:
+    """Undo whatever the request started; errors about a known game speak its language."""
+    # Read before the rollback: afterwards it would be a fresh query, and the
+    # game may have been closed in between.
+    if room is not None:
+        exc.lang = room.game.lang
     db.rollback()
-    return HTTPException(status_code=exc.status, detail=str(exc))
+    return exc
 
 
 @router.get("/network")
@@ -84,14 +90,14 @@ def create(
     user: Optional[models.User] = Depends(optional_user),
 ):
     if payload.mode not in QUIZ_MODES:
-        raise HTTPException(status_code=422, detail=f"Unknown mode '{payload.mode}'")
+        raise AppError("unknown_mode", status=422, mode=payload.mode)
     if payload.time_limit not in live.TIME_LIMITS:
-        raise HTTPException(status_code=422, detail="Unsupported time limit")
+        raise AppError("bad_time_limit", status=422)
     category = None
     if payload.category_slug:
         category = crud.get_category_by_slug(db, payload.category_slug)
         if category is None:
-            raise HTTPException(status_code=404, detail=f"No category '{payload.category_slug}'")
+            raise AppError("no_category", status=404, slug=payload.category_slug)
     try:
         room = live.create_room(
             db,
@@ -100,6 +106,7 @@ def create(
             time_limit=payload.time_limit,
             category=category,
             host_user=user,
+            lang=payload.lang,
         )
     except live.LiveError as exc:
         raise _fail(db, exc) from exc
@@ -111,14 +118,16 @@ def create(
 @router.get("/{pin}")
 def peek(pin: str, db: Session = Depends(get_db)):
     """Is there a game with this PIN, and can it still be joined?"""
+    room = None
     try:
         room = live.open_room(db, pin)
     except live.LiveError as exc:
-        raise _fail(db, exc) from exc
+        raise _fail(db, exc, room) from exc
     game = room.game
     return {
         "pin": game.pin,
         "phase": game.phase,
+        "lang": game.lang,
         "joinable": game.phase != "finished" and not game.locked,
         "player_count": len(room.active_players),
     }
@@ -130,12 +139,13 @@ def peek(pin: str, db: Session = Depends(get_db)):
 @router.get("/{pin}/host")
 def host_state(pin: str, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)):
     now = live._now()
+    room = None
     try:
         room = live.open_room(db, pin)
         live.check_host(room, x_live_token)
         room = live.poll(db, room, now)
     except live.LiveError as exc:
-        raise _fail(db, exc) from exc
+        raise _fail(db, exc, room) from exc
     view = live.host_view(room, now)
     live.mark_touched(db, room, now)
     db.commit()
@@ -144,6 +154,7 @@ def host_state(pin: str, x_live_token: Optional[str] = Header(None), db: Session
 
 def _host_action(pin: str, token: Optional[str], db: Session, action):
     now = live._now()
+    room = None
     try:
         room = live.open_room(db, pin, lock=True)
         live.check_host(room, token)
@@ -151,7 +162,7 @@ def _host_action(pin: str, token: Optional[str], db: Session, action):
         action(room, now)
         db.flush()
     except live.LiveError as exc:
-        raise _fail(db, exc) from exc
+        raise _fail(db, exc, room) from exc
     view = live.host_view(room, now)
     db.commit()
     return view
@@ -187,11 +198,12 @@ def host_remove(
 @router.delete("/{pin}", status_code=204)
 def host_close(pin: str, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)):
     """Close the room: into the host's history if it is kept, otherwise gone."""
+    room = None
     try:
         room = live.open_room(db, pin, lock=True)
         live.check_host(room, x_live_token)
     except live.LiveError as exc:
-        raise _fail(db, exc) from exc
+        raise _fail(db, exc, room) from exc
     live.retire(db, room.game)
     db.commit()
     return None
@@ -203,22 +215,23 @@ def host_close(pin: str, x_live_token: Optional[str] = Header(None), db: Session
 def _player(room: live.Room, token: Optional[str]) -> models.LivePlayer:
     player = room.player_by_token(token)
     if player is None:
-        raise live.LiveError("You are not in this game", status=403)
+        raise live.LiveError("not_in_game", status=403)
     if player.removed:
-        raise live.LiveError("The host removed you from this game", status=410)
+        raise live.LiveError("removed_from_game", status=410)
     return player
 
 
 @router.post("/{pin}/join", status_code=201)
 def join(pin: str, payload: JoinIn, db: Session = Depends(get_db)):
     now = live._now()
+    room = None
     try:
         room = live.open_room(db, pin, lock=True)
         player = room.join(payload.name, now)
         room.game.touched_at = now
         db.flush()
     except live.LiveError as exc:
-        raise _fail(db, exc) from exc
+        raise _fail(db, exc, room) from exc
     view = {"token": player.token, **live.player_view(room, player, now)}
     db.commit()
     return view
@@ -227,12 +240,13 @@ def join(pin: str, payload: JoinIn, db: Session = Depends(get_db)):
 @router.get("/{pin}/me")
 def player_state(pin: str, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)):
     now = live._now()
+    room = None
     try:
         room = live.open_room(db, pin)
         player = _player(room, x_live_token)
         room = live.poll(db, room, now)
     except live.LiveError as exc:
-        raise _fail(db, exc) from exc
+        raise _fail(db, exc, room) from exc
     view = live.player_view(room, player, now)
     live.mark_seen(db, room, player, now)
     db.commit()
@@ -244,6 +258,7 @@ def answer(
     pin: str, payload: AnswerIn, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)
 ):
     now = live._now()
+    room = None
     try:
         room = live.open_room(db, pin, lock=True)
         player = _player(room, x_live_token)
@@ -252,11 +267,10 @@ def answer(
         room.game.touched_at = now
         db.flush()
     except live.LiveError as exc:
-        raise _fail(db, exc) from exc
+        raise _fail(db, exc, room) from exc
     except IntegrityError as exc:
         # The database's own guard against a second answer (see LiveAnswer).
-        db.rollback()
-        raise HTTPException(status_code=409, detail="You have already answered") from exc
+        raise _fail(db, live.LiveError("already_answered"), room) from exc
     view = live.player_view(room, player, now)
     db.commit()
     return view

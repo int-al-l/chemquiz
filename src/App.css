@@ -1520,3 +1520,32 @@ body,
 .saved-error .text-button {
   color: var(--error);
 }
+
+/* ---------- language switch ---------- */
+
+.lang-switch {
+  display: inline-flex;
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.lang-switch-button {
+  padding: 4px 12px;
+  border: none;
+  background: transparent;
+  color: var(--on-surface-variant);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.lang-switch-button.is-selected {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.home-header .lang-switch,
+.profile > .lang-switch {
+  margin-top: 10px;
+}

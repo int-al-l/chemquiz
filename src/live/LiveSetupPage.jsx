@@ -5,6 +5,7 @@ import PageHeader from "../components/PageHeader";
 import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { createLiveGame, imageSrc, IS_DEMO } from "../api/client";
 import { useAuth } from "../auth/context";
+import { rich, useLang, useT } from "../i18n";
 import { useProgress } from "../progress/context";
 import { DemoNotice } from "./components";
 import { saveHostToken } from "./game";
@@ -21,11 +22,14 @@ function LiveSetupPage() {
   const navigate = useNavigate();
   const { catalog } = useProgress();
   const { user } = useAuth();
+  const t = useT();
+  const { lang: userLang } = useLang();
 
   const [deck, setDeck] = useState(null); // null = every deck
   const [mode, setMode] = useState("choice");
   const [count, setCount] = useState(10);
   const [timeLimit, setTimeLimit] = useState(20);
+  const [gameLang, setGameLang] = useState(userLang);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState(null);
 
@@ -44,6 +48,7 @@ function LiveSetupPage() {
         mode,
         questionCount: length,
         timeLimit,
+        lang: gameLang,
       });
       saveHostToken(game.pin, game.host_token);
       navigate(`/live/host/${game.pin}`, { replace: true });
@@ -56,7 +61,7 @@ function LiveSetupPage() {
   return (
     <main className="setup-page">
       <div className="page-layout setup">
-        <PageHeader title="Class game" backTo="/" />
+        <PageHeader title={t("live.setup.title")} backTo="/" />
 
         <section className="setup-content">
           {IS_DEMO ? (
@@ -64,26 +69,23 @@ function LiveSetupPage() {
           ) : (
             <>
               <p className="setup-lead live-setup-lead">
-                Put this screen on the board. Students join from their phones with a PIN and answer
-                against the clock.
+                {t("live.setup.lead")}
               </p>
               <p className="section-note">
                 {user ? (
-                  <Link to="/live/history">Past games</Link>
+                  <Link to="/live/history">{t("live.setup.pastGames")}</Link>
                 ) : (
-                  <>
-                    <Link to="/sign-in">Sign in</Link> to keep the results of your games.
-                  </>
+                  rich(t("live.setup.signIn"), { signIn: <Link to="/sign-in">{t("common.signInLink")}</Link> })
                 )}
               </p>
 
               {!catalog && <Loading />}
-              {catalog?.failed && <ErrorMessage error={{ message: "Could not load the decks." }} />}
+              {catalog?.failed && <ErrorMessage error={{ message: t("explore.loadFailed") }} />}
 
               {catalog && !catalog.failed && (
                 <>
                   <fieldset className="option-group">
-                    <legend className="option-legend">Deck</legend>
+                    <legend className="option-legend">{t("live.setup.deck")}</legend>
                     <div className="live-deck-grid">
                       <button
                         type="button"
@@ -94,7 +96,7 @@ function LiveSetupPage() {
                         <span className="live-deck-icon material-symbols-outlined" aria-hidden="true">
                           apps
                         </span>
-                        <span className="live-deck-name">Everything</span>
+                        <span className="live-deck-name">{t("history.everything")}</span>
                         <span className="option-note">{catalog.items.length}</span>
                       </button>
                       {decks.map((d) => (
@@ -120,11 +122,11 @@ function LiveSetupPage() {
                   </fieldset>
 
                   <fieldset className="option-group">
-                    <legend className="option-legend">Answer by</legend>
+                    <legend className="option-legend">{t("setup.answerBy")}</legend>
                     <div className="option-row">
                       {[
-                        ["choice", "image_search", "Name it", "Photo on the board, pick the name"],
-                        ["inverted", "grid_view", "Find it", "Name on the board, pick the photo"],
+                        ["choice", "image_search", t("mode.choice"), t("live.setup.choiceNote")],
+                        ["inverted", "grid_view", t("mode.inverted"), t("live.setup.invertedNote")],
                       ].map(([id, icon, title, note]) => (
                         <button
                           key={id}
@@ -144,7 +146,7 @@ function LiveSetupPage() {
                   </fieldset>
 
                   <fieldset className="option-group">
-                    <legend className="option-legend">Questions</legend>
+                    <legend className="option-legend">{t("setup.questions")}</legend>
                     <div className="option-row option-row-tight">
                       {LENGTHS.filter((n) => n < available).map((n) => (
                         <button
@@ -163,24 +165,41 @@ function LiveSetupPage() {
                         aria-pressed={length === available}
                         onClick={() => setCount(available)}
                       >
-                        All
+                        {t("setup.all")}
                         <span className="option-note">{available}</span>
                       </button>
                     </div>
                   </fieldset>
 
                   <fieldset className="option-group">
-                    <legend className="option-legend">Time per question</legend>
+                    <legend className="option-legend">{t("live.setup.time")}</legend>
                     <div className="option-row option-row-tight">
-                      {TIMES.map((t) => (
+                      {TIMES.map((sec) => (
                         <button
-                          key={t}
+                          key={sec}
                           type="button"
-                          className={`option-button option-button-small ${timeLimit === t ? "is-selected" : ""}`}
-                          aria-pressed={timeLimit === t}
-                          onClick={() => setTimeLimit(t)}
+                          className={`option-button option-button-small ${timeLimit === sec ? "is-selected" : ""}`}
+                          aria-pressed={timeLimit === sec}
+                          onClick={() => setTimeLimit(sec)}
                         >
-                          {t}s
+                          {t("live.setup.seconds", { n: sec })}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  <fieldset className="option-group">
+                    <legend className="option-legend">{t("live.setup.lang")}</legend>
+                    <div className="option-row option-row-tight">
+                      {["en", "ru"].map((code) => (
+                        <button
+                          key={code}
+                          type="button"
+                          className={`option-button option-button-small ${gameLang === code ? "is-selected" : ""}`}
+                          aria-pressed={gameLang === code}
+                          onClick={() => setGameLang(code)}
+                        >
+                          {t(`live.setup.lang.${code}`)}
                         </button>
                       ))}
                     </div>
@@ -189,10 +208,10 @@ function LiveSetupPage() {
                   {error && <ErrorMessage error={error} />}
 
                   <button className="primary-button" onClick={create} disabled={creating || !available} type="button">
-                    {creating ? "Opening the room..." : "Open the room"}
+                    {creating ? t("live.opening") : t("live.setup.open")}
                     {!creating && (
                       <span className="primary-button-note">
-                        {length} question{length === 1 ? "" : "s"}, {timeLimit} seconds each
+                        {t("live.setup.note", { n: length, s: timeLimit })}
                       </span>
                     )}
                   </button>

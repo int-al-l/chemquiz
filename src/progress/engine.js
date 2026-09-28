@@ -290,6 +290,7 @@ export function deckBadges(decks) {
     out.push({
       id: `deck-seen:${deck.slug}`,
       icon: "explore",
+      deck: deck.name,
       title: `${deck.name} explorer`,
       blurb: `Study every card in ${deck.name}`,
       test: (d) => deck.cards.every((s) => d.cards?.[s]?.seen),
@@ -297,6 +298,7 @@ export function deckBadges(decks) {
     out.push({
       id: `deck-master:${deck.slug}`,
       icon: "emoji_events",
+      deck: deck.name,
       title: `${deck.name} master`,
       blurb: `Master every card in ${deck.name}`,
       test: (d) => deck.cards.every((s) => mastery(d.cards?.[s]) === "mastered"),

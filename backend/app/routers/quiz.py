@@ -4,71 +4,68 @@ The grading happens here rather than in the browser, so the answers to
 unanswered questions are never sent to the client.
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from .. import crud, models, schemas
 from ..database import get_db
+from ..i18n import AppError, request_lang
 
 router = APIRouter(prefix="/api/quiz", tags=["quiz"])
 
 
 @router.post("/start", response_model=schemas.QuizSessionOut, status_code=201)
-def start_quiz(payload: schemas.QuizStartIn, db: Session = Depends(get_db)):
+def start_quiz(
+    payload: schemas.QuizStartIn, db: Session = Depends(get_db), lang: str = Depends(request_lang)
+):
     category = None
     if payload.category_slug:
         category = crud.get_category_by_slug(db, payload.category_slug)
         if category is None:
-            raise HTTPException(
-                status_code=404, detail=f"No category '{payload.category_slug}'"
-            )
+            raise AppError("no_category", status=404, slug=payload.category_slug)
 
-    try:
-        session = crud.create_quiz_session(
-            db,
-            mode=payload.mode.value,
-            question_count=payload.question_count,
-            category=category,
-        )
-    except ValueError as exc:
-        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    session = crud.create_quiz_session(
+        db,
+        mode=payload.mode.value,
+        question_count=payload.question_count,
+        category=category,
+    )
 
-    return crud.session_payload(db, session)
+    return crud.session_payload(db, session, lang)
 
 
 @router.get("/{token}", response_model=schemas.QuizSessionOut)
-def get_quiz(token: str, db: Session = Depends(get_db)):
+def get_quiz(token: str, db: Session = Depends(get_db), lang: str = Depends(request_lang)):
     session = crud.get_quiz_session(db, token)
     if session is None:
-        raise HTTPException(status_code=404, detail="Quiz not found or expired")
-    return crud.session_payload(db, session)
+        raise AppError("quiz_not_found", status=404)
+    return crud.session_payload(db, session, lang)
 
 
 @router.post("/{token}/answer", response_model=schemas.QuizAnswerOut)
 def answer_question(
-    token: str, payload: schemas.QuizAnswerIn, db: Session = Depends(get_db)
+    token: str,
+    payload: schemas.QuizAnswerIn,
+    db: Session = Depends(get_db),
+    lang: str = Depends(request_lang),
 ):
     session = crud.get_quiz_session(db, token)
     if session is None:
-        raise HTTPException(status_code=404, detail="Quiz not found or expired")
+        raise AppError("quiz_not_found", status=404)
 
     question = next(
         (q for q in session.questions if q.position == payload.position), None
     )
     if question is None:
-        raise HTTPException(
-            status_code=404, detail=f"Quiz has no question {payload.position}"
-        )
+        raise AppError("no_question", status=404, position=payload.position)
 
     if question.answered_at is not None:
         # Without this, a replayed request could turn a wrong answer into a
         # right one.
-        raise HTTPException(status_code=409, detail="Question already answered")
+        raise AppError("question_answered")
 
     if payload.choice_id not in question.choice_ids:
-        raise HTTPException(
-            status_code=422, detail="choice_id is not one of this question's options"
-        )
+        raise AppError("choice_not_option", status=422)
 
     question = crud.grade_answer(db, session, question, choice_id=payload.choice_id)
     db.refresh(session)
@@ -76,7 +73,7 @@ def answer_question(
     return {
         "position": question.position,
         "is_correct": question.is_correct,
-        "correct_item": crud.item_payload(question.item),
+        "correct_item": crud.item_payload(question.item, lang),
         "correct_choice_id": question.item_id,
         "given_choice_id": question.given_choice_id,
         "given_answer": question.given_answer,
@@ -87,11 +84,11 @@ def answer_question(
 
 
 @router.get("/{token}/results", response_model=schemas.QuizResultsOut)
-def get_results(token: str, db: Session = Depends(get_db)):
+def get_results(token: str, db: Session = Depends(get_db), lang: str = Depends(request_lang)):
     session = crud.get_quiz_session(db, token)
     if session is None:
-        raise HTTPException(status_code=404, detail="Quiz not found or expired")
-    return crud.results_payload(session)
+        raise AppError("quiz_not_found", status=404)
+    return crud.results_payload(session, lang, db)
 
 
 @router.delete("/{token}", status_code=204)

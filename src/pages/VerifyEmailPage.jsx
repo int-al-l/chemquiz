@@ -7,12 +7,14 @@ import PageHeader from "../components/PageHeader";
 import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { resendVerification, verifyEmail } from "../api/client";
 import { useAuth } from "../auth/context";
+import { rich, useT } from "../i18n";
 
 /**
  * Confirm an email address: type the code, or arrive here from the link in
  * the email (?token=...), which confirms on its own.
  */
 function VerifyEmailPage() {
+  const t = useT();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { completeSignIn } = useAuth();
@@ -29,8 +31,8 @@ function VerifyEmailPage() {
 
   useEffect(() => {
     if (cooldown <= 0) return undefined;
-    const t = window.setTimeout(() => setCooldown((c) => c - 1), 1000);
-    return () => window.clearTimeout(t);
+    const timer = window.setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => window.clearTimeout(timer);
   }, [cooldown]);
 
   // The link from the email: confirm straight away (once, even in StrictMode).
@@ -75,11 +77,11 @@ function VerifyEmailPage() {
   return (
     <main className="categories-page">
       <div className="page-layout">
-        <PageHeader title="Check your email" backTo="/sign-in" />
+        <PageHeader title={t("verify.title")} backTo="/sign-in" />
 
         <section className="categories-content narrow">
           {token && busy ? (
-            <Loading label="Confirming your email..." />
+            <Loading label={t("verify.confirming")} />
           ) : (
             <>
               <div className="mail-illustration" aria-hidden="true">
@@ -87,11 +89,10 @@ function VerifyEmailPage() {
               </div>
               {email ? (
                 <p className="lede">
-                  We sent a six-digit code to <strong>{email}</strong>. Type it below, or open the
-                  link in the email.
+                  {rich(t("verify.sent"), { email: <strong>{email}</strong> })}
                 </p>
               ) : (
-                <p className="lede">Open the link in the email, or sign in again to get a new code.</p>
+                <p className="lede">{t("verify.noEmail")}</p>
               )}
 
               <DemoInbox email={email} refresh={cooldown === 60} />
@@ -107,7 +108,7 @@ function VerifyEmailPage() {
                   />
                   {error && <ErrorMessage error={error} />}
                   <button className="primary-button" type="submit" disabled={busy || code.length !== 6}>
-                    {busy ? "Checking..." : "Confirm email"}
+                    {busy ? t("verify.checking") : t("verify.confirm")}
                   </button>
                 </form>
               )}
@@ -117,18 +118,18 @@ function VerifyEmailPage() {
                 {email &&
                   (cooldown > 0 ? (
                     <span className="muted">
-                      {resent ? "Sent again. " : ""}Resend in {cooldown}s
+                      {t(resent ? "verify.resentResendIn" : "verify.resendIn", { n: cooldown })}
                     </span>
                   ) : (
                     <button className="text-button" onClick={resend} type="button">
-                      Send a new code
+                      {t("verify.resend")}
                     </button>
                   ))}
                 <Link to="/sign-in" state={{ tab: "register", email }}>
-                  Wrong address?
+                  {t("verify.wrongAddress")}
                 </Link>
               </p>
-              <p className="fine-print">Can not find it? Look in the spam folder.</p>
+              <p className="fine-print">{t("verify.spam")}</p>
             </>
           )}
         </section>

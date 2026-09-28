@@ -8,6 +8,7 @@ import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { fetchCategory, fetchItems, imageSrc } from "../api/client";
 import { useApi } from "../hooks/useApi";
 import { useSwipe } from "../hooks/useSwipe";
+import { useT } from "../i18n";
 import { useProgress } from "../progress/context";
 import { deckSummary, dueSlugs, isDue, mastery } from "../progress/engine";
 import { useSaved } from "../saved/context";
@@ -60,6 +61,7 @@ function studyOrder(items, doc) {
 }
 
 function DeckPage({ review = false }) {
+  const t = useT();
   const { slug: routeSlug } = useParams();
   const slug = review ? "review" : routeSlug;
   const navigate = useNavigate();
@@ -99,12 +101,14 @@ function DeckPage({ review = false }) {
 
   const title =
     slug === "all"
-      ? "All cards"
+      ? t("common.allCards")
       : slug === "saved"
-        ? "My list"
+        ? t("common.myList")
         : slug === "review"
-          ? "Review"
-          : (data?.category?.name ?? catalog?.decks.find((d) => d.slug === slug)?.name ?? "Deck");
+          ? t("common.review")
+          : (data?.category?.name ??
+            catalog?.decks.find((d) => d.slug === slug)?.name ??
+            t("deck.fallbackTitle"));
 
   const mode = review ? "study" : (params.get("mode") ?? "browse");
   const setMode = (m) => setParams(m === "browse" ? {} : { mode: m }, { replace: true });
@@ -133,13 +137,13 @@ function DeckPage({ review = false }) {
         </span>
         <p>
           {review
-            ? "Nothing is due for review. Study some new cards and they will come back here when it is time."
+            ? t("deck.nothingDue")
             : slug === "saved"
-              ? "Your list is empty. Tap the star on any card to keep it here."
-              : "This deck has no cards yet."}
+              ? t("deck.listEmpty")
+              : t("deck.noCards")}
         </p>
         <Link className="primary-button" to="/explore">
-          Explore decks
+          {t("deck.exploreDecks")}
         </Link>
       </div>
     );
@@ -183,7 +187,7 @@ function DeckPage({ review = false }) {
   return (
     <main className="deck-page">
       <header className="deck-header">
-        <button className="icon-button" onClick={() => navigate(backTo)} aria-label="Back" type="button">
+        <button className="icon-button" onClick={() => navigate(backTo)} aria-label={t("deck.back")} type="button">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <h1 className="deck-title">{title}</h1>
@@ -191,8 +195,8 @@ function DeckPage({ review = false }) {
           className={`icon-button ${hideNames ? "is-on" : ""}`}
           onClick={() => setHideNames((v) => !v)}
           aria-pressed={hideNames}
-          title={hideNames ? "Show names on the front" : "Hide names (test yourself)"}
-          aria-label="Hide names on the front"
+          title={t(hideNames ? "deck.showNames" : "deck.hideNames")}
+          aria-label={t("deck.hideNamesLabel")}
           type="button"
         >
           <span className="material-symbols-outlined">{hideNames ? "visibility_off" : "visibility"}</span>
@@ -200,11 +204,11 @@ function DeckPage({ review = false }) {
       </header>
 
       {!review && items.length > 0 && (
-        <nav className="mode-switch" aria-label="How to go through the deck">
+        <nav className="mode-switch" aria-label={t("deck.modes")}>
           {[
-            ["browse", "style", "Browse"],
-            ["study", "school", "Study"],
-            ["grid", "grid_view", "All"],
+            ["browse", "style", t("deck.browse")],
+            ["study", "school", t("deck.study")],
+            ["grid", "grid_view", t("deck.grid")],
           ].map(([id, icon, label]) => (
             <button
               key={id}
@@ -231,6 +235,7 @@ function DeckPage({ review = false }) {
 // --- browse ------------------------------------------------------------------
 
 function BrowseView({ items, doc, progress, hideNames, has, toggle, startAt }) {
+  const t = useT();
   const [order, setOrder] = useState(() => items.map((i) => i.slug));
   const [index, setIndex] = useState(() => Math.min(Math.max(0, startAt || 0), items.length - 1));
   const [flipped, setFlipped] = useState(false);
@@ -289,13 +294,13 @@ function BrowseView({ items, doc, progress, hideNames, has, toggle, startAt }) {
             setIndex(0);
             setFlipped(false);
           }}
-          aria-label="Shuffle"
-          title="Shuffle"
+          aria-label={t("deck.shuffle")}
+          title={t("deck.shuffle")}
           type="button"
         >
           <span className="material-symbols-outlined">shuffle</span>
         </button>
-        <button className="round-button is-big" onClick={() => go(-1)} disabled={index === 0} aria-label="Previous card" type="button">
+        <button className="round-button is-big" onClick={() => go(-1)} disabled={index === 0} aria-label={t("deck.prev")} type="button">
           <span className="material-symbols-outlined">chevron_left</span>
         </button>
         <span className="deck-counter" aria-live="polite">
@@ -305,16 +310,16 @@ function BrowseView({ items, doc, progress, hideNames, has, toggle, startAt }) {
           className="round-button is-big"
           onClick={() => go(1)}
           disabled={index === order.length - 1}
-          aria-label="Next card"
+          aria-label={t("deck.next")}
           type="button"
         >
           <span className="material-symbols-outlined">chevron_right</span>
         </button>
-        <button className="round-button" onClick={flip} aria-label="Turn the card over" title="Turn over" type="button">
+        <button className="round-button" onClick={flip} aria-label={t("deck.turnOver")} title={t("deck.turnOverShort")} type="button">
           <span className="material-symbols-outlined">flip</span>
         </button>
       </footer>
-      <p className="deck-hint">Swipe to move · tap the card to turn it over</p>
+      <p className="deck-hint">{t("deck.browseHint")}</p>
     </>
   );
 }
@@ -322,6 +327,7 @@ function BrowseView({ items, doc, progress, hideNames, has, toggle, startAt }) {
 // --- study -------------------------------------------------------------------
 
 function StudyView({ items, bySlug, doc, progress, hideNames, has, toggle, quizTo, onExit }) {
+  const t = useT();
   const [queue, setQueue] = useState(() => studyOrder(items, doc));
   const [pos, setPos] = useState(0);
   const [known, setKnown] = useState([]);
@@ -385,22 +391,20 @@ function StudyView({ items, bySlug, doc, progress, hideNames, has, toggle, quizT
     const total = known.length + learning.length;
     return (
       <section className="round-summary">
-        <Ring value={total ? known.length / total : 0} size={140} stroke={12} className="summary-ring" label="Known this round">
+        <Ring value={total ? known.length / total : 0} size={140} stroke={12} className="summary-ring" label={t("deck.knownRound")}>
           <span className="summary-ring-value">
             {known.length}/{total}
           </span>
-          <span className="summary-ring-label">known</span>
+          <span className="summary-ring-label">{t("deck.known")}</span>
         </Ring>
-        <h2>{learning.length ? `Round ${round} done` : "You know them all!"}</h2>
-        <p className="summary-xp">+{roundXp} XP this round</p>
+        <h2>{learning.length ? t("deck.roundDone", { n: round }) : t("deck.allKnown")}</h2>
+        <p className="summary-xp">{t("deck.roundXp", { n: roundXp })}</p>
 
         <div className="summary-actions">
           {learning.length > 0 && (
             <button className="primary-button" onClick={() => startRound(shuffled(learning))} type="button">
-              Keep going
-              <span className="button-note">
-                {learning.length} card{learning.length === 1 ? "" : "s"} still learning
-              </span>
+              {t("deck.keepGoing")}
+              <span className="button-note">{t("deck.stillLearningCount", { n: learning.length })}</span>
             </button>
           )}
           <button
@@ -408,13 +412,13 @@ function StudyView({ items, bySlug, doc, progress, hideNames, has, toggle, quizT
             onClick={() => startRound(studyOrder(items, doc))}
             type="button"
           >
-            Study the whole deck again
+            {t("deck.studyAgain")}
           </button>
           <Link className="secondary-button" to={quizTo}>
-            Test yourself with a quiz
+            {t("deck.quiz")}
           </Link>
           <button className="text-button" onClick={onExit} type="button">
-            Done
+            {t("deck.done")}
           </button>
         </div>
       </section>
@@ -435,7 +439,7 @@ function StudyView({ items, bySlug, doc, progress, hideNames, has, toggle, quizT
         </span>
         <span className="study-position">
           {pos + 1} / {queue.length}
-          {round > 1 ? ` · round ${round}` : ""}
+          {round > 1 ? t("deck.round", { n: round }) : ""}
         </span>
         <span className="count-known">
           {known.length}
@@ -455,27 +459,27 @@ function StudyView({ items, bySlug, doc, progress, hideNames, has, toggle, quizT
           onToggleSave={() => toggle(item.slug)}
         />
         <span className="swipe-stamp is-know" style={{ opacity: dx > 0 ? lean : 0 }}>
-          Know it
+          {t("deck.knowIt")}
         </span>
         <span className="swipe-stamp is-learning" style={{ opacity: dx < 0 ? lean : 0 }}>
-          Still learning
+          {t("deck.stillLearning")}
         </span>
       </CardStage>
 
       <footer className="deck-controls study-controls">
         <button className="study-button is-learning" onClick={() => answer(false)} type="button">
           <span className="material-symbols-outlined" aria-hidden="true">close</span>
-          Still learning
+          {t("deck.stillLearning")}
         </button>
-        <button className="round-button" onClick={flip} aria-label="Turn the card over" title="Turn over" type="button">
+        <button className="round-button" onClick={flip} aria-label={t("deck.turnOver")} title={t("deck.turnOverShort")} type="button">
           <span className="material-symbols-outlined">flip</span>
         </button>
         <button className="study-button is-know" onClick={() => answer(true)} type="button">
           <span className="material-symbols-outlined" aria-hidden="true">check</span>
-          Know it
+          {t("deck.knowIt")}
         </button>
       </footer>
-      <p className="deck-hint">Swipe right if you know it, left if you are still learning</p>
+      <p className="deck-hint">{t("deck.studyHint")}</p>
     </>
   );
 }
@@ -483,6 +487,7 @@ function StudyView({ items, bySlug, doc, progress, hideNames, has, toggle, quizT
 // --- grid --------------------------------------------------------------------
 
 function GridView({ items, doc, onOpen }) {
+  const t = useT();
   return (
     <section className="card-grid">
       {items.map((item, index) => {
@@ -498,7 +503,7 @@ function GridView({ items, doc, onOpen }) {
               {item.image_url && <img src={imageSrc(item.image_url)} alt="" loading="lazy" />}
             </span>
             <span className="grid-name">{item.name}</span>
-            <span className={`grid-dot is-${m}`} title={m} />
+            <span className={`grid-dot is-${m}`} title={t(`deck.status.${m}`)} />
           </button>
         );
       })}

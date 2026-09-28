@@ -7,6 +7,7 @@ import PageHeader from "../components/PageHeader";
 import { ErrorMessage } from "../components/StatusMessage";
 import { forgotPassword, resetPassword } from "../api/client";
 import { useAuth } from "../auth/context";
+import { rich, useT } from "../i18n";
 
 /**
  * Forgotten password, in two steps: ask for a code, then enter it with a new
@@ -14,6 +15,7 @@ import { useAuth } from "../auth/context";
  * to choosing the password.
  */
 function ResetPasswordPage() {
+  const t = useT();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { completeSignIn } = useAuth();
@@ -59,16 +61,16 @@ function ResetPasswordPage() {
   return (
     <main className="categories-page">
       <div className="page-layout">
-        <PageHeader title="Reset password" backTo="/sign-in" />
+        <PageHeader title={t("reset.title")} backTo="/sign-in" />
 
         <section className="categories-content narrow">
           {step === "email" ? (
             <form className="sign-in-form" onSubmit={requestCode}>
               <p className="lede">
-                Enter your email and we will send you a code to choose a new password.
+                {t("reset.lede")}
               </p>
               <label className="field">
-                <span className="field-label">Email</span>
+                <span className="field-label">{t("common.email")}</span>
                 <input
                   className="field-input"
                   type="email"
@@ -80,7 +82,7 @@ function ResetPasswordPage() {
               </label>
               {error && <ErrorMessage error={error} />}
               <button className="primary-button" type="submit" disabled={busy}>
-                {busy ? "Sending..." : "Send code"}
+                {busy ? t("reset.sending") : t("reset.send")}
               </button>
             </form>
           ) : (
@@ -88,16 +90,15 @@ function ResetPasswordPage() {
               {!token && (
                 <>
                   <p className="lede">
-                    If <strong>{email}</strong> has an account, a code is on its way. Enter it with
-                    your new password.
+                    {rich(t("reset.sent"), { email: <strong>{email}</strong> })}
                   </p>
                   <DemoInbox email={email} refresh={step} />
                   <CodeInput value={code} onChange={setCode} />
                 </>
               )}
-              {token && <p className="lede">Choose a new password.</p>}
+              {token && <p className="lede">{t("reset.choose")}</p>}
               <label className="field">
-                <span className="field-label">New password</span>
+                <span className="field-label">{t("reset.newPassword")}</span>
                 <input
                   className="field-input"
                   type="password"
@@ -107,7 +108,7 @@ function ResetPasswordPage() {
                   minLength={8}
                   required
                 />
-                <span className="field-help">At least 8 characters, mixing letters with numbers or symbols.</span>
+                <span className="field-help">{t("common.passwordHelp")}</span>
               </label>
               {error && <ErrorMessage error={error} />}
               <button
@@ -115,18 +116,18 @@ function ResetPasswordPage() {
                 type="submit"
                 disabled={busy || (!token && code.length !== 6)}
               >
-                {busy ? "Saving..." : "Save password and sign in"}
+                {busy ? t("reset.saving") : t("reset.save")}
               </button>
               {!token && (
                 <button className="text-button" onClick={() => setStep("email")} type="button">
-                  Use a different email
+                  {t("reset.otherEmail")}
                 </button>
               )}
             </form>
           )}
 
           <p className="form-links">
-            <Link to="/sign-in">Back to sign in</Link>
+            <Link to="/sign-in">{t("reset.backToSignIn")}</Link>
           </p>
         </section>
       </div>

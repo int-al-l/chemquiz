@@ -13,12 +13,13 @@ import datetime as dt
 import json
 import re
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from .. import config, crud, mailer, models, progress, schemas, security
 from ..database import get_db
+from ..i18n import AppError, request_lang
 
 router = APIRouter(prefix="/api", tags=["account"])
 
@@ -45,7 +46,7 @@ def current_user(
 ) -> models.User:
     """Resolve the bearer token, or refuse."""
     if not authorization or not authorization.lower().startswith("bearer "):
-        raise HTTPException(status_code=401, detail="Sign in to use your list.")
+        raise AppError("sign_in_required", status=401)
 
     token = authorization.split(" ", 1)[1].strip()
     user = db.execute(
@@ -55,7 +56,7 @@ def current_user(
     ).scalar_one_or_none()
 
     if user is None or not user.email_verified:
-        raise HTTPException(status_code=401, detail="That sign-in has expired.")
+        raise AppError("sign_in_expired", status=401)
 
     user.last_seen_at = models.utcnow()
     db.commit()
@@ -91,20 +92,15 @@ def _signed_in(user: models.User) -> dict:
 def _check_email(value: str) -> str:
     email = normalise_email(value)
     if not EMAIL.match(email):
-        raise HTTPException(status_code=422, detail="That does not look like an email address.")
+        raise AppError("bad_email", status=422)
     return email
 
 
 def _check_password(password: str) -> None:
     if len(password) < config.PASSWORD_MIN_LENGTH:
-        raise HTTPException(
-            status_code=422,
-            detail=f"Use at least {config.PASSWORD_MIN_LENGTH} characters for the password.",
-        )
+        raise AppError("password_short", status=422, n=config.PASSWORD_MIN_LENGTH)
     if password.isdigit() or password.isalpha():
-        raise HTTPException(
-            status_code=422, detail="Mix letters with numbers or symbols in the password."
-        )
+        raise AppError("password_weak", status=422)
 
 
 def _find_user(db: Session, email: str) -> models.User | None:
@@ -113,7 +109,7 @@ def _find_user(db: Session, email: str) -> models.User | None:
     ).scalar_one_or_none()
 
 
-def _send_code(db: Session, user: models.User, purpose: str) -> None:
+def _send_code(db: Session, user: models.User, purpose: str, lang: str = "en") -> None:
     """Mail a fresh code + link, replacing any earlier unused one.
 
     Rate limited per user and purpose: a second request inside the cooldown is
@@ -152,19 +148,17 @@ def _send_code(db: Session, user: models.User, purpose: str) -> None:
 
     path = "verify-email" if purpose == "verify" else "reset-password"
     link = f"{config.PUBLIC_URL}/{path}?token={link_token}"
-    subject, text, html = mailer.code_email(purpose, user.name, code, link)
+    subject, text, html = mailer.code_email(purpose, user.name, code, link, lang)
     try:
         mailer.send(user.email, subject, text, html)
     except Exception as exc:  # noqa: BLE001
         print(f"Could not send email to {user.email}: {exc}", flush=True)
-        raise HTTPException(
-            status_code=503, detail="Could not send the email right now. Try again in a minute."
-        ) from exc
+        raise AppError("email_failed", status=503) from exc
 
 
 def _redeem(db: Session, payload: schemas.VerifyIn, purpose: str) -> models.User:
     """Check a code (with its email) or a link token; mark it used."""
-    bad = HTTPException(status_code=400, detail="That code is wrong or has expired.")
+    bad = AppError("bad_code", status=400)
 
     if payload.token:
         row = db.execute(
@@ -174,10 +168,10 @@ def _redeem(db: Session, payload: schemas.VerifyIn, purpose: str) -> models.User
             )
         ).scalar_one_or_none()
         if row is None or row.used_at is not None or _aware(row.expires_at) < _now():
-            raise HTTPException(status_code=400, detail="That link is no longer valid. Ask for a new one.")
+            raise AppError("bad_link", status=400)
     else:
         if not payload.email or not payload.code:
-            raise HTTPException(status_code=422, detail="Enter the code from the email.")
+            raise AppError("code_missing", status=422)
         user = _find_user(db, normalise_email(payload.email))
         if user is None:
             raise bad
@@ -193,9 +187,7 @@ def _redeem(db: Session, payload: schemas.VerifyIn, purpose: str) -> models.User
         if row is None or _aware(row.expires_at) < _now():
             raise bad
         if row.attempts >= config.CODE_MAX_ATTEMPTS:
-            raise HTTPException(
-                status_code=429, detail="Too many wrong codes. Ask for a new email."
-            )
+            raise AppError("too_many_codes", status=429)
         code = re.sub(r"\D", "", payload.code)
         if security.digest(f"{user.id}:{code}") != row.code_hash:
             row.attempts += 1
@@ -213,7 +205,8 @@ def _redeem(db: Session, payload: schemas.VerifyIn, purpose: str) -> models.User
 
 
 @router.post("/auth/register", response_model=schemas.PendingOut, status_code=202)
-def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
+def register(payload: schemas.RegisterIn, db: Session = Depends(get_db),
+             lang: str = Depends(request_lang)):
     """Create an account and mail a verification code.
 
     An address that registered but never verified can register again -- the
@@ -223,21 +216,15 @@ def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
     email = _check_email(payload.email)
     name = payload.name.strip()
     if not name:
-        raise HTTPException(status_code=422, detail="Please enter a name.")
+        raise AppError("name_missing", status=422)
     _check_password(payload.password)
 
     user = _find_user(db, email)
     if user is not None and user.email_verified and user.password_hash:
-        raise HTTPException(
-            status_code=409,
-            detail="There is already an account with this email. Sign in instead.",
-        )
+        raise AppError("account_exists")
     if user is not None and user.email_verified and not user.password_hash:
         # An account from before passwords: it must prove the address again.
-        raise HTTPException(
-            status_code=409,
-            detail="This email already has an account. Use \u201cForgot password\u201d to set a password.",
-        )
+        raise AppError("account_needs_password")
 
     if user is None:
         user = models.User(email=email, name=name, token=security.new_session_token())
@@ -248,7 +235,7 @@ def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
 
-    _send_code(db, user, "verify")
+    _send_code(db, user, "verify", lang)
     return {"email": email, "purpose": "verify"}
 
 
@@ -260,34 +247,29 @@ def verify(payload: schemas.VerifyIn, db: Session = Depends(get_db)):
 
 
 @router.post("/auth/resend", response_model=schemas.PendingOut, status_code=202)
-def resend(payload: schemas.EmailIn, db: Session = Depends(get_db)):
+def resend(payload: schemas.EmailIn, db: Session = Depends(get_db),
+           lang: str = Depends(request_lang)):
     email = _check_email(payload.email)
     user = _find_user(db, email)
     if user is not None and not user.email_verified:
-        _send_code(db, user, "verify")
+        _send_code(db, user, "verify", lang)
     return {"email": email, "purpose": "verify"}
 
 
 @router.post("/auth/login", response_model=schemas.SignedInUser)
-def login(payload: schemas.LoginIn, db: Session = Depends(get_db)):
+def login(payload: schemas.LoginIn, db: Session = Depends(get_db),
+          lang: str = Depends(request_lang)):
     email = _check_email(payload.email)
     user = _find_user(db, email)
 
     if user is not None and user.password_hash is None:
-        raise HTTPException(
-            status_code=409,
-            detail="This account was made before passwords existed. "
-            "Use \u201cForgot password\u201d to set one.",
-        )
+        raise AppError("legacy_account")
     if user is None or not security.verify_password(payload.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Wrong email or password.")
+        raise AppError("wrong_password", status=401)
 
     if not user.email_verified:
-        _send_code(db, user, "verify")
-        raise HTTPException(
-            status_code=403,
-            detail="Please verify your email first. We have sent you a new code.",
-        )
+        _send_code(db, user, "verify", lang)
+        raise AppError("verify_first", status=403)
 
     user.last_seen_at = models.utcnow()
     db.commit()
@@ -296,13 +278,14 @@ def login(payload: schemas.LoginIn, db: Session = Depends(get_db)):
 
 
 @router.post("/auth/forgot", response_model=schemas.PendingOut, status_code=202)
-def forgot(payload: schemas.EmailIn, db: Session = Depends(get_db)):
+def forgot(payload: schemas.EmailIn, db: Session = Depends(get_db),
+           lang: str = Depends(request_lang)):
     """Mail a reset code. Answers the same whether or not the account exists,
     so this cannot be used to find out who has an account."""
     email = _check_email(payload.email)
     user = _find_user(db, email)
     if user is not None:
-        _send_code(db, user, "reset")
+        _send_code(db, user, "reset", lang)
     return {"email": email, "purpose": "reset"}
 
 
@@ -349,7 +332,7 @@ def put_progress(payload: schemas.ProgressIn,
     """Merge the browser's copy into the stored one and return the result."""
     body = json.dumps(payload.data)
     if len(body) > 1_000_000:
-        raise HTTPException(status_code=413, detail="Progress document too large.")
+        raise AppError("progress_too_large", status=413)
     row = _progress_row(db, user)
     merged = progress.merge(json.loads(row.data or "{}"), payload.data)
     row.data = json.dumps(merged)
@@ -362,7 +345,8 @@ def put_progress(payload: schemas.ProgressIn,
 
 
 @router.get("/me/list", response_model=list[schemas.ItemOut])
-def my_list(user: models.User = Depends(current_user), db: Session = Depends(get_db)):
+def my_list(user: models.User = Depends(current_user), db: Session = Depends(get_db),
+            lang: str = Depends(request_lang)):
     rows = db.execute(
         select(models.SavedItem)
         .where(models.SavedItem.user_id == user.id)
@@ -371,7 +355,7 @@ def my_list(user: models.User = Depends(current_user), db: Session = Depends(get
         )
         .order_by(models.SavedItem.created_at.desc())
     ).scalars().all()
-    return [crud.item_payload(row.item) for row in rows]
+    return [crud.item_payload(row.item, lang) for row in rows]
 
 
 @router.put("/me/list/{slug}", response_model=schemas.SavedOut, status_code=201)
@@ -381,7 +365,7 @@ def save_item(slug: str, user: models.User = Depends(current_user),
         select(models.Item).where(models.Item.slug == slug)
     ).scalar_one_or_none()
     if item is None:
-        raise HTTPException(status_code=404, detail=f"No item '{slug}'")
+        raise AppError("no_item", status=404, slug=slug)
 
     existing = db.execute(
         select(models.SavedItem).where(
@@ -418,7 +402,8 @@ def unsave_item(slug: str, user: models.User = Depends(current_user),
 @router.post("/me/list/import", response_model=list[schemas.ItemOut])
 def import_list(payload: schemas.ImportListIn,
                 user: models.User = Depends(current_user),
-                db: Session = Depends(get_db)):
+                db: Session = Depends(get_db),
+                lang: str = Depends(request_lang)):
     """Adopt a list that was saved in the browser before signing in.
 
     Adds rather than replaces, so signing in on a second device cannot wipe
@@ -441,4 +426,4 @@ def import_list(payload: schemas.ImportListIn,
             db.add(models.SavedItem(user_id=user.id, item_id=item.id))
     db.commit()
 
-    return my_list(user=user, db=db)
+    return my_list(user=user, db=db, lang=lang)

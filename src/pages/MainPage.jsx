@@ -6,6 +6,8 @@ import { useAuth } from "../auth/context";
 import { useProgress } from "../progress/context";
 import { dueSlugs } from "../progress/engine";
 import { useSaved } from "../saved/context";
+import { useT } from "../i18n";
+import LanguageSwitch from "../i18n/LanguageSwitch";
 
 /**
  * The menu: where you stand (level, streak, today's goal), then what to do.
@@ -13,6 +15,7 @@ import { useSaved } from "../saved/context";
  * the single most useful thing to do on a return visit.
  */
 function MainPage() {
+  const t = useT();
   const { user } = useAuth();
   const { slugs } = useSaved();
   const { doc, catalog } = useProgress();
@@ -23,41 +26,41 @@ function MainPage() {
     due > 0 && {
       to: "/review",
       icon: "event_repeat",
-      title: "Review",
-      blurb: `${due} card${due === 1 ? " is" : "s are"} ready to refresh`,
+      title: t("common.review"),
+      blurb: t("main.reviewBlurb", { n: due }),
       variant: "is-primary",
       badge: due,
     },
     {
       to: "/quiz/setup",
       icon: "science",
-      title: "Play",
-      blurb: "Name the glassware, or find it by name",
+      title: t("main.play"),
+      blurb: t("main.playBlurb"),
       variant: due > 0 ? "" : "is-primary",
     },
     {
       to: "/explore",
       icon: "style",
-      title: "Explore",
-      blurb: "Learn with flashcards, deck by deck",
+      title: t("common.explore"),
+      blurb: t("main.exploreBlurb"),
     },
     {
       to: "/join",
       icon: "phone_iphone",
-      title: "Join a class game",
-      blurb: "Enter the PIN from the board",
+      title: t("main.join"),
+      blurb: t("main.joinBlurb"),
     },
     {
       to: "/live",
       icon: "cast_for_education",
-      title: "Host a class game",
-      blurb: "Put questions on the board, the class answers on phones",
+      title: t("main.host"),
+      blurb: t("main.hostBlurb"),
     },
     {
       to: "/list",
       icon: "star",
-      title: "My list",
-      blurb: "The ones you saved to revise",
+      title: t("common.myList"),
+      blurb: t("main.myListBlurb"),
       badge: slugs.length || null,
     },
   ].filter(Boolean);
@@ -66,12 +69,13 @@ function MainPage() {
     <main className="main-page">
       <div className="page-layout home">
         <header className="home-header">
-          <h1 className="home-title">Chemical Quiz</h1>
+          <h1 className="home-title">{t("main.title")}</h1>
+          <LanguageSwitch />
         </header>
 
         <LevelCard />
 
-        <nav className="tile-grid" aria-label="Main menu">
+        <nav className="tile-grid" aria-label={t("main.menu")}>
           {tiles.map((tile) => (
             <Link key={tile.to} to={tile.to} className={`tile ${tile.variant ?? ""}`}>
               <span className="tile-icon material-symbols-outlined" aria-hidden="true">
@@ -98,11 +102,11 @@ function MainPage() {
             <span className="material-symbols-outlined" aria-hidden="true">
               account_circle
             </span>
-            {user ? `Signed in as ${user.name}` : "Sign in to keep your progress"}
+            {user ? t("main.signedInAs", { name: user.name }) : t("main.signInPrompt")}
           </Link>
           {IS_DEMO && (
             <p className="demo-note">
-              Demo version: everything, accounts included, is saved in this browser only.
+              {t("main.demoNote")}
             </p>
           )}
         </footer>

@@ -6,18 +6,20 @@ import { EmptyMessage, ErrorMessage, Loading } from "../components/StatusMessage
 import { deleteLiveGame, fetchLiveGame, fetchLiveGameCsv, IS_DEMO, replayLiveGame } from "../api/client";
 import { useAuth } from "../auth/context";
 import { useApi } from "../hooks/useApi";
+import { useLang, useT } from "../i18n";
 import { DemoNotice, SignInToKeep } from "./components";
 import { saveHostToken } from "./game";
-import { describeGame, playedOn, saveFile, STATUS_LABELS } from "./history";
+import { describeGame, playedOn, saveFile } from "./history";
 
 /** One past class game: the standings, the results file, and what to play next. */
 function LiveGamePage() {
   const { id } = useParams();
   const { user } = useAuth();
+  const t = useT();
   return (
     <main className="categories-page">
       <div className="page-layout">
-        <PageHeader title="Class game" backTo="/live/history" />
+        <PageHeader title={t("live.setup.title")} backTo="/live/history" />
         <section className="categories-content narrow">
           {IS_DEMO ? <DemoNotice /> : user ? <GameDetail id={id} /> : <SignInToKeep />}
         </section>
@@ -28,6 +30,8 @@ function LiveGamePage() {
 
 function GameDetail({ id }) {
   const navigate = useNavigate();
+  const t = useT();
+  const { lang } = useLang();
   const { data: game, error, loading, reload } = useApi(() => fetchLiveGame(id), [id]);
   const [busy, setBusy] = useState(null); // which button is working
   const [actionError, setActionError] = useState(null);
@@ -57,7 +61,7 @@ function GameDetail({ id }) {
   const download = () => run("csv", async () => saveFile(await fetchLiveGameCsv(id)));
 
   const remove = () => {
-    if (!window.confirm("Delete this game from your history? This cannot be undone.")) return;
+    if (!window.confirm(t("live.game.deleteConfirm"))) return;
     run("delete", async () => {
       await deleteLiveGame(id);
       navigate("/live/history", { replace: true });
@@ -70,14 +74,14 @@ function GameDetail({ id }) {
   return (
     <>
       <p className="live-history-when">
-        {playedOn(game.played_at)}{" "}
-        <span className={`live-status is-${game.status}`}>{STATUS_LABELS[game.status]}</span>
+        {playedOn(game.played_at, lang)}{" "}
+        <span className={`live-status is-${game.status}`}>{t(`history.status.${game.status}`)}</span>
       </p>
       <p className="section-note">
-        {describeGame(game)} · {game.time_limit}s each
+        {t("live.game.summary", { game: describeGame(game, t), n: game.time_limit })}
       </p>
 
-      <h2 className="section-heading">Standings</h2>
+      <h2 className="section-heading">{t("live.game.standings")}</h2>
       {played ? (
         <ol className="live-standings">
           {game.standings.map((row) => (
@@ -85,14 +89,14 @@ function GameDetail({ id }) {
               <span className="live-standings-place">{row.place}</span>
               <span className="live-standings-name">{row.name}</span>
               <span className="live-standings-correct">
-                {row.correct}/{game.asked_count} right
+                {t("live.game.right", { correct: row.correct, asked: game.asked_count })}
               </span>
               <span className="live-standings-score">{row.score}</span>
             </li>
           ))}
         </ol>
       ) : (
-        <EmptyMessage>Nobody played.</EmptyMessage>
+        <EmptyMessage>{t("live.game.nobody")}</EmptyMessage>
       )}
 
       {actionError && <ErrorMessage error={actionError} />}
@@ -100,11 +104,11 @@ function GameDetail({ id }) {
       <div className="live-history-actions">
         <button type="button" className="secondary-button" onClick={download} disabled={busy !== null}>
           <span className="material-symbols-outlined" aria-hidden="true">download</span>
-          {busy === "csv" ? "Preparing..." : "Download CSV"}
+          {busy === "csv" ? t("live.game.preparing") : t("live.game.csv")}
         </button>
         <button type="button" className="secondary-button" onClick={() => replay("same")} disabled={busy !== null}>
           <span className="material-symbols-outlined" aria-hidden="true">replay</span>
-          {busy === "same" ? "Opening the room..." : "Same settings"}
+          {busy === "same" ? t("live.opening") : t("live.game.same")}
         </button>
         <button
           type="button"
@@ -113,7 +117,7 @@ function GameDetail({ id }) {
           disabled={busy !== null || !game.has_mistakes}
         >
           <span className="material-symbols-outlined" aria-hidden="true">school</span>
-          {busy === "mistakes" ? "Opening the room..." : "Work on mistakes"}
+          {busy === "mistakes" ? t("live.opening") : t("live.game.mistakes")}
         </button>
         <button
           type="button"
@@ -121,15 +125,15 @@ function GameDetail({ id }) {
           onClick={remove}
           disabled={busy !== null || stillPlaying}
         >
-          Delete
+          {t("live.game.delete")}
         </button>
       </div>
 
       {played && !game.has_mistakes && (
-        <p className="section-note">The class got every question right, so there is nothing to go over.</p>
+        <p className="section-note">{t("live.game.allRight")}</p>
       )}
       {stillPlaying && (
-        <p className="section-note">This game is still being played. Finish it on the board to delete it.</p>
+        <p className="section-note">{t("live.game.stillPlaying")}</p>
       )}
     </>
   );
