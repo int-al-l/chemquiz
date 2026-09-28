@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import CodeInput from "../components/CodeInput";
+import DemoInbox from "../components/DemoInbox";
 import PageHeader from "../components/PageHeader";
 import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { resendVerification, verifyEmail } from "../api/client";
@@ -92,6 +93,8 @@ function VerifyEmailPage() {
               ) : (
                 <p className="lede">Open the link in the email, or sign in again to get a new code.</p>
               )}
+
+              <DemoInbox email={email} refresh={cooldown === 60} />
 
               {email && (
                 <form className="sign-in-form" onSubmit={submit}>

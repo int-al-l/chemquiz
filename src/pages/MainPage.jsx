@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { LevelCard } from "../components/ProgressBits";
+import { IS_DEMO } from "../api/client";
 import { useAuth } from "../auth/context";
 import { useProgress } from "../progress/context";
 import { dueSlugs } from "../progress/engine";
@@ -87,6 +88,11 @@ function MainPage() {
             </span>
             {user ? `Signed in as ${user.name}` : "Sign in to keep your progress"}
           </Link>
+          {IS_DEMO && (
+            <p className="demo-note">
+              Demo version: everything, accounts included, is saved in this browser only.
+            </p>
+          )}
         </footer>
       </div>
     </main>

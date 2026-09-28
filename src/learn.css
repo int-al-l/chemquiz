@@ -1072,3 +1072,21 @@
 @media (prefers-reduced-motion: reduce) {
   .flip-inner, .card-mover, .toast, .toast-xp, .combo-pill, .name-option, .photo-option, .sheet { transition: none !important; animation: none !important; }
 }
+
+
+/* ---------- demo build ---------- */
+
+.demo-inbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--familiar-container);
+  color: var(--familiar);
+  font-size: 15px;
+}
+.demo-inbox strong { font-size: 18px; letter-spacing: 0.12em; font-variant-numeric: tabular-nums; }
+.demo-note { margin: 12px 0 0; font-size: 13px; color: var(--on-surface-variant); text-align: center; }
+.home-footer { flex-direction: column; align-items: center; }

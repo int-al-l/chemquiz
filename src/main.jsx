@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, HashRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 
@@ -46,10 +46,18 @@ if (!markIconsReady()) {
   window.setTimeout(markIconsReady, 3500)
 }
 
+// The demo build is served as static files from any path, so it routes on the
+// URL hash instead of the path.
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    {import.meta.env.VITE_DEMO ? (
+      <HashRouter>
+        <App />
+      </HashRouter>
+    ) : (
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    )}
   </StrictMode>,
 )

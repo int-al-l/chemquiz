@@ -29,7 +29,31 @@ export class ApiError extends Error {
   }
 }
 
+/** True in the demo build (`npm run build:demo`), where the API runs in the browser. */
+export const IS_DEMO = Boolean(import.meta.env.VITE_DEMO);
+
+async function demo(path, options) {
+  const { demoRequest } = await import("../demo/backend.js");
+  const result = await demoRequest(path, {
+    ...options,
+    headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+  });
+  if (result && result.__error) {
+    throw new ApiError(result.__error.detail, result.__error.status);
+  }
+  return result;
+}
+
+/** Demo build only: the code "emailed" to this address, or null. */
+export async function demoInbox(email) {
+  if (!IS_DEMO) return null;
+  const mod = await import("../demo/backend.js");
+  return mod.demoInbox(email);
+}
+
 async function request(path, options = {}) {
+  if (IS_DEMO) return demo(path, options);
+
   let response;
 
   try {

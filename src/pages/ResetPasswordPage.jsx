@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import CodeInput from "../components/CodeInput";
+import DemoInbox from "../components/DemoInbox";
 import PageHeader from "../components/PageHeader";
 import { ErrorMessage } from "../components/StatusMessage";
 import { forgotPassword, resetPassword } from "../api/client";
@@ -90,6 +91,7 @@ function ResetPasswordPage() {
                     If <strong>{email}</strong> has an account, a code is on its way. Enter it with
                     your new password.
                   </p>
+                  <DemoInbox email={email} refresh={step} />
                   <CodeInput value={code} onChange={setCode} />
                 </>
               )}

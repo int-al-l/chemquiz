@@ -38,6 +38,16 @@ npm run dev
 http://localhost:5173. Vite proxies `/api` and `/static` through to port 8000,
 so the browser only ever sees one origin and CORS never comes up.
 
+## Demo build (no backend)
+
+`npm run build:demo` builds a version that runs entirely in the browser: the
+API is replaced by `src/demo/backend.js`, which follows the same rules as the
+FastAPI backend and keeps everything (accounts included) in the browser's
+localStorage. No email is sent -- the verification code is shown on screen.
+The output in `dist-demo/` is plain static files (hash-based URLs), so it can be
+hosted anywhere. After changing `backend/seed_data.py`, refresh the demo's
+copy of the content with `python tools/make_demo_data.py`.
+
 ## Layout
 
 ```
