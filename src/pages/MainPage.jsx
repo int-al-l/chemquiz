@@ -6,6 +6,7 @@ import { useAuth } from "../auth/context";
 import { useProgress } from "../progress/context";
 import { dueSlugs } from "../progress/engine";
 import { useSaved } from "../saved/context";
+import LanguageSwitch from "../i18n/LanguageSwitch";
 
 /**
  * The menu: where you stand (level, streak, today's goal), then what to do.
@@ -67,6 +68,7 @@ function MainPage() {
       <div className="page-layout home">
         <header className="home-header">
           <h1 className="home-title">Chemical Quiz</h1>
+          <LanguageSwitch />
         </header>
 
         <LevelCard />

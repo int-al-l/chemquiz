@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { useLang } from "../i18n";
+
 /**
  * Run an async function on mount and whenever `deps` change, tracking the
  * loading and error states so pages do not each rewrite the same three
@@ -12,11 +14,13 @@ import { useCallback, useEffect, useState } from "react";
  * quickly between two categories can no longer leave the first response
  * overwriting the second, because a late reply carries an old key.
  *
- * `deps` must be JSON-serialisable; in practice they are route params.
+ * `deps` must be JSON-serialisable; in practice they are route params. The
+ * interface language is part of the key too, so switching it re-fetches.
  */
 export function useApi(loader, deps = []) {
   const [reloadKey, setReloadKey] = useState(0);
-  const key = JSON.stringify([...deps, reloadKey]);
+  const { lang } = useLang();
+  const key = JSON.stringify([...deps, lang, reloadKey]);
 
   const [state, setState] = useState({ key: null, data: null, error: null });
 

@@ -4,6 +4,7 @@ import PageHeader from "../components/PageHeader";
 import { Ring } from "../components/ProgressBits";
 import { IS_DEMO } from "../api/client";
 import { useAuth } from "../auth/context";
+import LanguageSwitch from "../i18n/LanguageSwitch";
 import { useProgress } from "../progress/context";
 import { BADGES, GOAL_CHOICES, deckBadges, deckSummary, recentDays } from "../progress/engine";
 
@@ -50,6 +51,8 @@ function ProfilePage() {
               )}
             </div>
           </div>
+
+          <LanguageSwitch />
 
           <div className="stat-grid">
             <div className="stat-box">

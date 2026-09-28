@@ -8,6 +8,7 @@ import {
   pushProgress,
 } from "../api/client";
 import { useAuth } from "../auth/context";
+import { useLang } from "../i18n";
 import { ProgressContext } from "./context";
 import * as engine from "./engine";
 import { isEmptyProgress, mergeProgress, normalise } from "./merge";
@@ -110,11 +111,15 @@ function ProgressStore({ email, children }) {
   }, []);
 
   // --- catalogue ----------------------------------------------------------
+  // Deck and card names come in the interface language, so a switch reloads
+  // them; the progress itself is keyed by slug and does not change.
+  const { lang } = useLang();
   const reloadCatalog = useCallback(() => {
     loadCatalog()
       .then(setCatalog)
       .catch(() => setCatalog((c) => c ?? { items: [], decks: [], failed: true }));
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
   useEffect(() => reloadCatalog(), [reloadCatalog]);
 
   // --- signed in: fetch the account's copy and merge ------------------------

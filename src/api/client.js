@@ -20,6 +20,13 @@ export function setAuthToken(token) {
   authToken = token ?? null;
 }
 
+/** The interface language, sent with every request so the server answers in it. */
+let requestLanguage = "en";
+
+export function setRequestLanguage(lang) {
+  requestLanguage = lang;
+}
+
 /** Thrown for any non-2xx response, carrying the server's message. */
 export class ApiError extends Error {
   constructor(message, status) {
@@ -36,6 +43,7 @@ async function demo(path, options) {
   const { demoRequest } = await import("../demo/backend.js");
   const result = await demoRequest(path, {
     ...options,
+    lang: requestLanguage,
     headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
   });
   if (result && result.__error) {
@@ -61,6 +69,7 @@ async function request(path, options = {}) {
       ...options,
       headers: {
         "Content-Type": "application/json",
+        "Accept-Language": requestLanguage,
         ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
         ...options.headers,
       },
@@ -231,7 +240,10 @@ export async function fetchLiveGameCsv(id) {
   let response;
   try {
     response = await fetch(`${BASE_URL}/api/me/live-games/${id}/results.csv`, {
-      headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+      headers: {
+        "Accept-Language": requestLanguage,
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      },
     });
   } catch {
     throw new ApiError("Could not reach the server. Is the backend running?", 0);
