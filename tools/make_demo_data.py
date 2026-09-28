@@ -29,6 +29,7 @@ for n, it in enumerate(seed_data.ITEMS, start=1):
         "id": n, "slug": it["slug"], "name": it["name"], "catalog_name": it.get("catalog_name"),
         "description": it.get("description"), "category": it["category"],
         "photos": [img(p["file"]) for p in it["photos"]],
+        "credits": [p.get("credit") for p in it["photos"]],
     })
 
 out = ROOT / "src" / "demo" / "data.json"

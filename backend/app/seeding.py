@@ -91,6 +91,7 @@ def upsert_item(db: Session, data: dict, categories_by_slug: dict, source: str):
                 item=item,
                 filename=photo["file"],
                 source_page=photo.get("page"),
+                credit=photo.get("credit"),
                 sort_order=order,
             )
         )

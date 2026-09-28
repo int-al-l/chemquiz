@@ -301,6 +301,8 @@ def item_payload(item: models.Item) -> dict:
         "image_url": image_url(item.cover),
         "photo_urls": [image_url(p.filename) for p in item.photos],
         "photo_count": len(item.photos),
+        # Parallel to photo_urls: the attribution a photo needs, or None.
+        "photo_credits": [p.credit for p in item.photos],
         "category_slug": item.category.slug if item.category is not None else None,
     }
 

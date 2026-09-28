@@ -16,7 +16,9 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
   const photos = item.photo_urls?.length ? item.photo_urls : [item.image_url].filter(Boolean);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [failed, setFailed] = useState({});
-  const current = photos[Math.min(photoIndex, photos.length - 1)];
+  const shown = Math.min(photoIndex, photos.length - 1);
+  const current = photos[shown];
+  const credit = item.photo_urls?.length ? item.photo_credits?.[shown] : null;
 
   const chip = masteryKey && (
     <span className={`mastery-chip is-${masteryKey}`}>{MASTERY_LABEL[masteryKey]}</span>
@@ -108,6 +110,7 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
             ) : (
               <p className="flip-back-text is-muted">No description yet.</p>
             )}
+            {credit && <p className="flip-back-credit">Photo: {credit}</p>}
           </div>
           <button className="flip-back-turn" onClick={onFlip} type="button">
             <span className="material-symbols-outlined" aria-hidden="true">flip</span>
