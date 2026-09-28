@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import PageHeader from "../components/PageHeader";
 import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { createLiveGame, imageSrc, IS_DEMO } from "../api/client";
+import { useAuth } from "../auth/context";
 import { useProgress } from "../progress/context";
 import { DemoNotice } from "./components";
 import { saveHostToken } from "./game";
@@ -19,6 +20,7 @@ const TIMES = [10, 20, 30, 60];
 function LiveSetupPage() {
   const navigate = useNavigate();
   const { catalog } = useProgress();
+  const { user } = useAuth();
 
   const [deck, setDeck] = useState(null); // null = every deck
   const [mode, setMode] = useState("choice");
@@ -64,6 +66,15 @@ function LiveSetupPage() {
               <p className="setup-lead live-setup-lead">
                 Put this screen on the board. Students join from their phones with a PIN and answer
                 against the clock.
+              </p>
+              <p className="section-note">
+                {user ? (
+                  <Link to="/live/history">Past games</Link>
+                ) : (
+                  <>
+                    <Link to="/sign-in">Sign in</Link> to keep the results of your games.
+                  </>
+                )}
               </p>
 
               {!catalog && <Loading />}

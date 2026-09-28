@@ -16,6 +16,8 @@ import LiveSetupPage from "./live/LiveSetupPage";
 import LiveHostPage from "./live/LiveHostPage";
 import JoinPage from "./live/JoinPage";
 import LivePlayPage from "./live/LivePlayPage";
+import LiveHistoryPage from "./live/LiveHistoryPage";
+import LiveGamePage from "./live/LiveGamePage";
 import Toaster from "./components/Toaster";
 
 import { AuthProvider } from "./auth/AuthProvider";
@@ -45,6 +47,8 @@ import "./live/live.css";
  *   /quiz/:token/results     the score afterwards
  *   /live                    set up a class game (the board)
  *   /live/host/:pin          the board during a class game
+ *   /live/history            a signed-in teacher's past class games
+ *   /live/history/:id        one past game: standings, CSV, play again
  *   /join[/:pin]             a student joins with the PIN (the QR code fills it in)
  *   /play/:pin               a student's phone during the game
  */
@@ -70,6 +74,8 @@ function App() {
 
             <Route path="/live" element={<LiveSetupPage />} />
             <Route path="/live/host/:pin" element={<LiveHostPage />} />
+            <Route path="/live/history" element={<LiveHistoryPage />} />
+            <Route path="/live/history/:id" element={<LiveGamePage />} />
             <Route path="/join" element={<JoinPage />} />
             <Route path="/join/:pin" element={<JoinPage />} />
             <Route path="/play/:pin" element={<LivePlayPage />} />

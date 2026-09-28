@@ -1,5 +1,6 @@
 /** Small pieces drawn on both the board and the phones. */
 import qrcode from "qrcode-generator";
+import { Link } from "react-router-dom";
 
 export function Shape({ index, size = 28 }) {
   const paths = [
@@ -70,5 +71,14 @@ export function DemoNotice() {
         README) to play with a class.
       </p>
     </div>
+  );
+}
+
+/** Shown where a signed-out teacher would otherwise see their past games. */
+export function SignInToKeep() {
+  return (
+    <p className="section-note">
+      <Link to="/sign-in">Sign in</Link> to keep the results of the class games you host.
+    </p>
   );
 }

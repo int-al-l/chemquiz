@@ -437,6 +437,11 @@ function Podium({ state, onNew }) {
           ))}
         </ol>
       )}
+      {state.owned && (
+        <p className="live-podium-saved">
+          Results saved. <Link to="/live/history">See past games</Link>
+        </p>
+      )}
       <button type="button" className="live-go-button" onClick={onNew}>
         New game
       </button>
