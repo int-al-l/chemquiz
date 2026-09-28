@@ -49,9 +49,18 @@ hosted anywhere.
 
 `npm run build:pages` writes the same build into `docs/`, which GitHub Pages
 serves (Settings -> Pages -> branch `main`, folder `/docs`) at
-https://int-al-l.github.io/chemquiz/ . Re-run it and commit `docs/` after
-changing the site. After changing `backend/seed_data.py`, refresh the demo's
-copy of the content with `python tools/make_demo_data.py`.
+https://int-al-l.github.io/chemquiz/ . A GitHub Action
+(`.github/workflows/pages.yml`) re-runs it, together with
+`python tools/make_demo_data.py`, after every merge to `main` and commits the
+result, so there is no need to do it by hand.
+
+## Working together
+
+Two people work on this repo. Every change goes on its own branch and into
+`main` through a pull request; CI checks each one. `docs/` and
+`src/demo/data.json` are rebuilt automatically after each merge, so don't commit
+them by hand. The full rules are in [CLAUDE.md](CLAUDE.md), which Claude reads
+at the start of every session.
 
 ## Layout
 

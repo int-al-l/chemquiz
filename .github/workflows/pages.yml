@@ -1,0 +1,52 @@
+name: Rebuild GitHub Pages
+
+# After every merge to main, regenerate the demo data and the docs/ build and
+# commit them, so nobody has to commit generated files from a branch.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "index.html"
+      - "vite.config.js"
+      - "package.json"
+      - "package-lock.json"
+      - "backend/seed_data.py"
+      - "backend/static/**"
+      - "tools/make_demo_data.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: python tools/make_demo_data.py
+      - run: npm ci
+      - run: npm run build:pages
+      - name: Commit if changed
+        run: |
+          git add -A docs src/demo/data.json
+          if git diff --cached --quiet; then
+            echo "Nothing to update"; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Rebuild GitHub Pages [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main

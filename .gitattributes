@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.pdf binary
+
+# generated: hidden in PR diffs, rebuilt by .github/workflows/pages.yml
+docs/** linguist-generated=true -diff
+src/demo/data.json linguist-generated=true
