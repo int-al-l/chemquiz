@@ -88,36 +88,51 @@ def list_products(list_path):
             for attempt in range(1, 4):
                 try:
                     page.goto(LIST_URL.format(page=n), wait_until="commit", timeout=120000)
-                    page.wait_for_selector('a[href*="/product-page/"]', timeout=60000)
-                    # Scroll so the whole grid renders.
-                    for _ in range(8):
-                        page.mouse.wheel(0, 2500)
-                        page.wait_for_timeout(400)
-                    links = page.eval_on_selector_all(
-                        'a[href*="/product-page/"]',
-                        "els => els.map(e => [e.href, (e.innerText || e.getAttribute('aria-label') || '').trim()])",
-                    )
-                    break
-                except Exception as exc:  # noqa: BLE001 - a slow page is retried, then skipped
-                    print(f"list page {n}: attempt {attempt} failed ({type(exc).__name__}); waiting and retrying")
+                except Exception as exc:  # noqa: BLE001 - the shop did not answer: retry
+                    print(f"list page {n}: attempt {attempt} did not load ({type(exc).__name__}); retrying")
                     page.wait_for_timeout(5000 * attempt)
-            if links is None:
-                print(f"list page {n}: skipped after 3 attempts")
-                state["next_page"] = n + 1
-                save()
-                continue
+                    continue
+                try:
+                    page.wait_for_selector('a[href*="/product-page/"]', timeout=30000)
+                except Exception:  # noqa: BLE001
+                    if attempt == 1:
+                        # Maybe just slow: load it once more before believing it is empty.
+                        print(f"list page {n}: no products yet; checking once more")
+                        continue
+                    # Loaded twice and still no products: past the end of the list.
+                    links = []
+                    try:
+                        page.screenshot(path=os.path.join(OUT, f"empty_list_page_{n}.png"))
+                    except Exception:  # noqa: BLE001
+                        pass
+                    break
+                # Scroll so the whole grid renders.
+                for _ in range(8):
+                    page.mouse.wheel(0, 2500)
+                    page.wait_for_timeout(400)
+                links = page.eval_on_selector_all(
+                    'a[href*="/product-page/"]',
+                    "els => els.map(e => [e.href, (e.innerText || e.getAttribute('aria-label') || '').trim()])",
+                )
+                break
 
             new = 0
-            for href, text in links:
+            for href, text in links or []:
                 slug = href.split("/product-page/")[1].split("?")[0].split("#")[0]
                 if slug and slug not in found:
                     found[slug] = text.split("\n")[0]
                     new += 1
-            print(f"list page {n}: {len(links)} links, {new} new, {len(found)} total")
+            if links is None:
+                print(f"list page {n}: skipped, the shop did not answer")
+            elif not links:
+                print(f"list page {n}: no products -- looks like the end of the list")
+            else:
+                print(f"list page {n}: {len(links)} links, {new} new, {len(found)} total")
             state["empty_in_a_row"] = state["empty_in_a_row"] + 1 if new == 0 else 0
             state["next_page"] = n + 1
             save()
             if state["empty_in_a_row"] >= 2:
+                print(f"{len(found)} products in the list; now reading the product pages.")
                 break
         browser.close()
     state["done"] = True
