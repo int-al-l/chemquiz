@@ -8,7 +8,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "backend"))
+import content_ru  # noqa: E402
 import seed_data  # noqa: E402
+from app.messages import MESSAGES  # noqa: E402
+
+
+def ru(table, slug, field):
+    return table.get(slug, {}).get(field)
 
 
 def img(name):
@@ -18,9 +24,13 @@ def img(name):
 categories, parents = [], {}
 for i, root in enumerate(seed_data.CATEGORIES):
     categories.append({"slug": root["slug"], "name": root["name"], "description": root.get("description"),
+                       "name_ru": ru(content_ru.CATEGORIES, root["slug"], "name"),
+                       "description_ru": ru(content_ru.CATEGORIES, root["slug"], "description"),
                        "image": img(root.get("image")), "parent": None, "order": root.get("sort_order", i)})
     for j, child in enumerate(root.get("children", [])):
         categories.append({"slug": child["slug"], "name": child["name"], "description": child.get("description"),
+                           "name_ru": ru(content_ru.CATEGORIES, child["slug"], "name"),
+                           "description_ru": ru(content_ru.CATEGORIES, child["slug"], "description"),
                            "image": img(child.get("image")), "parent": root["slug"], "order": child.get("sort_order", j)})
 
 items = []
@@ -28,10 +38,12 @@ for n, it in enumerate(seed_data.ITEMS, start=1):
     items.append({
         "id": n, "slug": it["slug"], "name": it["name"], "catalog_name": it.get("catalog_name"),
         "description": it.get("description"), "category": it["category"],
+        "name_ru": ru(content_ru.ITEMS, it["slug"], "name"),
+        "description_ru": ru(content_ru.ITEMS, it["slug"], "description"),
         "photos": [img(p["file"]) for p in it["photos"]],
         "credits": [p.get("credit") for p in it["photos"]],
     })
 
 out = ROOT / "src" / "demo" / "data.json"
-out.write_text(json.dumps({"categories": categories, "items": items}, ensure_ascii=False), "utf-8")
+out.write_text(json.dumps({"categories": categories, "items": items, "messages": MESSAGES}, ensure_ascii=False), "utf-8")
 print(f"{len(categories)} categories, {len(items)} items -> {out}")

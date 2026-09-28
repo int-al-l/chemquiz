@@ -37,15 +37,27 @@ function save() {
 }
 
 class HttpError extends Error {
-  constructor(status, detail) {
+  constructor(status, detail, code) {
     super(detail);
     this.status = status;
     this.detail = detail;
+    this.code = code ?? null;
   }
 }
-const fail = (status, detail) => {
-  throw new HttpError(status, detail);
+
+// The language of the request being answered (set by demoRequest), and the
+// server's messages in both languages (data.json, from app/messages.py).
+let lang = "en";
+const format = (text, values) => text.replace(/\{(\w+)\}/g, (m, k) => (k in values ? String(values[k]) : m));
+
+/** Refuse, in the request's language when the message is known by `key`. */
+const fail = (status, detail, key, values = {}) => {
+  const text = key && DATA.messages?.[key]?.[lang];
+  throw new HttpError(status, text ? format(text, values) : detail, key);
 };
+
+/** A card's or deck's text in the request's language, English when there is no Russian. */
+const txt = (o, field) => (lang === "ru" && o?.[`${field}_ru`]) || o?.[field];
 
 // --- content ---------------------------------------------------------------------
 
@@ -66,9 +78,9 @@ function itemOut(i) {
   return {
     id: i.id,
     slug: i.slug,
-    name: i.name,
+    name: txt(i, "name"),
     catalog_name: i.catalog_name,
-    description: i.description,
+    description: txt(i, "description"),
     image_url: i.photos[0] ?? null,
     photo_urls: i.photos,
     photo_count: i.photos.length,
@@ -81,8 +93,8 @@ function catOut(c) {
   return {
     id: cats.indexOf(c) + 1,
     slug: c.slug,
-    name: c.name,
-    description: c.description,
+    name: txt(c, "name"),
+    description: txt(c, "description"),
     image_url: c.image,
     child_count: children(c.slug).length,
     item_count: items.filter((i) => i.category === c.slug).length,
@@ -91,10 +103,16 @@ function catOut(c) {
 }
 
 function findCat(slug) {
-  return cats.find((c) => c.slug === slug) || fail(404, `No category '${slug}'`);
+  return cats.find((c) => c.slug === slug) || fail(404, `No category '${slug}'`, "no_category", { slug });
 }
 
 // --- quiz ------------------------------------------------------------------------
+
+/** The deck's name in the request's language (sessions keep the English copy). */
+const categoryName = (s) => txt(cats.find((c) => c.slug === s.category_slug), "name") ?? s.category_name;
+
+/** The picked option's name in the request's language (older sessions keep only the English). */
+const givenAnswer = (q) => (q.givenId != null && itemById[q.givenId] ? txt(itemById[q.givenId], "name") : q.givenName);
 
 const token = () =>
   Array.from(crypto.getRandomValues(new Uint8Array(24)), (b) => b.toString(36).padStart(2, "0")).join("");
@@ -126,12 +144,12 @@ function distractors(answer, pool) {
 }
 
 function startQuiz({ category_slug, mode, question_count }) {
-  if (!["choice", "inverted"].includes(mode)) fail(422, "Unknown quiz mode");
+  if (!["choice", "inverted"].includes(mode)) fail(422, "Unknown quiz mode", "unknown_mode", { mode });
   const n = Number(question_count);
   if (!(n >= 1 && n <= 500)) fail(422, "Question count must be between 1 and 500");
   const cat = category_slug ? findCat(category_slug) : null;
   const pool = itemsUnder(cat?.slug);
-  if (!pool.length) fail(409, "no items available for this category");
+  if (!pool.length) fail(409, "no items available for this category", "empty_category");
 
   const asked = shuffle(pool).slice(0, n);
   const questions = asked.map((item, idx) => {
@@ -168,7 +186,7 @@ function startQuiz({ category_slug, mode, question_count }) {
 }
 
 function getSession(t) {
-  return db().sessions[t] || fail(404, "Quiz not found or expired");
+  return db().sessions[t] || fail(404, "Quiz not found or expired", "quiz_not_found");
 }
 
 const counts = (s) => ({
@@ -183,7 +201,7 @@ function questionOut(s, q) {
     return {
       position: q.position,
       image_url: null,
-      prompt: itemById[q.item].name,
+      prompt: txt(itemById[q.item], "name"),
       choices: q.choices.map((id, i) => ({ id, image_url: q.choicePhotos[i] })),
       answered: q.answered,
     };
@@ -192,7 +210,7 @@ function questionOut(s, q) {
     position: q.position,
     image_url: q.photo,
     prompt: null,
-    choices: q.choices.map((id) => ({ id, name: itemById[id].name })),
+    choices: q.choices.map((id) => ({ id, name: txt(itemById[id], "name") })),
     answered: q.answered,
   };
 }
@@ -202,7 +220,7 @@ function sessionOut(s) {
     token: s.token,
     mode: s.mode,
     category_slug: s.category_slug,
-    category_name: s.category_name,
+    category_name: categoryName(s),
     ...counts(s),
     questions: s.questions.map((q) => questionOut(s, q)),
   };
@@ -210,12 +228,13 @@ function sessionOut(s) {
 
 function answer(t, { position, choice_id }) {
   const s = getSession(t);
-  const q = s.questions.find((x) => x.position === position) || fail(404, `Quiz has no question ${position}`);
-  if (q.answered) fail(409, "Question already answered");
-  if (!q.choices.includes(choice_id)) fail(422, "choice_id is not one of this question's options");
+  const q = s.questions.find((x) => x.position === position) || fail(404, `Quiz has no question ${position}`, "no_question", { position });
+  if (q.answered) fail(409, "Question already answered", "question_answered");
+  if (!q.choices.includes(choice_id)) fail(422, "choice_id is not one of this question's options", "choice_not_option");
   q.answered = true;
   q.given = choice_id;
   q.givenName = itemById[choice_id].name;
+  q.givenId = choice_id;
   q.correct = choice_id === q.item;
   const c = counts(s);
   if (c.is_complete) s.completed_at = new Date().toISOString();
@@ -226,7 +245,7 @@ function answer(t, { position, choice_id }) {
     correct_item: itemOut(itemById[q.item]),
     correct_choice_id: q.item,
     given_choice_id: choice_id,
-    given_answer: q.givenName,
+    given_answer: givenAnswer(q),
     answered_count: c.answered_count,
     correct_count: c.correct_count,
     is_complete: c.is_complete,
@@ -239,7 +258,7 @@ function results(t) {
     token: s.token,
     mode: s.mode,
     category_slug: s.category_slug,
-    category_name: s.category_name,
+    category_name: categoryName(s),
     ...counts(s),
     created_at: s.created_at,
     completed_at: s.completed_at,
@@ -247,7 +266,7 @@ function results(t) {
       position: q.position,
       item: q.answered ? itemOut(itemById[q.item]) : null,
       image_url: q.photo,
-      given_answer: q.givenName,
+      given_answer: givenAnswer(q),
       is_correct: q.correct,
       answered: q.answered,
     })),
@@ -260,13 +279,13 @@ const EMAIL = /^[^@\s]+@[^@\s.]+(\.[^@\s.]+)+$/;
 
 function checkEmail(value) {
   const email = String(value || "").trim().toLowerCase();
-  if (!EMAIL.test(email)) fail(422, "That does not look like an email address.");
+  if (!EMAIL.test(email)) fail(422, "That does not look like an email address.", "bad_email");
   return email;
 }
 
 function checkPassword(p) {
-  if (!p || p.length < 8) fail(422, "Use at least 8 characters for the password.");
-  if (/^\d+$/.test(p) || /^[a-z]+$/i.test(p)) fail(422, "Mix letters with numbers or symbols in the password.");
+  if (!p || p.length < 8) fail(422, "Use at least 8 characters for the password.", "password_short", { n: 8 });
+  if (/^\d+$/.test(p) || /^[a-z]+$/i.test(p)) fail(422, "Mix letters with numbers or symbols in the password.", "password_weak");
 }
 
 async function hash(text) {
@@ -293,17 +312,17 @@ function redeem({ email, code, token: link }, purpose) {
   let key;
   if (link) {
     key = Object.keys(store.codes).find((k) => k.startsWith(`${purpose}:`) && store.codes[k].link === link);
-    if (!key) fail(400, "That link is no longer valid. Ask for a new one.");
+    if (!key) fail(400, "That link is no longer valid. Ask for a new one.", "bad_link");
   } else {
-    if (!email || !code) fail(422, "Enter the code from the email.");
+    if (!email || !code) fail(422, "Enter the code from the email.", "code_missing");
     key = `${purpose}:${String(email).trim().toLowerCase()}`;
     const row = store.codes[key];
-    if (!row || row.expires < Date.now()) fail(400, "That code is wrong or has expired.");
-    if (row.attempts >= 5) fail(429, "Too many wrong codes. Ask for a new email.");
+    if (!row || row.expires < Date.now()) fail(400, "That code is wrong or has expired.", "bad_code");
+    if (row.attempts >= 5) fail(429, "Too many wrong codes. Ask for a new email.", "too_many_codes");
     if (String(code).replace(/\D/g, "") !== row.code) {
       row.attempts += 1;
       save();
-      fail(400, "That code is wrong or has expired.");
+      fail(400, "That code is wrong or has expired.", "bad_code");
     }
   }
   const userEmail = key.split(":").slice(1).join(":");
@@ -321,16 +340,16 @@ function currentUser(headers) {
   const auth = headers?.Authorization || headers?.authorization || "";
   const t = auth.replace(/^Bearer\s+/i, "");
   const user = Object.values(db().users).find((u) => u.token === t && u.verified);
-  return user || fail(401, t ? "That sign-in has expired." : "Sign in to use your list.");
+  return user || fail(401, t ? "That sign-in has expired." : "Sign in to use your list.", t ? "sign_in_expired" : "sign_in_required");
 }
 
 async function register({ name, email, password }) {
   email = checkEmail(email);
-  if (!String(name || "").trim()) fail(422, "Please enter a name.");
+  if (!String(name || "").trim()) fail(422, "Please enter a name.", "name_missing");
   checkPassword(password);
   const store = db();
   let user = store.users[email];
-  if (user?.verified) fail(409, "There is already an account with this email. Sign in instead.");
+  if (user?.verified) fail(409, "There is already an account with this email. Sign in instead.", "account_exists");
   user = user || { email, token: token(), saved: [], progress: {} };
   user.name = name.trim();
   user.password = await hash(password);
@@ -343,10 +362,10 @@ async function register({ name, email, password }) {
 async function login({ email, password }) {
   email = checkEmail(email);
   const user = db().users[email];
-  if (!user || user.password !== (await hash(password))) fail(401, "Wrong email or password.");
+  if (!user || user.password !== (await hash(password))) fail(401, "Wrong email or password.", "wrong_password");
   if (!user.verified) {
     sendCode(user, "verify");
-    fail(403, "Please verify your email first. We have sent you a new code.");
+    fail(403, "Please verify your email first. We have sent you a new code.", "verify_first");
   }
   return signedIn(user);
 }
@@ -369,6 +388,7 @@ export async function demoRequest(path, options = {}) {
   const p = url.pathname;
   const q = url.searchParams;
   const headers = options.headers;
+  lang = options.lang === "ru" ? "ru" : "en";
   let m;
 
   // A beat of latency, so loading states behave as they do for real.
@@ -396,7 +416,7 @@ export async function demoRequest(path, options = {}) {
       return itemsUnder(cat).map(itemOut);
     }
     if ((m = p.match(/^\/api\/items\/([^/]+)$/))) {
-      return itemOut(itemBySlug[decodeURIComponent(m[1])] || fail(404, "No such item"));
+      return itemOut(itemBySlug[decodeURIComponent(m[1])] || fail(404, "No such item", "no_item", { slug: decodeURIComponent(m[1]) }));
     }
 
     if (p === "/api/quiz/start" && method === "POST") return startQuiz(body);
@@ -452,7 +472,7 @@ export async function demoRequest(path, options = {}) {
     if ((m = p.match(/^\/api\/me\/list\/([^/]+)$/))) {
       const user = currentUser(headers);
       const slug = decodeURIComponent(m[1]);
-      if (!itemBySlug[slug]) fail(404, `No item '${slug}'`);
+      if (!itemBySlug[slug]) fail(404, `No item '${slug}'`, "no_item", { slug });
       user.saved = user.saved.filter((s) => s !== slug);
       if (method === "PUT") user.saved.unshift(slug);
       save();
