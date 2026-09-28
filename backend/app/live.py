@@ -396,8 +396,9 @@ def create_room(
     host_user: Optional[models.User] = None,
     items: Optional[list[models.Item]] = None,
     rng: Optional[random.Random] = None,
+    lang: str = "en",
 ) -> Room:
-    """Draw the questions and open a room for them.
+    """Draw the questions, in `lang`, and open a room for them.
 
     `items` fixes which items are asked (work on mistakes); otherwise
     `question_count` of the deck's items are drawn at random. The caller
@@ -414,7 +415,7 @@ def create_room(
     else:
         asked = list(items)
         rng.shuffle(asked)
-    questions = _draw(db, asked, pool, mode, rng)
+    questions = _draw(db, asked, pool, mode, rng, lang)
 
     # Read everything needed from these objects now: the purge commits, and
     # a commit expires them.
@@ -425,7 +426,8 @@ def create_room(
         question_count=len(questions),
         category_id=category.id if category else None,
         category_slug=category.slug if category else None,
-        category_name=category.name if category else None,
+        category_name=localized(category, "name", lang) if category else None,
+        lang=lang,
         questions=questions,
     )
     now = _now()
@@ -459,7 +461,7 @@ def create_room(
     raise LiveError("no_free_pins", status=503)
 
 
-def _draw(db: Session, asked, pool, mode: str, rng: random.Random) -> list[dict]:
+def _draw(db: Session, asked, pool, mode: str, rng: random.Random, lang: str = "en") -> list[dict]:
     """The frozen questions: what is shown, the options, and the answer."""
     questions = []
     for position, (item, options, photo, picks) in enumerate(
@@ -472,8 +474,8 @@ def _draw(db: Session, asked, pool, mode: str, rng: random.Random) -> list[dict]
                 for option, pick in zip(options, picks)
             ]
         else:
-            choices = [{"id": o.id, "name": o.name} for o in options]
-        answer = crud.item_payload(item)
+            choices = [{"id": o.id, "name": localized(o, "name", lang)} for o in options]
+        answer = crud.item_payload(item, lang)
         # Reveal the picture that was actually asked about.
         answer["image_url"] = photo_url
         questions.append(
@@ -481,7 +483,7 @@ def _draw(db: Session, asked, pool, mode: str, rng: random.Random) -> list[dict]
                 "position": position,
                 "correct_id": item.id,
                 "image_url": photo_url if mode == "choice" else None,
-                "prompt": item.name if mode == "inverted" else None,
+                "prompt": localized(item, "name", lang) if mode == "inverted" else None,
                 "choices": choices,
                 "item": answer,
             }
@@ -581,6 +583,7 @@ def host_view(room: Room, now: float) -> dict:
     standings = room.standings()
     return {
         "pin": game.pin,
+        "lang": game.lang,
         "phase": game.phase,
         "mode": game.mode,
         "category_name": game.category_name,
@@ -631,6 +634,7 @@ def player_view(room: Room, player: models.LivePlayer, now: float) -> dict:
         }
     return {
         "pin": game.pin,
+        "lang": game.lang,
         "phase": game.phase,
         "mode": game.mode,
         "question_count": len(game.questions),

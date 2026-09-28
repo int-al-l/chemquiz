@@ -171,6 +171,7 @@ def replay(db: Session, game: models.LiveGame, kind: str, user: models.User) -> 
             time_limit=game.time_limit,
             category=category,
             host_user=user,
+            lang=game.lang,
         )
     ids = Results(db, game).mistake_item_ids()
     if not ids:
@@ -190,4 +191,5 @@ def replay(db: Session, game: models.LiveGame, kind: str, user: models.User) -> 
         category=category,
         host_user=user,
         items=list(items),
+        lang=game.lang,
     )

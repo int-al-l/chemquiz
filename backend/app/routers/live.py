@@ -10,7 +10,7 @@ would be read again one at a time.
 from __future__ import annotations
 
 import socket
-from typing import Optional
+from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, Header
 from pydantic import BaseModel, Field
@@ -31,6 +31,7 @@ class CreateIn(BaseModel):
     mode: str = "choice"
     question_count: int = Field(10, ge=1, le=MAX_QUESTION_COUNT)
     time_limit: int = live.DEFAULT_TIME_LIMIT
+    lang: Literal["en", "ru"] = "en"
 
 
 class JoinIn(BaseModel):
@@ -103,6 +104,7 @@ def create(
             time_limit=payload.time_limit,
             category=category,
             host_user=user,
+            lang=payload.lang,
         )
     except live.LiveError as exc:
         raise _fail(db, exc) from exc
@@ -123,6 +125,7 @@ def peek(pin: str, db: Session = Depends(get_db)):
     return {
         "pin": game.pin,
         "phase": game.phase,
+        "lang": game.lang,
         "joinable": game.phase != "finished" and not game.locked,
         "player_count": len(room.active_players),
     }

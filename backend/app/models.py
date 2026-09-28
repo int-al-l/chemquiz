@@ -439,6 +439,8 @@ class LiveGame(Base):
 
     # "choice" or "inverted", as in QuizSession.
     mode: Mapped[str] = mapped_column(String(16))
+    # "en" or "ru", chosen by the teacher; the questions are frozen in it.
+    lang: Mapped[str] = mapped_column(String(2), default="en")
     time_limit: Mapped[int] = mapped_column(Integer)
     question_count: Mapped[int] = mapped_column(Integer)
     # A null slug means the game drew from the whole library.
