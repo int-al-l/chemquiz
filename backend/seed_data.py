@@ -949,7 +949,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'FLASK, REACTION TUBE',
   'description': 'The tube-shaped member of the same family: a narrow vessel with a stopcock, for '
                  'reacting or storing small amounts of air-sensitive material under inert gas.',
-  'aliases': ['Reaction tube', 'Storage tube', 'Schlenk storage tube'],
+  'aliases': ['Reaction tube', 'Storage tube', 'Schlenk storage tube', 'J Young tube', "Young's ampoule", 'J Young ampoule', 'Young ampoule'],
   'source_products': [{'id': 2190,
                        'url': 'https://chengduglassware.com/product/synthware-reaction-tube-with-2mm-aperture-glass-valve-flask-reaction-tube-borosilicate-glass-f89/'},
                       {'id': 20963,
