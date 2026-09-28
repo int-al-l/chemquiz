@@ -135,7 +135,9 @@ export function questionClock(state, now) {
   return { reading: false, left: Math.ceil(left), fraction: left / state.time_limit };
 }
 
-export function ordinal(n) {
+/** A place: "1st" in English, "1-е" (as in "1-е место") in Russian. */
+export function ordinal(n, lang = "en") {
+  if (lang === "ru") return `${n}-е`;
   const s = ["th", "st", "nd", "rd"];
   const v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);

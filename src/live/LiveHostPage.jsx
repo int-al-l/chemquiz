@@ -13,6 +13,8 @@ import {
   liveNext,
   liveRemovePlayer,
 } from "../api/client";
+import { rich, useT } from "../i18n";
+import { LanguageScope } from "../i18n/LanguageProvider";
 import { Countdown, DemoNotice, QrCode, Shape } from "./components";
 import { hostToken, OPTION_STYLES, questionClock, saveHostToken, useLivePoll, useServerNow } from "./game";
 
@@ -99,6 +101,27 @@ function LiveHostPage() {
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  return (
+    <LanguageScope lang={state?.lang}>
+      <HostScreen
+        pin={pin}
+        token={token}
+        state={state}
+        error={error}
+        now={now}
+        busy={busy}
+        actionError={actionError}
+        act={act}
+        next={next}
+        close={close}
+      />
+    </LanguageScope>
+  );
+}
+
+/** The board's texts, drawn inside the game's language scope. */
+function HostScreen({ pin, token, state, error, now, busy, actionError, act, next, close }) {
+  const t = useT();
   if (IS_DEMO) {
     return (
       <main className="live-board">
@@ -111,14 +134,14 @@ function LiveHostPage() {
     return (
       <main className="live-board live-board-center">
         <div className="live-message">
-          <h1>This game is not open on this screen</h1>
+          <h1>{t("live.host.notOpen")}</h1>
           <p>
             {token
-              ? "It has ended, or the server was restarted."
-              : "Only the device that opened a game can run its board."}
+              ? t("live.host.ended")
+              : t("live.host.otherDevice")}
           </p>
           <Link className="primary-button live-inline-button" to="/live">
-            Start a new game
+            {t("live.host.startNew")}
           </Link>
         </div>
       </main>
@@ -128,17 +151,18 @@ function LiveHostPage() {
   if (!state) {
     return (
       <main className="live-board live-board-center">
-        {error ? <ErrorMessage error={error} /> : <p className="status-message">Opening the room...</p>}
+        {error ? <ErrorMessage error={error} /> : <p className="status-message">{t("live.opening")}</p>}
       </main>
     );
   }
 
   return (
     <main className={`live-board phase-${state.phase}`}>
-      {error && <div className="live-offline">Reconnecting to the server...</div>}
+      {error && <div className="live-offline">{t("live.host.reconnecting")}</div>}
 
       {state.phase === "lobby" && (
         <Lobby
+          t={t}
           state={state}
           busy={busy}
           onStart={next}
@@ -149,12 +173,12 @@ function LiveHostPage() {
       )}
 
       {(state.phase === "question" || state.phase === "reveal") && (
-        <QuestionBoard state={state} now={now} busy={busy} onNext={next} />
+        <QuestionBoard t={t} state={state} now={now} busy={busy} onNext={next} />
       )}
 
-      {state.phase === "scoreboard" && <Scoreboard state={state} busy={busy} onNext={next} />}
+      {state.phase === "scoreboard" && <Scoreboard t={t} state={state} busy={busy} onNext={next} />}
 
-      {state.phase === "finished" && <Podium state={state} onNew={close} />}
+      {state.phase === "finished" && <Podium t={t} state={state} onNew={close} />}
 
       {actionError && (
         <div className="live-toast" role="alert">
@@ -167,12 +191,12 @@ function LiveHostPage() {
           className="live-end-button"
           type="button"
           onClick={() => {
-            if (window.confirm("End the game now and show the final results?")) {
+            if (window.confirm(t("live.host.endConfirm"))) {
               act(() => liveFinish(pin, token));
             }
           }}
         >
-          End game
+          {t("live.host.end")}
         </button>
       )}
     </main>
@@ -181,7 +205,7 @@ function LiveHostPage() {
 
 // --- lobby -------------------------------------------------------------------------
 
-function Lobby({ state, busy, onStart, onLock, onRemove, onClose }) {
+function Lobby({ t, state, busy, onStart, onLock, onRemove, onClose }) {
   const { base, local } = useJoinBase();
   const joinUrl = base ? `${base}/join/${state.pin}` : null;
   const shortUrl = base ? `${base.replace(/^https?:\/\//, "")}/join` : null;
@@ -192,25 +216,26 @@ function Lobby({ state, busy, onStart, onLock, onRemove, onClose }) {
       <section className="live-join-panel">
         <div className="live-join-text">
           <p className="live-join-step">
-            Go to <strong>{shortUrl ?? "this site"}</strong>
+            {rich(t("live.host.goTo", { url: "{url}" }), {
+              url: <strong>{shortUrl ?? t("live.host.thisSite")}</strong>,
+            })}
           </p>
-          <p className="live-join-step">and enter the PIN</p>
-          <p className="live-pin" aria-label={`Game PIN ${state.pin.split("").join(" ")}`}>
+          <p className="live-join-step">{t("live.host.enterPin")}</p>
+          <p className="live-pin" aria-label={t("live.host.pinLabel", { pin: state.pin.split("").join(" ") })}>
             {state.pin.slice(0, 3)}
             <span className="live-pin-gap" />
             {state.pin.slice(3)}
           </p>
           {local && !base && (
             <p className="live-join-warn">
-              This board is open as “localhost”, which phones cannot reach. Open the site using this
-              computer's network address instead.
+              {t("live.host.localhost")}
             </p>
           )}
         </div>
         {joinUrl && (
           <div className="live-qr-box">
-            <QrCode text={joinUrl} label="Scan to join" />
-            <span>Scan to join</span>
+            <QrCode text={joinUrl} label={t("live.host.scan")} />
+            <span>{t("live.host.scan")}</span>
           </div>
         )}
       </section>
@@ -221,22 +246,22 @@ function Lobby({ state, busy, onStart, onLock, onRemove, onClose }) {
             <span className="material-symbols-outlined" aria-hidden="true">
               group
             </span>
-            {count} player{count === 1 ? "" : "s"}
+            {t("history.players", { n: count })}
           </h2>
           <span className="live-players-meta">
-            {state.question_count} questions · {state.mode === "choice" ? "Name it" : "Find it"}
+            {t("history.questions", { n: state.question_count })} · {t(`mode.${state.mode}`)}
             {state.category_name ? ` · ${state.category_name}` : ""}
           </span>
         </header>
 
         {count === 0 ? (
-          <p className="live-waiting">Waiting for players to join...</p>
+          <p className="live-waiting">{t("live.host.waiting")}</p>
         ) : (
           <ul className="live-player-chips">
             {state.players.map((p) => (
               <li key={p.id} className={p.away ? "is-away" : ""}>
                 <span>{p.name}</span>
-                <button type="button" aria-label={`Remove ${p.name}`} title="Remove" onClick={() => onRemove(p.id)}>
+                <button type="button" aria-label={t("live.host.remove", { name: p.name })} title={t("live.host.removeShort")} onClick={() => onRemove(p.id)}>
                   <span className="material-symbols-outlined" aria-hidden="true">
                     close
                   </span>
@@ -252,16 +277,16 @@ function Lobby({ state, busy, onStart, onLock, onRemove, onClose }) {
           <span className="material-symbols-outlined" aria-hidden="true">
             close
           </span>
-          Cancel
+          {t("live.host.cancel")}
         </button>
         <button type="button" className={`live-ghost-button ${state.locked ? "is-on" : ""}`} onClick={onLock}>
           <span className="material-symbols-outlined" aria-hidden="true">
             {state.locked ? "lock" : "lock_open"}
           </span>
-          {state.locked ? "Locked" : "Lock room"}
+          {state.locked ? t("live.host.locked") : t("live.host.lock")}
         </button>
         <button type="button" className="live-go-button" onClick={onStart} disabled={busy || count === 0}>
-          Start
+          {t("live.host.start")}
           <span className="material-symbols-outlined" aria-hidden="true">
             play_arrow
           </span>
@@ -273,7 +298,7 @@ function Lobby({ state, busy, onStart, onLock, onRemove, onClose }) {
 
 // --- a question, then its answer ----------------------------------------------------
 
-function QuestionBoard({ state, now, busy, onNext }) {
+function QuestionBoard({ t, state, now, busy, onNext }) {
   const q = state.question;
   const reveal = state.reveal;
   const clock = questionClock(state, now);
@@ -292,16 +317,16 @@ function QuestionBoard({ state, now, busy, onNext }) {
         </span>
         {reveal ? (
           <span className="live-q-status">
-            {reveal.right_count} of {total} got it right
+            {t("live.host.rightCount", { right: reveal.right_count, total })}
           </span>
         ) : (
           <span className="live-q-status">
-            {clock.reading ? "Get ready..." : inverted ? "Find the photo" : "What is this?"}
+            {clock.reading ? t("live.host.getReady") : inverted ? t("live.host.findPhoto") : t("live.host.whatIsThis")}
           </span>
         )}
         <span className="live-q-answers">
           <strong>{state.answered_count}</strong>
-          answer{state.answered_count === 1 ? "" : "s"}
+          {t("live.host.answers", { n: state.answered_count })}
         </span>
       </header>
 
@@ -309,7 +334,7 @@ function QuestionBoard({ state, now, busy, onNext }) {
         {!reveal && <Countdown {...clock} />}
         {inverted ? (
           <div className="live-q-prompt">
-            <span>Find the</span>
+            <span>{t("live.host.findThe")}</span>
             <strong>{q.prompt}</strong>
           </div>
         ) : (
@@ -319,7 +344,7 @@ function QuestionBoard({ state, now, busy, onNext }) {
         )}
         {reveal && (
           <aside className="live-q-explain">
-            <span className="live-q-explain-label">Answer</span>
+            <span className="live-q-explain-label">{t("live.host.answer")}</span>
             <strong>{reveal.item.name}</strong>
             {reveal.item.description && <p>{reveal.item.description}</p>}
           </aside>
@@ -338,7 +363,7 @@ function QuestionBoard({ state, now, busy, onNext }) {
             >
               <Shape index={i} size={inverted ? 30 : 38} />
               {inverted ? (
-                <img src={imageSrc(choice.image_url)} alt={`${style.label}`} draggable="false" />
+                <img src={imageSrc(choice.image_url)} alt={t(`live.shape.${style.key}`)} draggable="false" />
               ) : (
                 <span className="live-option-text">{choice.name}</span>
               )}
@@ -347,7 +372,7 @@ function QuestionBoard({ state, now, busy, onNext }) {
                   <span className="live-option-bar" style={{ width: `${(n / most) * 100}%` }} />
                   <span className="live-option-n">{n}</span>
                   {isRight && (
-                    <span className="material-symbols-outlined" aria-label="Right answer">
+                    <span className="material-symbols-outlined" aria-label={t("live.host.rightAnswer")}>
                       check_circle
                     </span>
                   )}
@@ -359,7 +384,7 @@ function QuestionBoard({ state, now, busy, onNext }) {
       </ul>
 
       <button type="button" className="live-next-button" onClick={onNext} disabled={busy}>
-        {reveal ? "Standings" : "Skip"}
+        {reveal ? t("live.host.standings") : t("live.host.skip")}
         <span className="material-symbols-outlined" aria-hidden="true">
           {reveal ? "leaderboard" : "skip_next"}
         </span>
@@ -370,18 +395,18 @@ function QuestionBoard({ state, now, busy, onNext }) {
 
 // --- standings ------------------------------------------------------------------------
 
-function Scoreboard({ state, busy, onNext }) {
+function Scoreboard({ t, state, busy, onNext }) {
   const last = state.position >= state.question_count;
   return (
     <div className="live-scoreboard">
-      <h1>Standings</h1>
+      <h1>{t("live.host.standings")}</h1>
       <ol className="live-ranks">
         {state.leaderboard.map((p, i) => (
           <li key={p.id} style={{ animationDelay: `${i * 90}ms` }}>
             <span className="live-rank-n">{i + 1}</span>
             <span className="live-rank-name">{p.name}</span>
             {p.streak >= 2 && (
-              <span className="live-rank-streak" title="Right answers in a row">
+              <span className="live-rank-streak" title={t("live.host.streak")}>
                 <span className="material-symbols-outlined" aria-hidden="true">
                   local_fire_department
                 </span>
@@ -393,7 +418,7 @@ function Scoreboard({ state, busy, onNext }) {
         ))}
       </ol>
       <button type="button" className="live-next-button" onClick={onNext} disabled={busy}>
-        {last ? "Final results" : "Next question"}
+        {last ? t("live.host.final") : t("live.host.nextQuestion")}
         <span className="material-symbols-outlined" aria-hidden="true">
           arrow_forward
         </span>
@@ -402,7 +427,7 @@ function Scoreboard({ state, busy, onNext }) {
   );
 }
 
-function Podium({ state, onNew }) {
+function Podium({ t, state, onNew }) {
   const [first, second, third] = state.leaderboard;
   const rest = state.leaderboard.slice(3);
   const steps = [
@@ -412,7 +437,7 @@ function Podium({ state, onNew }) {
   ];
   return (
     <div className="live-podium-page">
-      <h1>Final results</h1>
+      <h1>{t("live.host.final")}</h1>
       <div className="live-podium">
         {steps.map(([p, place, cls]) => (
           <div key={place} className={`live-step ${cls}`}>
@@ -439,11 +464,11 @@ function Podium({ state, onNew }) {
       )}
       {state.owned && (
         <p className="live-podium-saved">
-          Results saved. <Link to="/live/history">See past games</Link>
+          {rich(t("live.host.saved"), { link: <Link to="/live/history">{t("live.host.seePast")}</Link> })}
         </p>
       )}
       <button type="button" className="live-go-button" onClick={onNew}>
-        New game
+        {t("live.host.newGame")}
       </button>
     </div>
   );

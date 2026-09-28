@@ -186,7 +186,7 @@ function live(path, token, options = {}) {
   });
 }
 
-export function createLiveGame({ categorySlug, mode, questionCount, timeLimit }) {
+export function createLiveGame({ categorySlug, mode, questionCount, timeLimit, lang }) {
   return live("", null, {
     method: "POST",
     body: JSON.stringify({
@@ -194,6 +194,7 @@ export function createLiveGame({ categorySlug, mode, questionCount, timeLimit })
       mode,
       question_count: questionCount,
       time_limit: timeLimit,
+      lang,
     }),
   });
 }
