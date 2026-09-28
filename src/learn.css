@@ -170,6 +170,20 @@
 }
 .flip-back { transform: rotateY(180deg); }
 
+/* Hiding the back of a face is not enough on every browser: Safari still
+   draws the badge and star that sit on top of the front face, mirrored, on
+   the back. So the face that is turned away is also hidden outright, halfway
+   through the turn (the turn takes 0.5 s). */
+.flip-face,
+.flip-face * {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.flip-front { visibility: visible; transition: visibility 0s linear 0.25s; }
+.flip-back { visibility: hidden; transition: visibility 0s linear 0.25s; }
+.flip-card.is-flipped .flip-front { visibility: hidden; }
+.flip-card.is-flipped .flip-back { visibility: visible; }
+
 .flip-top {
   position: absolute;
   top: 0;
@@ -1074,7 +1088,7 @@
 .code-boxes:focus-within .code-box.is-current { border-color: var(--primary); }
 
 @media (prefers-reduced-motion: reduce) {
-  .flip-inner, .card-mover, .toast, .toast-xp, .combo-pill, .name-option, .photo-option, .sheet { transition: none !important; animation: none !important; }
+  .flip-inner, .flip-front, .flip-back, .card-mover, .toast, .toast-xp, .combo-pill, .name-option, .photo-option, .sheet { transition: none !important; animation: none !important; }
 }
 
 
