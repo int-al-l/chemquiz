@@ -912,3 +912,199 @@ PHOTOS.update(_LABWARE_PHOTOS)
 NEW_OR_CHANGED.update(_LABWARE_CARDS)
 for _slug in _LABWARE_PHOTOS:
     DROPPED.pop(_slug, None)
+
+# --- new cards, 2026-09-29 ---------------------------------------------------------
+# Everyday equipment the set was missing, all photographed from Commons. Still
+# missing for want of a usable photograph: Wurtz and Claisen flasks, UV lamp.
+PHOTOS.update({
+    "dean-stark-trap": ["wm:Dean-Stark.JPG", "wm:Dean-Stark trap in use.jpg"],
+    "rotary-evaporator": ["wm:Rotationsverdampfer ohne Vakuumpumpe.jpg", "wm:Rotationsverdampfer.jpg",
+                          "wm:Heidolph Rotary evaporator.jpg"],
+    "heating-mantle": ["wm:Electrothermal Heating Mantle.jpg", "wm:Topné hnízdo.jpg", "wm:Heating Mantle1.jpg"],
+    "cork-ring": ["wm:Korkring.png", "wm:Round bottom flasks cork stand.jpg",
+                  "wm:Korkové podstavce pro varné baňky s kulatým dnem.jpg"],
+    "wash-bottle": ["wm:Lab wash-bottles water EtOH.jpg", "wm:Wash bottle.jpg", "wm:Wash bottle2.jpg"],
+    "stirring-rod": ["wm:Stirring rod.jpg", "wm:Pyrex Glass Rod.jpg", "wm:Glass rod.jpg"],
+    "watch-glass": ["wm:Uhrglas.png", "wm:Chroman sodný.JPG"],
+    "rubber-stopper": ["wm:Rubber stopper holes.jpg", "wm:Rubber stopper.jpeg", "wm:Rubber bung 1.jpg"],
+    "syringe": ["wm:Disposable syringe 5ml 3.jpg", "wm:Disposable syringe 30ml 3.jpg", "wm:Syringe with needle (2).JPG"],
+    "tlc-plate": ["wm:TLC-isomers.jpg", "wm:Chiral TLC Baclofen.jpg"],
+})
+DROPPED.pop("dean-stark-trap", None)
+
+COMMONS.update({
+    'Dean-Stark.JPG': {
+        "credit": 'Epop, CC0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Dean-Stark.JPG',
+    },
+    'Dean-Stark trap in use.jpg': {
+        "credit": 'Mfomich, CC0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Dean-Stark_trap_in_use.jpg',
+    },
+    'Rotationsverdampfer.jpg': {
+        "credit": 'Gmhofmann, public domain, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Rotationsverdampfer.jpg',
+    },
+    'Heidolph Rotary evaporator.jpg': {
+        "credit": 'Edsel Little, CC BY-SA 2.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Heidolph_Rotary_evaporator.jpg',
+    },
+    'Rotationsverdampfer ohne Vakuumpumpe.jpg': {
+        "credit": 'HaJo88, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Rotationsverdampfer_ohne_Vakuumpumpe.jpg',
+    },
+    'Electrothermal Heating Mantle.jpg': {
+        "credit": 'Markbob1968, CC BY-SA 3.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Electrothermal_Heating_Mantle.jpg',
+    },
+    'Topné hnízdo.jpg': {
+        "credit": 'Milda 444, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Topn%C3%A9_hn%C3%ADzdo.jpg',
+    },
+    'Heating Mantle1.jpg': {
+        "credit": 'Naithik Shetty, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Heating_Mantle1.jpg',
+    },
+    'Lab wash-bottles water EtOH.jpg': {
+        "credit": 'Masur, public domain, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Lab_wash-bottles_water_EtOH.jpg',
+    },
+    'Wash bottle.jpg': {
+        "credit": 'Kessaya.gae, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Wash_bottle.jpg',
+    },
+    'Wash bottle2.jpg': {
+        "credit": 'Kessaya.gae, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Wash_bottle2.jpg',
+    },
+    'Uhrglas.png': {
+        "credit": 'MediaLab TH Köln, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Uhrglas.png',
+    },
+    'Chroman sodný.JPG': {
+        "credit": 'Ondřej Mangl, public domain, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Chroman_sodn%C3%BD.JPG',
+    },
+    'Stirring rod.jpg': {
+        "credit": 'TarnPraewan, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Stirring_rod.jpg',
+    },
+    'Pyrex Glass Rod.jpg': {
+        "credit": 'TarnPraewan, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Pyrex_Glass_Rod.jpg',
+    },
+    'Glass rod.jpg': {
+        "credit": 'TarnPraewan, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Glass_rod.jpg',
+    },
+    'Disposable syringe 5ml 3.jpg': {
+        "credit": 'Nadina Wiórkiewicz (Nadine90), CC BY-SA 3.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Disposable_syringe_5ml_3.jpg',
+    },
+    'Disposable syringe 30ml 3.jpg': {
+        "credit": 'Nadina Wiórkiewicz (Nadine90), CC BY-SA 3.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Disposable_syringe_30ml_3.jpg',
+    },
+    'Syringe with needle (2).JPG': {
+        "credit": 'Intropin, CC BY-SA 3.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Syringe_with_needle_(2).JPG',
+    },
+    'Round bottom flasks cork stand.jpg': {
+        "credit": 'Nadina Wiórkiewicz (Nadine90), CC BY-SA 3.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Round_bottom_flasks_cork_stand.jpg',
+    },
+    'Korkové podstavce pro varné baňky s kulatým dnem.jpg': {
+        "credit": 'Milda 444, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Korkov%C3%A9_podstavce_pro_varn%C3%A9_ba%C5%88ky_s_kulat%C3%BDm_dnem.jpg',
+    },
+    'Korkring.png': {
+        "credit": 'MediaLab TH Köln, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Korkring.png',
+    },
+    'Rubber stopper holes.jpg': {
+        "credit": 'U5780710, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Rubber_stopper_holes.jpg',
+    },
+    'Rubber stopper.jpeg': {
+        "credit": 'Gharris, CC BY-SA 3.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Rubber_stopper.jpeg',
+    },
+    'Rubber bung 1.jpg': {
+        "credit": 'Nadans., CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Rubber_bung_1.jpg',
+    },
+    'TLC-isomers.jpg': {
+        "credit": 'Dvnyn, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:TLC-isomers.jpg',
+    },
+    'Chiral TLC Baclofen.jpg': {
+        "credit": 'RBn53, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Chiral_TLC_Baclofen.jpg',
+    },
+})
+
+NEW_OR_CHANGED.update({
+    # --- distillation ------------------------------------------------------------------
+    "dean-stark-trap": _card(
+        "distillation", "Dean–Stark trap", ["Dean-Stark apparatus", "Dean Stark", "Dean-Stark receiver",
+                                            "Water separator"],
+        "A graduated side tube with a tap, fitted between a reaction flask and a reflux condenser. The "
+        "solvent — usually toluene — boils off together with the water the reaction makes; both condense "
+        "and drip into the tube, where the heavier water sinks and the solvent overflows back into the "
+        "flask. Taking the water out drives the reaction to completion, and the scale shows how far it "
+        "has got.", "DEAN-STARK TRAP"),
+    "rotary-evaporator": _card(
+        "distillation", "Rotary evaporator", ["Rotovap", "Rotavap", "Rotary evaporation apparatus"],
+        "An instrument for removing solvent from a solution quickly and gently. The flask spins, half "
+        "dipped in a warm water bath, so the liquid spreads into a thin film; under vacuum the solvent "
+        "boils far below its normal boiling point, condenses on a cooled coil and runs into a receiving "
+        "flask. Almost every organic product is concentrated on one.", "ROTARY EVAPORATOR"),
+    # --- heating & support -------------------------------------------------------------------
+    "heating-mantle": _card(
+        "bench", "Heating mantle", ["Mantle heater", "Heating mantel", "Isomantle"],
+        "A bowl of woven glass fabric with a heating wire inside, shaped to cradle a round-bottom flask. "
+        "It heats the whole lower half of the flask evenly, with no open flame and no bath of hot oil, "
+        "which makes it the usual way to heat a flask for a distillation or a reflux."),
+    "cork-ring": _card(
+        "bench", "Cork ring", ["Cork flask stand", "Cork support ring", "Flask stand"],
+        "A thick ring of cork that a round-bottom flask sits in on the bench. Without it the flask would "
+        "roll over; cork also does not scratch the glass and does not draw heat out of a hot flask as "
+        "suddenly as a cold bench top would."),
+    # --- bench tools --------------------------------------------------------------------------
+    "wash-bottle": _card(
+        "tools", "Wash bottle", ["Squeeze bottle", "Squirt bottle", "Rinse bottle"],
+        "A soft plastic bottle with a bent nozzle. Squeezing it sends out a thin, aimed stream of water "
+        "or solvent — for rinsing glassware, washing a solid on a filter, or bringing a volumetric flask "
+        "up to the mark."),
+    "stirring-rod": _card(
+        "tools", "Glass rod", ["Stirring rod", "Glass stirring rod", "Stir rod"],
+        "A plain rod of solid glass. It stirs a solution in a beaker, guides a liquid down into a funnel "
+        "without splashing, scratches the inside of a flask to start crystals forming, and carries a "
+        "drop of solution onto indicator paper."),
+    # --- tubes & dishes -----------------------------------------------------------------------
+    "watch-glass": _card(
+        "tubes", "Watch glass", ["Watch-glass", "Clock glass"],
+        "A round, slightly curved disc of glass, like the glass of an old pocket watch. It covers a "
+        "beaker to keep dust out while vapour escapes, holds a little solid for weighing or drying, and "
+        "lets a drop of solution evaporate where the residue can be seen."),
+    # --- closures -------------------------------------------------------------------------------
+    "rubber-stopper": _card(
+        "closures", "Rubber stopper", ["Rubber bung", "Bung", "Bored stopper"],
+        "A tapered plug of rubber for a flask or a test tube without a ground-glass joint. Bored through, "
+        "it holds a thermometer, a glass tube or a funnel stem. Rubber swells in many organic solvents, "
+        "so it belongs to aqueous work and to teaching labs."),
+    # --- measuring ------------------------------------------------------------------------------
+    "syringe": _card(
+        "measuring", "Syringe", ["Disposable syringe", "Plastic syringe", "Luer syringe",
+                                 "Syringe with needle"],
+        "A plastic or glass barrel with a plunger and, usually, a steel needle on a Luer fitting. In the "
+        "lab it measures out a liquid and moves it through a septum without opening the flask, so air- "
+        "and moisture-sensitive reagents go straight from their bottle into the reaction."),
+    # --- chromatography ------------------------------------------------------------------------
+    "tlc-plate": _card(
+        "chromatography", "TLC plate", ["Thin-layer chromatography plate", "Silica plate", "TLC sheet"],
+        "A sheet of glass, aluminium or plastic coated with a thin layer of silica gel. Spots of the "
+        "mixtures go on a pencil line near the bottom; after the plate has stood in solvent in a "
+        "developing tank, the compounds sit at different heights and are seen under a UV lamp or with "
+        "a stain."),
+})
