@@ -590,6 +590,8 @@ def host_view(room: Room, now: float) -> dict:
         "question_count": len(game.questions),
         "position": game.position,
         "locked": game.locked,
+        # Signed in when the room was opened: the game goes into their history.
+        "owned": game.host_user_id is not None,
         **_clock(room, now),
         "players": [
             {

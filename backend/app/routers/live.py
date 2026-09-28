@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 from .. import crud, live, models
 from ..config import MAX_QUESTION_COUNT, QUIZ_MODES
 from ..database import get_db
+from .account import optional_user
 
 router = APIRouter(prefix="/api/live", tags=["live"])
 
@@ -77,7 +78,11 @@ def network():
 
 
 @router.post("", status_code=201)
-def create(payload: CreateIn, db: Session = Depends(get_db)):
+def create(
+    payload: CreateIn,
+    db: Session = Depends(get_db),
+    user: Optional[models.User] = Depends(optional_user),
+):
     if payload.mode not in QUIZ_MODES:
         raise HTTPException(status_code=422, detail=f"Unknown mode '{payload.mode}'")
     if payload.time_limit not in live.TIME_LIMITS:
@@ -94,6 +99,7 @@ def create(payload: CreateIn, db: Session = Depends(get_db)):
             question_count=payload.question_count,
             time_limit=payload.time_limit,
             category=category,
+            host_user=user,
         )
     except live.LiveError as exc:
         raise _fail(db, exc) from exc

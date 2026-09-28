@@ -5,10 +5,10 @@ from __future__ import annotations
 import random
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app import live, models
-from test_api import client  # noqa: F401 -- the seeded test app
+from test_api import auth, client, sign_in  # noqa: F401 -- the seeded test app
 
 
 class Clock:
@@ -246,3 +246,78 @@ def test_a_taken_pin_is_skipped(client, clock):
         )
         db.commit()
         assert room.game.pin == "654321"
+
+
+def teacher(client):
+    """Sign-in headers for a teacher account."""
+    return auth(sign_in(client).json()["token"])
+
+
+def stored(client, **where):
+    with client.session_factory() as db:
+        return db.scalars(select(models.LiveGame).filter_by(**where)).all()
+
+
+def start_one_question(client, room):
+    pin, token = room["pin"], room["host_token"]
+    join(client, pin, "Ann")
+    client.post(f"/api/live/{pin}/next", headers=host(token))
+    return pin, token
+
+
+def test_a_signed_in_host_owns_the_game(client, clock):
+    assert make_room(client, headers=teacher(client))["owned"] is True
+    assert make_room(client)["owned"] is False
+
+
+def test_an_expired_sign_in_still_hosts(client, clock):
+    room = make_room(client, headers=auth("not-a-real-token"))
+    assert room["owned"] is False
+
+
+def test_closing_an_owned_started_game_keeps_it(client, clock):
+    room = make_room(client, headers=teacher(client))
+    pin, token = start_one_question(client, room)
+    assert client.delete(f"/api/live/{pin}", headers=host(token)).status_code == 204
+    assert client.get(f"/api/live/{pin}").status_code == 404  # the PIN is free again
+    [game] = stored(client, host_token=token)
+    assert game.pin is None and game.started_at is not None
+
+
+def test_closing_an_owned_game_still_in_the_lobby_drops_it(client, clock):
+    room = make_room(client, headers=teacher(client))
+    client.delete(f"/api/live/{room['pin']}", headers=host(room["host_token"]))
+    assert stored(client, host_token=room["host_token"]) == []
+
+
+def test_idle_games_are_archived_or_dropped(client, clock):
+    t = teacher(client)
+    kept = make_room(client, headers=t)
+    start_one_question(client, kept)
+    lobby = make_room(client, headers=t)
+    anonymous = make_room(client)
+    start_one_question(client, anonymous)
+
+    clock.advance(live.ROOM_IDLE_SECONDS + 1)
+    make_room(client)  # creating a game runs the purge
+
+    [game] = stored(client, host_token=kept["host_token"])
+    assert game.pin is None
+    assert stored(client, host_token=lobby["host_token"]) == []
+    assert stored(client, host_token=anonymous["host_token"]) == []
+    with client.session_factory() as db:
+        # Only the kept game's player is left.
+        assert db.scalar(select(func.count()).select_from(models.LivePlayer)) == 1
+
+
+def test_an_archived_games_pin_can_be_reused(client, clock):
+    room = make_room(client, headers=teacher(client))
+    pin, token = start_one_question(client, room)
+    client.delete(f"/api/live/{pin}", headers=host(token))
+    with client.session_factory() as db:
+        again = live.create_room(
+            db, mode="choice", question_count=1, time_limit=20, category=None,
+            rng=SamePins([pin]),
+        )
+        db.commit()
+        assert again.game.pin == pin
