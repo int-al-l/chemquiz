@@ -10,11 +10,12 @@ from __future__ import annotations
 import csv
 import datetime as dt
 import io
+from typing import Optional
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
-from . import models
+from . import live, models
 
 # An item goes into "Work on mistakes" when fewer than this share of the class
 # got it right. Not answering counts as getting it wrong.
@@ -146,3 +147,47 @@ def results_csv(db: Session, game: models.LiveGame) -> str:
 def csv_filename(game: models.LiveGame) -> str:
     day = dt.datetime.fromtimestamp(game.started_at, dt.timezone.utc).strftime("%Y-%m-%d")
     return f"chemquiz-class-game-{day}.csv"
+
+
+def _deck(db: Session, game: models.LiveGame) -> Optional[models.Category]:
+    """The deck to play again from; None means the whole library."""
+    if game.category_slug is None:
+        return None
+    category = db.get(models.Category, game.category_id) if game.category_id else None
+    if category is None:
+        raise live.LiveError("That deck is no longer on the site")
+    return category
+
+
+def replay(db: Session, game: models.LiveGame, kind: str, user: models.User) -> live.Room:
+    """A new room from a past game: "same" draws afresh with the same
+    settings; "mistakes" asks only what the class got wrong."""
+    category = _deck(db, game)
+    if kind == "same":
+        return live.create_room(
+            db,
+            mode=game.mode,
+            question_count=game.question_count,
+            time_limit=game.time_limit,
+            category=category,
+            host_user=user,
+        )
+    ids = Results(db, game).mistake_item_ids()
+    if not ids:
+        raise live.LiveError("The class got every question right -- nothing to go over")
+    items = db.scalars(
+        select(models.Item)
+        .where(models.Item.id.in_(ids))
+        .options(selectinload(models.Item.photos), selectinload(models.Item.category))
+    ).all()
+    if not items:
+        raise live.LiveError("Those items are no longer on the site")
+    return live.create_room(
+        db,
+        mode=game.mode,
+        question_count=len(items),
+        time_limit=game.time_limit,
+        category=category,
+        host_user=user,
+        items=list(items),
+    )

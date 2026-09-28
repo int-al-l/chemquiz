@@ -6,7 +6,10 @@ it did not exist.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Response
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -70,3 +73,26 @@ def results_csv(game_id: int, user: models.User = Depends(current_user), db: Ses
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": f'attachment; filename="{live_history.csv_filename(game)}"'},
     )
+
+
+class ReplayIn(BaseModel):
+    kind: Literal["same", "mistakes"]
+
+
+@router.post("/{game_id}/replay", status_code=201)
+def replay(
+    game_id: int,
+    payload: ReplayIn,
+    user: models.User = Depends(current_user),
+    db: Session = Depends(get_db),
+):
+    """Open a new room from a past game; answers like POST /api/live."""
+    game = _own_game(db, user, game_id)
+    try:
+        room = live_history.replay(db, game, payload.kind, user)
+    except live.LiveError as exc:
+        db.rollback()
+        raise HTTPException(status_code=exc.status, detail=str(exc)) from exc
+    view = {"host_token": room.game.host_token, **live.host_view(room, live._now())}
+    db.commit()
+    return view

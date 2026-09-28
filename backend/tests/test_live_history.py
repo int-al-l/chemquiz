@@ -148,3 +148,84 @@ def test_an_unfinished_games_csv_has_only_the_questions_asked(client, clock):
     rows = csv_rows(client, t, only_game(client, t)["id"])
     assert len(rows[0]) == 4 + 1
     assert rows[1][3:] == ["0", ""]
+
+
+def replay(client, headers, game_id, kind):
+    return client.post(f"/api/me/live-games/{game_id}/replay", json={"kind": kind}, headers=headers)
+
+
+def test_play_again_with_the_same_settings(client, clock):
+    t = teacher(client)
+    play(client, clock, ["Ann"], [{"Ann": "right"}, {"Ann": "wrong"}], headers=t)
+    res = replay(client, t, only_game(client, t)["id"], "same")
+    assert res.status_code == 201
+    room = res.json()
+    assert room["phase"] == "lobby" and room["owned"] is True and room["host_token"]
+    assert room["question_count"] == 2 and room["category_name"] == "Condensers"
+
+
+def test_work_on_mistakes_takes_the_items_under_80_percent(client, clock):
+    t = teacher(client)
+    five = ["A", "B", "C", "D", "E"]
+    room, _ = play(client, clock, five, [
+        {"A": "right", "B": "right", "C": "right", "D": "right", "E": "wrong"},  # 80%: fine
+        {"A": "right", "B": "right", "C": "right"},  # 60%, two did not answer: a mistake
+        {name: "wrong" for name in five},  # 0%: a mistake
+    ], headers=t)
+    expected = {correct_id(client, room["pin"], 2), correct_id(client, room["pin"], 3)}
+
+    old = only_game(client, t)
+    assert old["has_mistakes"] is True
+    new = replay(client, t, old["id"], "mistakes").json()
+
+    with client.session_factory() as db:
+        game = db.scalars(select(models.LiveGame).where(models.LiveGame.pin == new["pin"])).one()
+        assert {q["correct_id"] for q in game.questions} == expected
+        assert game.mode == "choice" and game.time_limit == 20
+        assert game.category_slug == "condensers"
+
+
+def test_no_mistakes_nothing_to_replay(client, clock):
+    t = teacher(client)
+    play(client, clock, ["Ann"], [{"Ann": "right"}], headers=t)
+    old = only_game(client, t)
+    assert old["has_mistakes"] is False
+    assert replay(client, t, old["id"], "mistakes").status_code == 409
+
+
+def test_mistakes_only_count_questions_that_were_asked(client, clock):
+    t = teacher(client)
+    room = make_room(client, headers=t, question_count=3)
+    pin, token = room["pin"], room["host_token"]
+    ann = join(client, pin, "Ann")
+    client.post(f"/api/live/{pin}/next", headers=host(token))
+    clock.advance(live.READ_SECONDS + 1)
+    client.post(
+        f"/api/live/{pin}/answer",
+        json={"position": 1, "choice_id": correct_id(client, pin, 1)},
+        headers=host(ann["token"]),
+    )
+    client.delete(f"/api/live/{pin}", headers=host(token))  # closed after question 1
+    # Questions 2 and 3 were never asked, so they are not mistakes.
+    assert only_game(client, t)["has_mistakes"] is False
+
+
+def test_replaying_a_removed_deck_is_refused(client, clock):
+    t = teacher(client)
+    play(client, clock, ["Ann"], [{"Ann": "wrong"}], headers=t)
+    with client.session_factory() as db:
+        # What Postgres's ON DELETE SET NULL leaves when the deck is removed.
+        db.execute(update(models.LiveGame).values(category_id=None))
+        db.commit()
+    game_id = only_game(client, t)["id"]
+    assert replay(client, t, game_id, "same").status_code == 409
+    assert replay(client, t, game_id, "mistakes").status_code == 409
+
+
+def test_replay_checks_the_kind_and_the_owner(client, clock):
+    t = teacher(client)
+    play(client, clock, ["Ann"], [{"Ann": "wrong"}], headers=t)
+    game_id = only_game(client, t)["id"]
+    assert replay(client, t, game_id, "everything").status_code == 422
+    other = auth(sign_in(client, name="Bea", email="bea@example.com").json()["token"])
+    assert replay(client, other, game_id, "same").status_code == 404
