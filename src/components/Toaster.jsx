@@ -1,8 +1,10 @@
+import { badgeText, titleKey, useT } from "../i18n";
 import { useProgress } from "../progress/context";
 
 /** XP pops, level-ups and new badges, floating above whatever page is open. */
 function Toaster() {
   const { toasts, dismissToast } = useProgress();
+  const tr = useT();
   if (!toasts.length) return null;
 
   return (
@@ -11,7 +13,7 @@ function Toaster() {
         if (t.type === "xp") {
           return (
             <div key={`${t.id}-${t.bump}`} className="toast toast-xp">
-              +{t.amount} XP
+              {tr("toast.xp", { amount: t.amount })}
             </div>
           );
         }
@@ -20,16 +22,16 @@ function Toaster() {
         let text = "";
         if (t.type === "level") {
           icon = "military_tech";
-          title = `Level ${t.level}!`;
-          text = t.newTitle ? `New title: ${t.title}` : "Keep it up!";
+          title = tr("toast.level", { n: t.level });
+          text = t.newTitle ? tr("toast.newTitle", { title: tr(titleKey(t.title)) }) : tr("toast.keepItUp");
         } else if (t.type === "badge") {
           icon = t.badge.icon;
-          title = "Badge unlocked";
-          text = t.badge.title;
+          title = tr("toast.badge");
+          text = badgeText(tr, t.badge).title;
         } else if (t.type === "goal") {
           icon = "flag";
-          title = "Daily goal reached";
-          text = "+20 XP bonus";
+          title = tr("toast.goal");
+          text = tr("toast.goalBonus");
         }
         return (
           <button

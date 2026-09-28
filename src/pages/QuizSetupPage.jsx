@@ -5,6 +5,7 @@ import PageHeader from "../components/PageHeader";
 import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { fetchCategory, fetchItems, imageSrc, startQuiz } from "../api/client";
 import { useApi } from "../hooks/useApi";
+import { useT } from "../i18n";
 
 const LENGTHS = [5, 10, 20];
 
@@ -12,14 +13,14 @@ const MODES = [
   {
     id: "choice",
     icon: "image_search",
-    title: "Name it",
-    note: "See a photo, pick the name",
+    title: "setup.nameIt",
+    note: "setup.nameItNote",
   },
   {
     id: "inverted",
     icon: "grid_view",
-    title: "Find it",
-    note: "See a name, pick the photo",
+    title: "setup.findIt",
+    note: "setup.findItNote",
   },
 ];
 
@@ -47,6 +48,7 @@ function previewOf(items) {
  * you at a glance whether you picked the category you meant.
  */
 function QuizSetupPage() {
+  const t = useT();
   const { slug } = useParams();
   const navigate = useNavigate();
 
@@ -72,7 +74,7 @@ function QuizSetupPage() {
   const preview = useMemo(() => previewOf(items), [items]);
 
   const available = slug ? (category?.quizzable_count ?? 0) : items.length;
-  const title = slug ? (category?.name ?? "Quiz") : "All categories";
+  const title = slug ? (category?.name ?? t("setup.quiz")) : t("common.allCategories");
   const length = Math.min(questionCount, available || questionCount);
 
   function pickCount(n) {
@@ -112,7 +114,7 @@ function QuizSetupPage() {
             <>
               {available === 0 ? (
                 <p className="status-message">
-                  This category has no items yet, so there is nothing to quiz on.
+                  {t("setup.nothing")}
                 </p>
               ) : (
                 <>
@@ -127,12 +129,13 @@ function QuizSetupPage() {
                   )}
 
                   <p className="setup-lead">
-                    {available} piece{available === 1 ? "" : "s"} to name
-                    {slug ? ` in ${title.toLowerCase()}` : ""}.
+                    {slug
+                      ? t("setup.leadIn", { n: available, lower: title.toLowerCase(), name: title })
+                      : t("setup.leadAll", { n: available })}
                   </p>
 
                   <fieldset className="option-group">
-                    <legend className="option-legend">Answer by</legend>
+                    <legend className="option-legend">{t("setup.answerBy")}</legend>
 
                     <div className="option-row">
                       {MODES.map((choice) => (
@@ -149,15 +152,15 @@ function QuizSetupPage() {
                           >
                             {choice.icon}
                           </span>
-                          {choice.title}
-                          <span className="option-note">{choice.note}</span>
+                          {t(choice.title)}
+                          <span className="option-note">{t(choice.note)}</span>
                         </button>
                       ))}
                     </div>
                   </fieldset>
 
                   <fieldset className="option-group">
-                    <legend className="option-legend">Questions</legend>
+                    <legend className="option-legend">{t("setup.questions")}</legend>
 
                     <div className="option-row option-row-tight">
                       {LENGTHS.filter((n) => n < available).map((count) => (
@@ -181,11 +184,11 @@ function QuizSetupPage() {
                         aria-pressed={questionCount === available}
                         type="button"
                       >
-                        All
+                        {t("setup.all")}
                         <span className="option-note">{available}</span>
                       </button>
                       <label className="count-field">
-                        <span className="option-note">or type</span>
+                        <span className="option-note">{t("setup.orType")}</span>
                         <input
                           type="number"
                           inputMode="numeric"
@@ -200,16 +203,14 @@ function QuizSetupPage() {
                             }
                           }}
                           onBlur={() => pickCount(questionCount)}
-                          aria-label="Number of questions"
+                          aria-label={t("setup.countLabel")}
                         />
                       </label>
                     </div>
 
                     {parseInt(countText, 10) > available && (
                       <p className="option-hint">
-                        There {available === 1 ? "is" : "are"} {available} piece
-                        {available === 1 ? "" : "s"} here, so the quiz will be {available} question
-                        {available === 1 ? "" : "s"} long.
+                        {t("setup.capped", { n: available })}
                       </p>
                     )}
                   </fieldset>
@@ -222,11 +223,10 @@ function QuizSetupPage() {
                     disabled={starting}
                     type="button"
                   >
-                    {starting ? "Starting..." : "Start quiz"}
+                    {starting ? t("setup.starting") : t("setup.start")}
                     {!starting && (
                       <span className="primary-button-note">
-                        {length} question{length === 1 ? "" : "s"},{" "}
-                        {mode === "choice" ? "photo to name" : "name to photo"}
+                        {t(mode === "choice" ? "setup.noteChoice" : "setup.noteInverted", { n: length })}
                       </span>
                     )}
                   </button>

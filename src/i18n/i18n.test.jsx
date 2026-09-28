@@ -69,3 +69,19 @@ describe("switching language", () => {
     expect(document.documentElement.lang).toBe("ru");
   });
 });
+
+import { BADGES } from "../progress/engine";
+import { titleKey } from "./index";
+
+describe("engine texts", () => {
+  it("every badge and level title has a key", () => {
+    for (const b of BADGES) {
+      expect(en[`badge.${b.id}.title`], b.id).toBe(b.title);
+      expect(typeof ru[`badge.${b.id}.blurb`], b.id).toBe("string");
+    }
+    for (const title of ["Lab Rookie", "Glassware Apprentice", "Bench Hand", "Bench Chemist",
+      "Synthesis Pro", "Distillation Master", "Master Glassblower"]) {
+      expect(en[titleKey(title)], title).toBe(title);
+    }
+  });
+});

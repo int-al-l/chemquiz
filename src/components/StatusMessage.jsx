@@ -4,21 +4,25 @@
  * way instead of inventing its own.
  */
 
-export function Loading({ label = "Loading..." }) {
+import { useT } from "../i18n";
+
+export function Loading({ label }) {
+  const t = useT();
   return (
     <p className="status-message" role="status">
-      {label}
+      {label ?? t("common.loading")}
     </p>
   );
 }
 
 export function ErrorMessage({ error, onRetry }) {
+  const t = useT();
   return (
     <div className="status-message status-error" role="alert">
-      <p>{error?.message ?? "Something went wrong."}</p>
+      <p>{error?.message ?? t("common.error")}</p>
       {onRetry && (
         <button className="text-button" onClick={onRetry} type="button">
-          Try again
+          {t("common.retry")}
         </button>
       )}
     </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { imageSrc } from "../api/client";
-import { MASTERY_LABEL } from "../progress/engine";
+import { useT } from "../i18n";
 
 /**
  * A study card: the photograph fills the front, the name sits in a strip at
@@ -13,6 +13,7 @@ import { MASTERY_LABEL } from "../progress/engine";
  * leaving the card.
  */
 function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, onFlip }) {
+  const t = useT();
   const photos = item.photo_urls?.length ? item.photo_urls : [item.image_url].filter(Boolean);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [failed, setFailed] = useState({});
@@ -21,7 +22,7 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
   const credit = item.photo_urls?.length ? item.photo_credits?.[shown] : null;
 
   const chip = masteryKey && (
-    <span className={`mastery-chip is-${masteryKey}`}>{MASTERY_LABEL[masteryKey]}</span>
+    <span className={`mastery-chip is-${masteryKey}`}>{t(`mastery.${masteryKey}`)}</span>
   );
 
   const star = onToggleSave && (
@@ -32,8 +33,8 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
         onToggleSave();
       }}
       aria-pressed={saved}
-      aria-label={saved ? `Remove ${item.name} from my list` : `Save ${item.name} to my list`}
-      title={saved ? "In my list" : "Save to my list"}
+      aria-label={t(saved ? "common.removeItem" : "common.saveItem", { name: item.name })}
+      title={t(saved ? "common.inList" : "common.saveToList")}
       type="button"
     >
       <span className="material-symbols-outlined">{saved ? "star" : "star_outline"}</span>
@@ -54,7 +55,7 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
             {current && !failed[current] ? (
               <img
                 src={imageSrc(current)}
-                alt={hideName ? "Which piece of glassware is this?" : item.name}
+                alt={hideName ? t("card.whichPiece") : item.name}
                 draggable="false"
                 onError={() => setFailed((f) => ({ ...f, [current]: true }))}
               />
@@ -75,7 +76,7 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
                     e.stopPropagation();
                     setPhotoIndex(i);
                   }}
-                  aria-label={`Photo ${i + 1} of ${photos.length}`}
+                  aria-label={t("card.photoOf", { i: i + 1, n: photos.length })}
                   type="button"
                 />
               ))}
@@ -86,7 +87,7 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
             {hideName ? (
               <span className="flip-strip-hint">
                 <span className="material-symbols-outlined" aria-hidden="true">touch_app</span>
-                Tap to reveal
+                {t("card.tapToReveal")}
               </span>
             ) : (
               <span className="flip-name">{item.name}</span>
@@ -108,13 +109,13 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
             {item.description ? (
               <p className="flip-back-text">{item.description}</p>
             ) : (
-              <p className="flip-back-text is-muted">No description yet.</p>
+              <p className="flip-back-text is-muted">{t("common.noDescription")}</p>
             )}
-            {credit && <p className="flip-back-credit">Photo: {credit}</p>}
+            {credit && <p className="flip-back-credit">{t("card.photoCredit", { credit })}</p>}
           </div>
           <button className="flip-back-turn" onClick={onFlip} type="button">
             <span className="material-symbols-outlined" aria-hidden="true">flip</span>
-            Turn back
+            {t("card.turnBack")}
           </button>
         </section>
       </div>

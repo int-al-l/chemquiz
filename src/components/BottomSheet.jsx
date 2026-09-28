@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 
+import { useT } from "../i18n";
+
 /** A panel that slides up from the bottom; closes on the backdrop or Escape. */
 function BottomSheet({ open, onClose, title, children }) {
+  const t = useT();
   useEffect(() => {
     if (!open) return undefined;
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -16,7 +19,7 @@ function BottomSheet({ open, onClose, title, children }) {
         <div className="sheet-handle" aria-hidden="true" />
         <header className="sheet-header">
           <h2>{title}</h2>
-          <button className="icon-button" onClick={onClose} aria-label="Close" type="button">
+          <button className="icon-button" onClick={onClose} aria-label={t("common.close")} type="button">
             <span className="material-symbols-outlined">close</span>
           </button>
         </header>

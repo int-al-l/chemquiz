@@ -7,6 +7,7 @@ import Thumbnail from "../components/Thumbnail";
 import { EmptyMessage, ErrorMessage, Loading } from "../components/StatusMessage";
 import { fetchItems } from "../api/client";
 import { useApi } from "../hooks/useApi";
+import { rich, useT } from "../i18n";
 
 import { useSaved } from "../saved/context";
 
@@ -17,6 +18,7 @@ import { useSaved } from "../saved/context";
  * so a saved item's name or picture stays current after the catalog is edited.
  */
 function MyListPage() {
+  const t = useT();
   const { slugs, remove, isSignedIn } = useSaved();
 
   const loader = useCallback(() => fetchItems(), []);
@@ -30,7 +32,7 @@ function MyListPage() {
   return (
     <main className="categories-page">
       <div className="page-layout">
-        <PageHeader title="My list" backTo="/" />
+        <PageHeader title={t("common.myList")} backTo="/" />
 
         <section className="categories-content">
           <SavedError />
@@ -40,17 +42,16 @@ function MyListPage() {
 
           {items && slugs.length === 0 && (
             <EmptyMessage>
-              Nothing saved yet. Tap the star on any card in{" "}
-              <Link to="/explore">Explore</Link> to keep it here.
+              {rich(t("mylist.empty"), {
+                explore: <Link to="/explore">{t("common.explore")}</Link>,
+              })}
             </EmptyMessage>
           )}
 
           {saved.length > 0 && (
             <Link className="primary-button" to="/explore/saved">
-              Study these as flashcards
-              <span className="button-note">
-                {saved.length} card{saved.length === 1 ? "" : "s"}
-              </span>
+              {t("mylist.study")}
+              <span className="button-note">{t("common.cards", { n: saved.length })}</span>
             </Link>
           )}
 
@@ -74,8 +75,8 @@ function MyListPage() {
                   <button
                     className="save-button"
                     onClick={() => remove(item.slug)}
-                    aria-label={`Remove ${item.name} from my list`}
-                    title="Remove from my list"
+                    aria-label={t("common.removeItem", { name: item.name })}
+                    title={t("common.removeFromList")}
                     type="button"
                   >
                     <span className="material-symbols-outlined">star</span>
@@ -87,19 +88,15 @@ function MyListPage() {
 
           {items && missing > 0 && (
             <p className="section-note">
-              {missing} saved item{missing === 1 ? " is" : "s are"} no longer in
-              the catalog.
+              {t("mylist.missing", { n: missing })}
             </p>
           )}
 
           <p className="section-note">
             {isSignedIn ? (
-              "Saved to your account, so they follow you to another device."
+              t("mylist.synced")
             ) : (
-              <>
-                Saved in this browser only.{" "}
-                <Link to="/sign-in">Sign in</Link> to keep them.
-              </>
+              rich(t("mylist.local"), { signIn: <Link to="/sign-in">{t("common.signInLink")}</Link> })
             )}
           </p>
         </section>

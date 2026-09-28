@@ -7,11 +7,13 @@ import Thumbnail from "../components/Thumbnail";
 import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { fetchResults } from "../api/client";
 import { useApi } from "../hooks/useApi";
+import { useT } from "../i18n";
 import { useSaved } from "../saved/context";
 import { LevelCard } from "../components/ProgressBits";
 
 /** One answered question in the review list. */
 function ResultRow({ question, has, toggle }) {
+  const t = useT();
   const item = question.item;
   const saved = has(item.slug);
 
@@ -32,8 +34,8 @@ function ResultRow({ question, has, toggle }) {
         {!question.is_correct && (
           <p className="item-description">
             {question.given_answer
-              ? `You picked: ${question.given_answer}`
-              : "No answer given"}
+              ? t("results.picked", { answer: question.given_answer })
+              : t("results.noAnswer")}
           </p>
         )}
       </div>
@@ -42,12 +44,8 @@ function ResultRow({ question, has, toggle }) {
         className="save-button"
         onClick={() => toggle(item.slug)}
         aria-pressed={saved}
-        aria-label={
-          saved
-            ? `Remove ${item.name} from my list`
-            : `Save ${item.name} to my list`
-        }
-        title={saved ? "In my list" : "Save to my list"}
+        aria-label={t(saved ? "common.removeItem" : "common.saveItem", { name: item.name })}
+        title={t(saved ? "common.inList" : "common.saveToList")}
         type="button"
       >
         <span className="material-symbols-outlined">
@@ -59,6 +57,7 @@ function ResultRow({ question, has, toggle }) {
 }
 
 function QuizResultsPage() {
+  const t = useT();
   const { token } = useParams();
   const location = useLocation();
   const earned = location.state?.xp;
@@ -79,7 +78,7 @@ function QuizResultsPage() {
   return (
     <main className="categories-page">
       <div className="page-layout">
-        <PageHeader title="Results" backTo="/" />
+        <PageHeader title={t("results.title")} backTo="/" />
 
         <section className="categories-content">
           <SavedError />
@@ -94,14 +93,14 @@ function QuizResultsPage() {
                   {results.correct_count} / {results.question_count}
                 </p>
                 <p className="score-label">
-                  {results.category_name ?? "All categories"}
+                  {results.category_name ?? t("common.allCategories")}
                   {" · "}
-                  {results.mode === "inverted" ? "find the photo" : "name the photo"}
+                  {results.mode === "inverted" ? t("results.modeFind") : t("results.modeName")}
                 </p>
                 {earned > 0 && (
                   <p className="score-xp">
-                    +{earned} XP
-                    {bestCombo >= 2 && <span> · best streak {bestCombo}</span>}
+                    {t("toast.xp", { amount: earned })}
+                    {bestCombo >= 2 && <span>{t("results.bestStreak", { n: bestCombo })}</span>}
                   </p>
                 )}
               </div>
@@ -110,18 +109,18 @@ function QuizResultsPage() {
 
               <div className="results-actions">
                 <Link className="primary-button" to={playAgain}>
-                  Play again
+                  {t("results.playAgain")}
                 </Link>
                 <Link className="secondary-button" to="/explore">
-                  Explore
+                  {t("common.explore")}
                 </Link>
               </div>
 
               {missed.length > 0 && (
                 <>
-                  <h2 className="section-heading">Worth another look</h2>
+                  <h2 className="section-heading">{t("results.missed")}</h2>
                   <p className="section-note">
-                    They will come back in your next Review. Star any to keep them in My list.
+                    {t("results.missedNote")}
                   </p>
                   <div className="categories-list">
                     {missed.map((question) => (
@@ -138,7 +137,7 @@ function QuizResultsPage() {
 
               {correct.length > 0 && (
                 <>
-                  <h2 className="section-heading">You knew these</h2>
+                  <h2 className="section-heading">{t("results.knew")}</h2>
                   <div className="categories-list">
                     {correct.map((question) => (
                       <ResultRow

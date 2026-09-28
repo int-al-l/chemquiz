@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
+import { useT } from "../i18n";
+
 /**
  * The title bar shared by every screen.
  *
@@ -9,6 +11,7 @@ import { useNavigate } from "react-router-dom";
  */
 function PageHeader({ title, backTo, onBack }) {
   const navigate = useNavigate();
+  const t = useT();
 
   const showBack = backTo !== undefined || onBack !== undefined;
 
@@ -28,7 +31,7 @@ function PageHeader({ title, backTo, onBack }) {
         <button
           className="back-icon-button"
           onClick={handleBack}
-          aria-label="Go back"
+          aria-label={t("common.goBack")}
           type="button"
         >
           <span className="material-symbols-outlined">arrow_back</span>

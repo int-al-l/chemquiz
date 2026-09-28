@@ -7,6 +7,8 @@
  * build at a backend on a different host.
  */
 
+import { translate } from "../i18n";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 /**
@@ -76,10 +78,7 @@ async function request(path, options = {}) {
     });
   } catch {
     // fetch only rejects when the request never got a reply at all.
-    throw new ApiError(
-      "Could not reach the server. Is the backend running?",
-      0,
-    );
+    throw new ApiError(translate(requestLanguage, "api.unreachable"), 0);
   }
 
   if (response.status === 204) {
@@ -109,22 +108,18 @@ function describeFailure(status, body) {
   }
 
   if (status === 502 || status === 503 || status === 504) {
-    return (
-      "The backend is not responding. Start it with " +
-      "`uvicorn app.main:app --reload --port 8000` from the backend folder, " +
-      "then try again."
-    );
+    return translate(requestLanguage, "api.gateway");
   }
 
   if (status === 404) {
-    return "That is not on the server. It may have been renamed or removed.";
+    return translate(requestLanguage, "api.notFound");
   }
 
   if (status >= 500) {
-    return "The server hit an error. Check the terminal running uvicorn for the traceback.";
+    return translate(requestLanguage, "api.serverError");
   }
 
-  return `Request failed (${status}).`;
+  return translate(requestLanguage, "api.failed", { status });
 }
 
 /** Turn an API-relative image path into something an <img> can load. */

@@ -5,6 +5,7 @@ import PageHeader from "../components/PageHeader";
 import { ErrorMessage } from "../components/StatusMessage";
 import { login, register } from "../api/client";
 import { useAuth } from "../auth/context";
+import { useT } from "../i18n";
 import { readLocal } from "../saved/localList";
 
 /**
@@ -12,6 +13,7 @@ import { readLocal } from "../saved/localList";
  * link) to confirm the address; the next screen takes the code.
  */
 function SignInPage() {
+  const t = useT();
   const navigate = useNavigate();
   const location = useLocation();
   const { user, completeSignIn } = useAuth();
@@ -57,7 +59,7 @@ function SignInPage() {
   return (
     <main className="categories-page">
       <div className="page-layout">
-        <PageHeader title={isRegister ? "Create account" : "Sign in"} backTo="/" />
+        <PageHeader title={isRegister ? t("signin.create") : t("common.signIn")} backTo="/" />
 
         <section className="categories-content narrow">
           <div className="tabs" role="tablist">
@@ -71,7 +73,7 @@ function SignInPage() {
               }}
               type="button"
             >
-              Sign in
+              {t("common.signIn")}
             </button>
             <button
               role="tab"
@@ -83,25 +85,25 @@ function SignInPage() {
               }}
               type="button"
             >
-              Create account
+              {t("signin.create")}
             </button>
           </div>
 
           <p className="lede">
             {isRegister
-              ? "Your level, streak, progress and saved cards will follow you to any device."
-              : "Welcome back. Pick up where you left off."}
+              ? t("signin.registerLede")
+              : t("signin.lede")}
           </p>
 
           <form className="sign-in-form" onSubmit={handleSubmit}>
             {isRegister && (
               <label className="field">
-                <span className="field-label">Name</span>
+                <span className="field-label">{t("signin.name")}</span>
                 <input
                   className="field-input"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Anton"
+                  placeholder={t("signin.namePlaceholder")}
                   autoComplete="name"
                   required
                 />
@@ -109,7 +111,7 @@ function SignInPage() {
             )}
 
             <label className="field">
-              <span className="field-label">Email</span>
+              <span className="field-label">{t("common.email")}</span>
               <input
                 className="field-input"
                 type="email"
@@ -122,7 +124,7 @@ function SignInPage() {
             </label>
 
             <label className="field">
-              <span className="field-label">Password</span>
+              <span className="field-label">{t("signin.password")}</span>
               <span className="password-wrap">
                 <input
                   className="field-input"
@@ -136,7 +138,7 @@ function SignInPage() {
                 <button
                   className="icon-button password-eye"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={t(showPassword ? "signin.hidePassword" : "signin.showPassword")}
                   type="button"
                 >
                   <span className="material-symbols-outlined">
@@ -145,28 +147,27 @@ function SignInPage() {
                 </button>
               </span>
               {isRegister && (
-                <span className="field-help">At least 8 characters, mixing letters with numbers or symbols.</span>
+                <span className="field-help">{t("common.passwordHelp")}</span>
               )}
             </label>
 
             {pending.length > 0 && (
               <p className="section-note">
-                The {pending.length} card{pending.length === 1 ? "" : "s"} saved in this browser, and
-                your progress so far, will be added to your account.
+                {t("signin.pending", { n: pending.length })}
               </p>
             )}
 
             {error && <ErrorMessage error={error} />}
 
             <button className="primary-button" type="submit" disabled={busy}>
-              {busy ? "One moment..." : isRegister ? "Create account" : "Sign in"}
+              {busy ? t("signin.busy") : isRegister ? t("signin.create") : t("common.signIn")}
             </button>
           </form>
 
           {!isRegister && (
             <p className="form-links">
               <Link to={`/reset-password${email ? `?email=${encodeURIComponent(email)}` : ""}`}>
-                Forgot password?
+                {t("signin.forgot")}
               </Link>
             </p>
           )}

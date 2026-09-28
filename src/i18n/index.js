@@ -5,7 +5,7 @@
  * one, follows the browser. The API client is told too, so the server sends
  * card names and errors in the same language.
  */
-import { createContext, useCallback, useContext } from "react";
+import { Fragment, createContext, createElement, useCallback, useContext } from "react";
 
 import en from "./en";
 import ru from "./ru";
@@ -50,6 +50,28 @@ export function translate(lang, key, values = {}) {
 /** "Lab Rookie" -> "level.lab-rookie": level titles are stored in English, translated when shown. */
 export function titleKey(title) {
   return `level.${title.toLowerCase().replace(/[^a-z]+/g, "-").replace(/^-|-$/g, "")}`;
+}
+
+/**
+ * Put React nodes (a link, bold text) into a translated sentence:
+ * rich("Tap {link} to go", { link: <Link/> }). The whole sentence stays one key.
+ */
+export function rich(text, nodes) {
+  return text
+    .split(/\{(\w+)\}/)
+    .map((part, i) => (i % 2 ? createElement(Fragment, { key: i }, nodes[part] ?? `{${part}}`) : part));
+}
+
+/**
+ * A badge's title and blurb in the interface language. The engine keeps them in
+ * English; a deck badge ("deck-seen:flasks") names its deck.
+ */
+export function badgeText(t, badge) {
+  const base = badge.id.split(":")[0];
+  return {
+    title: t(`badge.${base}.title`, { deck: badge.deck }),
+    blurb: t(`badge.${base}.blurb`, { deck: badge.deck }),
+  };
 }
 
 export const LanguageContext = createContext({ lang: "en", setLang: () => {} });

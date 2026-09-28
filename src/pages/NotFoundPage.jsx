@@ -1,16 +1,18 @@
 import { Link } from "react-router-dom";
 
 import PageHeader from "../components/PageHeader";
+import { rich, useT } from "../i18n";
 
 function NotFoundPage() {
+  const t = useT();
   return (
     <main className="categories-page">
       <div className="page-layout">
-        <PageHeader title="Not found" backTo="/" />
+        <PageHeader title={t("notfound.title")} backTo="/" />
 
         <section className="categories-content">
           <p className="status-message">
-            That page does not exist. <Link to="/">Back to the menu</Link>.
+            {rich(t("notfound.text"), { link: <Link to="/">{t("notfound.back")}</Link> })}
           </p>
         </section>
       </div>

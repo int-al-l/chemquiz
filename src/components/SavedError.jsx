@@ -1,3 +1,4 @@
+import { useT } from "../i18n";
 import { useSaved } from "../saved/context";
 
 /**
@@ -10,13 +11,14 @@ import { useSaved } from "../saved/context";
  */
 function SavedError() {
   const { error, dismissError } = useSaved();
+  const t = useT();
   if (!error) return null;
 
   return (
     <div className="status-message status-error saved-error" role="alert">
       <p>{error.message}</p>
       <button className="text-button" onClick={dismissError} type="button">
-        Dismiss
+        {t("common.dismiss")}
       </button>
     </div>
   );
