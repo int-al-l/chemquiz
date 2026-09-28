@@ -73,6 +73,10 @@ settings with fresh questions, or **Work on mistakes**, which asks only the
 items fewer than 80% of the class got right. Games hosted without signing in
 are not kept.
 
+**Language of a game.** The teacher picks English or Russian when opening the
+room; the board and every phone follow it, whatever language the phones are
+set to.
+
 ## Demo build (no backend)
 
 `npm run build:demo` builds a version that runs entirely in the browser: the
@@ -151,6 +155,18 @@ tools/fetch_synthware.py  downloads the Synthware catalogue (run it locally)
 | `/live/history` | past class games (signed in) |
 | `/live/history/:id` | one past game: standings, CSV, play again |
 | `/join[/:pin]`, `/play/:pin` | a student joins, and plays on their phone |
+
+## Languages
+
+The site speaks English and Russian. The switch is on the main menu and in
+the profile; until someone picks, it follows the browser. Card and deck texts
+come from the server in the chosen language: English from
+`backend/seed_data.py`, Russian from `backend/content_ru.py` (hand-edited --
+add an entry there for every new card; a test fails until you do, and the
+site shows the English text meanwhile). Interface texts are in
+`src/i18n/en.js` and `ru.js`; server messages in `backend/app/messages.py`.
+The browser sends the choice as `Accept-Language`, and errors come back as
+`{"detail": ..., "code": ...}` in that language.
 
 ## Learning with cards
 
@@ -274,10 +290,13 @@ dimension arrows and captions, which Synthware uses as many main images),
 the new cards and their text, and the cards dropped for lack of a clean photo.
 `build.py --sheets DIR` writes contact sheets for checking the result by eye.
 
+Whichever way a card is added, give it a Russian name and description in
+`backend/content_ru.py` (keyed by the card's slug).
+
 ## Tests
 
 ```bash
-cd backend && python -m pytest    # 100 tests: content, quiz, accounts, progress, class games
+cd backend && python -m pytest    # 123 tests: content, quiz, accounts, progress, class games, languages
 npm test                          # vitest: saved-list provider, progress engine
 npm run lint                      # eslint, including the React hooks rules
 npm run build
