@@ -16,7 +16,8 @@ It creates labware/ with
 and packs it into labware_part1.zip, labware_part2.zip, ... (under ~95 MB
 each). Attach all the parts to the chat.
 
-Re-running is safe: anything already downloaded is skipped.
+Re-running is safe: it continues where it stopped, and anything already
+downloaded is skipped.
 """
 
 import concurrent.futures as cf
@@ -57,28 +58,55 @@ def get(url, tries=4):
 
 # --- 1. the list of Synthware products (needs a real browser) ---------------------------
 
-def list_products():
+def list_products(list_path):
+    """Walk the Synthware list pages in a hidden browser.
+
+    Progress is saved after every page, so an interrupted run picks up where
+    it stopped. A page that will not load is retried, then skipped.
+    """
     from playwright.sync_api import sync_playwright
 
-    found = {}  # slug -> name
+    state = {"found": {}, "next_page": 1, "empty_in_a_row": 0, "done": False}
+    if os.path.exists(list_path):
+        saved = json.load(open(list_path, encoding="utf-8"))
+        state.update(saved if "found" in saved else {"found": saved, "done": True})
+        if state["done"]:
+            return state["found"]
+        print(f"resuming at list page {state['next_page']} ({len(state['found'])} products so far)")
+
+    found = state["found"]
+
+    def save():
+        json.dump(state, open(list_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page(viewport={"width": 1400, "height": 1000})
-        empty_in_a_row = 0
-        for n in range(1, MAX_PAGES + 1):
-            page.goto(LIST_URL.format(page=n), wait_until="domcontentloaded", timeout=90000)
-            try:
-                page.wait_for_selector('a[href*="/product-page/"]', timeout=30000)
-            except Exception:
-                pass
-            # Scroll so the whole grid renders.
-            for _ in range(8):
-                page.mouse.wheel(0, 2500)
-                page.wait_for_timeout(400)
-            links = page.eval_on_selector_all(
-                'a[href*="/product-page/"]',
-                "els => els.map(e => [e.href, (e.innerText || e.getAttribute('aria-label') || '').trim()])",
-            )
+        page.set_default_timeout(60000)
+        for n in range(state["next_page"], MAX_PAGES + 1):
+            links = None
+            for attempt in range(1, 4):
+                try:
+                    page.goto(LIST_URL.format(page=n), wait_until="commit", timeout=120000)
+                    page.wait_for_selector('a[href*="/product-page/"]', timeout=60000)
+                    # Scroll so the whole grid renders.
+                    for _ in range(8):
+                        page.mouse.wheel(0, 2500)
+                        page.wait_for_timeout(400)
+                    links = page.eval_on_selector_all(
+                        'a[href*="/product-page/"]',
+                        "els => els.map(e => [e.href, (e.innerText || e.getAttribute('aria-label') || '').trim()])",
+                    )
+                    break
+                except Exception as exc:  # noqa: BLE001 - a slow page is retried, then skipped
+                    print(f"list page {n}: attempt {attempt} failed ({type(exc).__name__}); waiting and retrying")
+                    page.wait_for_timeout(5000 * attempt)
+            if links is None:
+                print(f"list page {n}: skipped after 3 attempts")
+                state["next_page"] = n + 1
+                save()
+                continue
+
             new = 0
             for href, text in links:
                 slug = href.split("/product-page/")[1].split("?")[0].split("#")[0]
@@ -86,10 +114,14 @@ def list_products():
                     found[slug] = text.split("\n")[0]
                     new += 1
             print(f"list page {n}: {len(links)} links, {new} new, {len(found)} total")
-            empty_in_a_row = empty_in_a_row + 1 if new == 0 else 0
-            if empty_in_a_row >= 2:
+            state["empty_in_a_row"] = state["empty_in_a_row"] + 1 if new == 0 else 0
+            state["next_page"] = n + 1
+            save()
+            if state["empty_in_a_row"] >= 2:
                 break
         browser.close()
+    state["done"] = True
+    save()
     return found
 
 
@@ -141,12 +173,7 @@ def download(product):
 def main():
     os.makedirs(os.path.join(OUT, "images"), exist_ok=True)
     list_path = os.path.join(OUT, "list.json")
-    if os.path.exists(list_path):
-        found = json.load(open(list_path, encoding="utf-8"))
-        print(f"{len(found)} products from the saved list")
-    else:
-        found = list_products()
-        json.dump(found, open(list_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    found = list_products(list_path)
     if not found:
         print("No products found -- the shop layout may have changed. Send me the output above.")
         return 1
