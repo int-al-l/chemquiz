@@ -1,0 +1,14 @@
+import fitz
+
+
+pdf = fitz.open("C:/Users/anton/Downloads/Synthware-catalog-2018.pdf")
+
+page = pdf[31]
+images = page.get_image_info(xrefs=True)
+
+for image in images:
+    print(
+        "NUMBER:", image["number"],
+        "XREF:", image["xref"],
+        "BBOX:", image["bbox"]
+    )
