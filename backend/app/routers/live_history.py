@@ -6,7 +6,7 @@ it did not exist.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -60,3 +60,13 @@ def remove_game(game_id: int, user: models.User = Depends(current_user), db: Ses
     live.delete_game(db, game.id)
     db.commit()
     return None
+
+
+@router.get("/{game_id}/results.csv")
+def results_csv(game_id: int, user: models.User = Depends(current_user), db: Session = Depends(get_db)):
+    game = _own_game(db, user, game_id)
+    return Response(
+        content=live_history.results_csv(db, game).encode("utf-8"),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{live_history.csv_filename(game)}"'},
+    )

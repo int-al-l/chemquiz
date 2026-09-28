@@ -7,6 +7,10 @@ Only games hosted while signed in, and that got past the lobby, are kept
 
 from __future__ import annotations
 
+import csv
+import datetime as dt
+import io
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -103,3 +107,42 @@ def detail(db: Session, game: models.LiveGame) -> dict:
             for place, p in enumerate(results.players, start=1)
         ],
     }
+
+
+# A spreadsheet runs a cell starting with one of these as a formula, and a
+# nickname is typed by a student.
+_FORMULA_START = ("=", "+", "-", "@", "\t", "\r")
+
+
+def _cell(text: str) -> str:
+    return "'" + text if text.startswith(_FORMULA_START) else text
+
+
+def results_csv(db: Session, game: models.LiveGame) -> str:
+    """One row per player: place, name, score, right answers, then + / − /
+    blank for each question asked.
+
+    Semicolons and a byte-order mark, so Excel set up for Russian (or most of
+    Europe) opens it with a double click; Google Sheets reads it too.
+    """
+    results = Results(db, game)
+    questions = asked(game)
+    out = io.StringIO()
+    writer = csv.writer(out, delimiter=";", lineterminator="\r\n")
+    writer.writerow(
+        ["Place", "Name", "Score", "Correct",
+         *(_cell(f"Q{q['position']} {q['item']['name']}") for q in questions)]
+    )
+    for place, p in enumerate(results.players, start=1):
+        mine = results.answers[p.id]
+        marks = []
+        for q in questions:
+            a = mine.get(q["position"])
+            marks.append("" if a is None else "+" if a.correct else "−")
+        writer.writerow([place, _cell(p.name), p.score, results.correct_count(p), *marks])
+    return "﻿" + out.getvalue()
+
+
+def csv_filename(game: models.LiveGame) -> str:
+    day = dt.datetime.fromtimestamp(game.started_at, dt.timezone.utc).strftime("%Y-%m-%d")
+    return f"chemquiz-class-game-{day}.csv"

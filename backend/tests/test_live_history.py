@@ -102,3 +102,49 @@ def test_deleting_a_game(client, clock):
     with client.session_factory() as db:
         assert db.scalar(select(func.count()).select_from(models.LiveAnswer)) == 0
         assert db.scalar(select(func.count()).select_from(models.LivePlayer)) == 0
+
+
+def csv_rows(client, headers, game_id):
+    res = client.get(f"/api/me/live-games/{game_id}/results.csv", headers=headers)
+    assert res.status_code == 200
+    assert res.headers["content-type"].startswith("text/csv")
+    assert 'filename="chemquiz-class-game-' in res.headers["content-disposition"]
+    text = res.content.decode("utf-8")
+    assert text.startswith("﻿")
+    return [line.split(";") for line in text[1:].strip().split("\r\n")]
+
+
+def test_results_csv(client, clock):
+    t = teacher(client)
+    room, joined = play(
+        client, clock, ["Ann", "=cmd", "Cy", "Dan"],
+        [{"Ann": "right", "=cmd": "wrong", "Dan": "right"}, {"Ann": "right"}],
+        headers=t,
+    )
+    # The host removes Dan after the game: he is left out.
+    client.post(
+        f"/api/live/{room['pin']}/players/{joined['Dan']['you']['id']}/remove",
+        headers=host(room["host_token"]),
+    )
+
+    rows = csv_rows(client, t, only_game(client, t)["id"])
+    assert rows[0][:4] == ["Place", "Name", "Score", "Correct"]
+    assert rows[0][4].startswith("Q1 Condenser ") and rows[0][5].startswith("Q2 Condenser ")
+    assert rows[1][:2] == ["1", "Ann"] and rows[1][3:] == ["2", "+", "+"]
+    # A name a spreadsheet would run as a formula is kept as text.
+    assert rows[2][1] == "'=cmd" and rows[2][3:] == ["0", "−", ""]
+    assert rows[3][1] == "Cy" and rows[3][3:] == ["0", "", ""]
+    assert len(rows) == 4  # Dan is not there
+
+
+def test_an_unfinished_games_csv_has_only_the_questions_asked(client, clock):
+    t = teacher(client)
+    room = make_room(client, headers=t, question_count=3)
+    pin, token = room["pin"], room["host_token"]
+    join(client, pin, "Ann")
+    client.post(f"/api/live/{pin}/next", headers=host(token))  # question 1 of 3
+    client.delete(f"/api/live/{pin}", headers=host(token))  # closed mid-way
+
+    rows = csv_rows(client, t, only_game(client, t)["id"])
+    assert len(rows[0]) == 4 + 1
+    assert rows[1][3:] == ["0", ""]
