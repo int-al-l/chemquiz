@@ -2,21 +2,25 @@
 
 The host and each player hold a secret token, sent in the X-Live-Token
 header. The PIN only finds the room; it grants nothing on its own.
+
+Each endpoint builds its reply before it commits: after a commit, every row
+would be read again one at a time.
 """
 
 from __future__ import annotations
 
-import secrets
 import socket
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel, Field
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from .. import crud, live
+from .. import crud, live, models
 from ..config import MAX_QUESTION_COUNT, QUIZ_MODES
 from ..database import get_db
+from .account import optional_user
 
 router = APIRouter(prefix="/api/live", tags=["live"])
 
@@ -41,15 +45,10 @@ class LockIn(BaseModel):
     locked: bool
 
 
-def _fail(exc: live.LiveError) -> HTTPException:
+def _fail(db: Session, exc: live.LiveError) -> HTTPException:
+    """Undo whatever the request started, and say why."""
+    db.rollback()
     return HTTPException(status_code=exc.status, detail=str(exc))
-
-
-def _host_room(pin: str, token: Optional[str]) -> live.Room:
-    room = live.registry.get(pin)
-    if not token or not secrets.compare_digest(room.host_token, token):
-        raise live.LiveError("Only the host can do that", status=403)
-    return room
 
 
 @router.get("/network")
@@ -79,7 +78,11 @@ def network():
 
 
 @router.post("", status_code=201)
-def create(payload: CreateIn, db: Session = Depends(get_db)):
+def create(
+    payload: CreateIn,
+    db: Session = Depends(get_db),
+    user: Optional[models.User] = Depends(optional_user),
+):
     if payload.mode not in QUIZ_MODES:
         raise HTTPException(status_code=422, detail=f"Unknown mode '{payload.mode}'")
     if payload.time_limit not in live.TIME_LIMITS:
@@ -96,103 +99,108 @@ def create(payload: CreateIn, db: Session = Depends(get_db)):
             question_count=payload.question_count,
             time_limit=payload.time_limit,
             category=category,
+            host_user=user,
         )
     except live.LiveError as exc:
-        raise _fail(exc) from exc
-    with live.registry.lock:
-        return {"host_token": room.host_token, **live.host_view(room, live._now())}
+        raise _fail(db, exc) from exc
+    view = {"host_token": room.game.host_token, **live.host_view(room, live._now())}
+    db.commit()
+    return view
 
 
 @router.get("/{pin}")
-def peek(pin: str):
+def peek(pin: str, db: Session = Depends(get_db)):
     """Is there a game with this PIN, and can it still be joined?"""
-    with live.registry.lock:
-        try:
-            room = live.registry.get(pin)
-        except live.LiveError as exc:
-            raise _fail(exc) from exc
-        return {
-            "pin": room.pin,
-            "phase": room.phase,
-            "joinable": room.phase != "finished" and not room.locked,
-            "player_count": len(room.active_players),
-        }
+    try:
+        room = live.open_room(db, pin)
+    except live.LiveError as exc:
+        raise _fail(db, exc) from exc
+    game = room.game
+    return {
+        "pin": game.pin,
+        "phase": game.phase,
+        "joinable": game.phase != "finished" and not game.locked,
+        "player_count": len(room.active_players),
+    }
 
 
 # --- host -----------------------------------------------------------------------
 
 
 @router.get("/{pin}/host")
-def host_state(pin: str, x_live_token: Optional[str] = Header(None)):
+def host_state(pin: str, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)):
     now = live._now()
-    with live.registry.lock:
-        try:
-            room = _host_room(pin, x_live_token)
-        except live.LiveError as exc:
-            raise _fail(exc) from exc
-        room.touched_at = now
-        room.tick(now)
-        return live.host_view(room, now)
+    try:
+        room = live.open_room(db, pin)
+        live.check_host(room, x_live_token)
+        room = live.poll(db, room, now)
+    except live.LiveError as exc:
+        raise _fail(db, exc) from exc
+    view = live.host_view(room, now)
+    live.mark_touched(db, room, now)
+    db.commit()
+    return view
 
 
-def _host_action(pin: str, token: Optional[str], action):
+def _host_action(pin: str, token: Optional[str], db: Session, action):
     now = live._now()
-    with live.registry.lock:
-        try:
-            room = _host_room(pin, token)
-            room.touched_at = now
-            action(room, now)
-        except live.LiveError as exc:
-            raise _fail(exc) from exc
-        return live.host_view(room, now)
+    try:
+        room = live.open_room(db, pin, lock=True)
+        live.check_host(room, token)
+        room.game.touched_at = now
+        action(room, now)
+        db.flush()
+    except live.LiveError as exc:
+        raise _fail(db, exc) from exc
+    view = live.host_view(room, now)
+    db.commit()
+    return view
 
 
 @router.post("/{pin}/next")
-def host_next(pin: str, x_live_token: Optional[str] = Header(None)):
-    return _host_action(pin, x_live_token, lambda room, now: room.advance(now))
+def host_next(pin: str, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)):
+    return _host_action(pin, x_live_token, db, lambda room, now: room.advance(now))
 
 
 @router.post("/{pin}/finish")
-def host_finish(pin: str, x_live_token: Optional[str] = Header(None)):
-    return _host_action(pin, x_live_token, lambda room, now: room.finish(now))
+def host_finish(pin: str, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)):
+    return _host_action(pin, x_live_token, db, lambda room, now: room.finish(now))
 
 
 @router.post("/{pin}/lock")
-def host_lock(pin: str, payload: LockIn, x_live_token: Optional[str] = Header(None)):
+def host_lock(
+    pin: str, payload: LockIn, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)
+):
     def lock(room, now):
-        room.locked = payload.locked
+        room.game.locked = payload.locked
 
-    return _host_action(pin, x_live_token, lock)
+    return _host_action(pin, x_live_token, db, lock)
 
 
 @router.post("/{pin}/players/{player_id}/remove")
-def host_remove(pin: str, player_id: int, x_live_token: Optional[str] = Header(None)):
-    def remove(room, now):
-        for p in room.players:
-            if p.id == player_id:
-                p.removed = True
-                room.tick(now)  # they may have been the last one to answer
-                return
-        raise live.LiveError("No such player", status=404)
-
-    return _host_action(pin, x_live_token, remove)
+def host_remove(
+    pin: str, player_id: int, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)
+):
+    return _host_action(pin, x_live_token, db, lambda room, now: room.remove(player_id, now))
 
 
 @router.delete("/{pin}", status_code=204)
-def host_close(pin: str, x_live_token: Optional[str] = Header(None)):
-    with live.registry.lock:
-        try:
-            _host_room(pin, x_live_token)
-        except live.LiveError as exc:
-            raise _fail(exc) from exc
-        del live.registry.rooms[pin]
+def host_close(pin: str, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)):
+    """Close the room: into the host's history if it is kept, otherwise gone."""
+    try:
+        room = live.open_room(db, pin, lock=True)
+        live.check_host(room, x_live_token)
+    except live.LiveError as exc:
+        raise _fail(db, exc) from exc
+    live.retire(db, room.game)
+    db.commit()
     return None
 
 
 # --- players ----------------------------------------------------------------------
 
 
-def _player(room: live.Room, token: Optional[str]) -> live.Player:
+def _player(room: live.Room, token: Optional[str]) -> models.LivePlayer:
     player = room.player_by_token(token)
     if player is None:
         raise live.LiveError("You are not in this game", status=403)
@@ -202,42 +210,53 @@ def _player(room: live.Room, token: Optional[str]) -> live.Player:
 
 
 @router.post("/{pin}/join", status_code=201)
-def join(pin: str, payload: JoinIn):
+def join(pin: str, payload: JoinIn, db: Session = Depends(get_db)):
     now = live._now()
-    with live.registry.lock:
-        try:
-            room = live.registry.get(pin)
-            player = room.join(payload.name, now)
-        except live.LiveError as exc:
-            raise _fail(exc) from exc
-        room.touched_at = now
-        return {"token": player.token, **live.player_view(room, player, now)}
+    try:
+        room = live.open_room(db, pin, lock=True)
+        player = room.join(payload.name, now)
+        room.game.touched_at = now
+        db.flush()
+    except live.LiveError as exc:
+        raise _fail(db, exc) from exc
+    view = {"token": player.token, **live.player_view(room, player, now)}
+    db.commit()
+    return view
 
 
 @router.get("/{pin}/me")
-def player_state(pin: str, x_live_token: Optional[str] = Header(None)):
+def player_state(pin: str, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)):
     now = live._now()
-    with live.registry.lock:
-        try:
-            room = live.registry.get(pin)
-            player = _player(room, x_live_token)
-        except live.LiveError as exc:
-            raise _fail(exc) from exc
-        player.last_seen = now
-        room.tick(now)
-        return live.player_view(room, player, now)
+    try:
+        room = live.open_room(db, pin)
+        player = _player(room, x_live_token)
+        room = live.poll(db, room, now)
+    except live.LiveError as exc:
+        raise _fail(db, exc) from exc
+    view = live.player_view(room, player, now)
+    live.mark_seen(db, room, player, now)
+    db.commit()
+    return view
 
 
 @router.post("/{pin}/answer")
-def answer(pin: str, payload: AnswerIn, x_live_token: Optional[str] = Header(None)):
+def answer(
+    pin: str, payload: AnswerIn, x_live_token: Optional[str] = Header(None), db: Session = Depends(get_db)
+):
     now = live._now()
-    with live.registry.lock:
-        try:
-            room = live.registry.get(pin)
-            player = _player(room, x_live_token)
-            player.last_seen = now
-            room.answer(player, payload.position, payload.choice_id, now)
-        except live.LiveError as exc:
-            raise _fail(exc) from exc
-        room.touched_at = now
-        return live.player_view(room, player, now)
+    try:
+        room = live.open_room(db, pin, lock=True)
+        player = _player(room, x_live_token)
+        player.last_seen = now
+        room.answer(player, payload.position, payload.choice_id, now)
+        room.game.touched_at = now
+        db.flush()
+    except live.LiveError as exc:
+        raise _fail(db, exc) from exc
+    except IntegrityError as exc:
+        # The database's own guard against a second answer (see LiveAnswer).
+        db.rollback()
+        raise HTTPException(status_code=409, detail="You have already answered") from exc
+    view = live.player_view(room, player, now)
+    db.commit()
+    return view

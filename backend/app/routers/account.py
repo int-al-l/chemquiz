@@ -62,6 +62,27 @@ def current_user(
     return user
 
 
+def optional_user(
+    db: Session = Depends(get_db),
+    authorization: str | None = Header(default=None),
+) -> models.User | None:
+    """The signed-in user, or None -- never a refusal.
+
+    For endpoints anyone may use, where signing in only adds something (a
+    class game goes into the host's history). A stale token simply counts as
+    signed out. Read-only, unlike `current_user`.
+    """
+    if not authorization or not authorization.lower().startswith("bearer "):
+        return None
+    token = authorization.split(" ", 1)[1].strip()
+    user = db.execute(
+        select(models.User).where(models.User.token == token)
+    ).scalar_one_or_none()
+    if user is None or not user.email_verified:
+        return None
+    return user
+
+
 def _signed_in(user: models.User) -> dict:
     return {"token": user.token, "email": user.email, "name": user.name,
             "saved_count": len(user.saved)}

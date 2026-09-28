@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-import pytest
+import random
 
-from app import live
-from test_api import client  # noqa: F401 -- the seeded test app
+import pytest
+from sqlalchemy import func, select
+
+from app import live, models
+from test_api import auth, client, sign_in  # noqa: F401 -- the seeded test app
 
 
 class Clock:
@@ -23,19 +26,17 @@ class Clock:
 def clock(monkeypatch):
     c = Clock()
     monkeypatch.setattr(live, "_now", c)
-    live.registry.clear()
     yield c
-    live.registry.clear()
 
 
 def host(token):
     return {"X-Live-Token": token}
 
 
-def make_room(client, **kw):
+def make_room(client, headers=None, **kw):
     body = {"category_slug": "condensers", "mode": "choice", "question_count": 3, "time_limit": 20}
     body.update(kw)
-    res = client.post("/api/live", json=body)
+    res = client.post("/api/live", json=body, headers=headers or {})
     assert res.status_code == 201, res.text
     return res.json()
 
@@ -46,8 +47,21 @@ def join(client, pin, name):
     return res.json()
 
 
-def correct_id(pin, position):
-    return live.registry.rooms[pin].questions[position - 1].correct_id
+def correct_id(client, pin, position):
+    with client.session_factory() as db:
+        game = db.scalars(select(models.LiveGame).where(models.LiveGame.pin == pin)).one()
+        return game.questions[position - 1]["correct_id"]
+
+
+class SamePins(random.Random):
+    """Hands out the given PINs in order; everything else stays random."""
+
+    def __init__(self, pins):
+        super().__init__()
+        self.pins = list(pins)
+
+    def randint(self, a, b):
+        return int(self.pins.pop(0))
 
 
 def test_create_and_join(client, clock):
@@ -104,7 +118,7 @@ def test_full_game(client, clock):
     me = client.get(f"/api/live/{pin}/me", headers=host(ann["token"])).json()
     assert me["question"]["choices"] and me["reveal"] is None
 
-    right = correct_id(pin, 1)
+    right = correct_id(client, pin, 1)
     wrong = next(c["id"] for c in me["question"]["choices"] if c["id"] != right)
 
     # Too early: still reading time.
@@ -142,7 +156,7 @@ def test_full_game(client, clock):
     view = client.post(f"/api/live/{pin}/next", headers=host(token)).json()
     assert view["phase"] == "question" and view["position"] == 2
     clock.advance(live.READ_SECONDS + 10)
-    client.post(f"/api/live/{pin}/answer", json={"position": 2, "choice_id": correct_id(pin, 2)},
+    client.post(f"/api/live/{pin}/answer", json={"position": 2, "choice_id": correct_id(client, pin, 2)},
                 headers=host(ann["token"]))
     clock.advance(10 + live.GRACE_SECONDS)  # time up
     view = client.get(f"/api/live/{pin}/host", headers=host(token)).json()
@@ -154,7 +168,7 @@ def test_full_game(client, clock):
     assert me["you"]["result"]["answered"] is False and me["you"]["rank"] == 2
 
     # A late answer is refused.
-    res = client.post(f"/api/live/{pin}/answer", json={"position": 2, "choice_id": correct_id(pin, 2)},
+    res = client.post(f"/api/live/{pin}/answer", json={"position": 2, "choice_id": correct_id(client, pin, 2)},
                       headers=host(bob["token"]))
     assert res.status_code == 409
 
@@ -193,7 +207,7 @@ def test_removing_last_answerer_closes_question(client, clock):
     bob = join(client, pin, "Bob")
     client.post(f"/api/live/{pin}/next", headers=host(token))
     clock.advance(live.READ_SECONDS + 1)
-    client.post(f"/api/live/{pin}/answer", json={"position": 1, "choice_id": correct_id(pin, 1)},
+    client.post(f"/api/live/{pin}/answer", json={"position": 1, "choice_id": correct_id(client, pin, 1)},
                 headers=host(ann["token"]))
     view = client.post(f"/api/live/{pin}/players/{bob['you']['id']}/remove", headers=host(token)).json()
     assert view["phase"] == "reveal"
@@ -221,3 +235,89 @@ def test_idle_rooms_are_dropped(client, clock):
     clock.advance(live.ROOM_IDLE_SECONDS + 1)
     make_room(client)
     assert client.get(f"/api/live/{old['pin']}").status_code == 404
+
+
+def test_a_taken_pin_is_skipped(client, clock):
+    first = make_room(client)
+    with client.session_factory() as db:
+        room = live.create_room(
+            db, mode="choice", question_count=1, time_limit=20, category=None,
+            rng=SamePins([first["pin"], "654321"]),
+        )
+        db.commit()
+        assert room.game.pin == "654321"
+
+
+def teacher(client):
+    """Sign-in headers for a teacher account."""
+    return auth(sign_in(client).json()["token"])
+
+
+def stored(client, **where):
+    with client.session_factory() as db:
+        return db.scalars(select(models.LiveGame).filter_by(**where)).all()
+
+
+def start_one_question(client, room):
+    pin, token = room["pin"], room["host_token"]
+    join(client, pin, "Ann")
+    client.post(f"/api/live/{pin}/next", headers=host(token))
+    return pin, token
+
+
+def test_a_signed_in_host_owns_the_game(client, clock):
+    assert make_room(client, headers=teacher(client))["owned"] is True
+    assert make_room(client)["owned"] is False
+
+
+def test_an_expired_sign_in_still_hosts(client, clock):
+    room = make_room(client, headers=auth("not-a-real-token"))
+    assert room["owned"] is False
+
+
+def test_closing_an_owned_started_game_keeps_it(client, clock):
+    room = make_room(client, headers=teacher(client))
+    pin, token = start_one_question(client, room)
+    assert client.delete(f"/api/live/{pin}", headers=host(token)).status_code == 204
+    assert client.get(f"/api/live/{pin}").status_code == 404  # the PIN is free again
+    [game] = stored(client, host_token=token)
+    assert game.pin is None and game.started_at is not None
+
+
+def test_closing_an_owned_game_still_in_the_lobby_drops_it(client, clock):
+    room = make_room(client, headers=teacher(client))
+    client.delete(f"/api/live/{room['pin']}", headers=host(room["host_token"]))
+    assert stored(client, host_token=room["host_token"]) == []
+
+
+def test_idle_games_are_archived_or_dropped(client, clock):
+    t = teacher(client)
+    kept = make_room(client, headers=t)
+    start_one_question(client, kept)
+    lobby = make_room(client, headers=t)
+    anonymous = make_room(client)
+    start_one_question(client, anonymous)
+
+    clock.advance(live.ROOM_IDLE_SECONDS + 1)
+    make_room(client)  # creating a game runs the purge
+
+    [game] = stored(client, host_token=kept["host_token"])
+    assert game.pin is None
+    assert stored(client, host_token=lobby["host_token"]) == []
+    assert stored(client, host_token=anonymous["host_token"]) == []
+    with client.session_factory() as db:
+        # Only the kept game's player is left.
+        assert db.scalar(select(func.count()).select_from(models.LivePlayer)) == 1
+
+
+def test_an_archived_games_pin_can_be_reused(client, clock):
+    room = make_room(client, headers=teacher(client))
+    pin, token = start_one_question(client, room)
+    client.delete(f"/api/live/{pin}", headers=host(token))
+    with client.session_factory() as db:
+        again = live.create_room(
+            db, mode="choice", question_count=1, time_limit=20, category=None,
+            rng=SamePins([pin]),
+        )
+        db.commit()
+        assert again.game.pin == pin

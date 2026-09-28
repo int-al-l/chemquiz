@@ -214,6 +214,36 @@ export const liveAnswer = (pin, token, { position, choiceId }) =>
     body: JSON.stringify({ position, choice_id: choiceId }),
   });
 
+// --- past class games (signed in) -------------------------------------------------
+
+export const fetchLiveGames = () => request("/api/me/live-games");
+export const fetchLiveGame = (id) => request(`/api/me/live-games/${id}`);
+export const deleteLiveGame = (id) => request(`/api/me/live-games/${id}`, { method: "DELETE" });
+export const replayLiveGame = (id, kind) =>
+  request(`/api/me/live-games/${id}/replay`, { method: "POST", body: JSON.stringify({ kind }) });
+
+/**
+ * A past game's results as a CSV file, with the name the server suggests.
+ * Fetched rather than linked to, because a plain link cannot carry the
+ * sign-in token.
+ */
+export async function fetchLiveGameCsv(id) {
+  let response;
+  try {
+    response = await fetch(`${BASE_URL}/api/me/live-games/${id}/results.csv`, {
+      headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+    });
+  } catch {
+    throw new ApiError("Could not reach the server. Is the backend running?", 0);
+  }
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new ApiError(describeFailure(response.status, body), response.status);
+  }
+  const match = /filename="([^"]+)"/.exec(response.headers.get("Content-Disposition") ?? "");
+  return { blob: await response.blob(), filename: match ? match[1] : `class-game-${id}.csv` };
+}
+
 // --- account ---------------------------------------------------------------
 
 function post(path, body) {

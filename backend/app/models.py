@@ -8,6 +8,10 @@ quiz in progress cannot be read out of the network tab.
 Accounts live in User (email + password, verified by a code sent by email),
 EmailCode (the one-time codes and links) and UserProgress (the learning
 progress document: XP, per-card mastery, streak days, badges).
+
+Live classroom games live in LiveGame, LivePlayer and LiveAnswer (the rules
+are in app/live.py). A game hosted while signed in stays after it ends, as the
+host's history.
 """
 
 from __future__ import annotations
@@ -16,14 +20,17 @@ import datetime as dt
 from typing import Optional
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     DateTime,
+    Float,
     ForeignKey,
     Index,
     Integer,
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -383,3 +390,104 @@ class QuizQuestion(Base):
         if not self.choice_photo_ids:
             return []
         return [int(p) if p else None for p in self.choice_photo_ids.split(",")]
+
+
+class LiveGame(Base):
+    """A live classroom game (the rules are in `app/live.py`).
+
+    `pin` is how the class finds the game while it runs. It is cleared when the
+    game is archived, so the six digits can go to a new game; the partial
+    unique index keeps PINs unique among games that still have one, even when
+    two backend processes create games at the same moment.
+
+    `questions` is frozen when the game is created -- what the board shows, the
+    options, which one is right, and the card revealed afterwards -- so a game
+    in someone's history reads the same after the content changes.
+
+    Times are epoch seconds, the clock `live._now()` reads.
+    """
+
+    __tablename__ = "live_games"
+    __table_args__ = (
+        Index(
+            "uq_live_games_pin",
+            "pin",
+            unique=True,
+            sqlite_where=text("pin IS NOT NULL"),
+            postgresql_where=text("pin IS NOT NULL"),
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pin: Mapped[Optional[str]] = mapped_column(String(6), default=None)
+    host_token: Mapped[str] = mapped_column(String(43), unique=True)
+    # Null when the host was not signed in; such games are never kept.
+    host_user_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), default=None, index=True
+    )
+
+    # "choice" or "inverted", as in QuizSession.
+    mode: Mapped[str] = mapped_column(String(16))
+    time_limit: Mapped[int] = mapped_column(Integer)
+    question_count: Mapped[int] = mapped_column(Integer)
+    # A null slug means the game drew from the whole library.
+    category_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("categories.id", ondelete="SET NULL"), default=None
+    )
+    category_slug: Mapped[Optional[str]] = mapped_column(String(80), default=None)
+    category_name: Mapped[Optional[str]] = mapped_column(String(160), default=None)
+    questions: Mapped[list] = mapped_column(JSON)
+
+    phase: Mapped[str] = mapped_column(String(16), default="lobby")
+    position: Mapped[int] = mapped_column(Integer, default=0)
+    starts_at: Mapped[Optional[float]] = mapped_column(Float, default=None)
+    deadline: Mapped[Optional[float]] = mapped_column(Float, default=None)
+    closed_at: Mapped[Optional[float]] = mapped_column(Float, default=None)
+    locked: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    created_at: Mapped[float] = mapped_column(Float)
+    touched_at: Mapped[float] = mapped_column(Float)
+    started_at: Mapped[Optional[float]] = mapped_column(Float, default=None)
+    finished_at: Mapped[Optional[float]] = mapped_column(Float, default=None)
+
+
+class LivePlayer(Base):
+    """A phone in a live game, known by a nickname and a secret token."""
+
+    __tablename__ = "live_players"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    game_id: Mapped[int] = mapped_column(
+        ForeignKey("live_games.id", ondelete="CASCADE"), index=True
+    )
+    token: Mapped[str] = mapped_column(String(43), unique=True)
+    name: Mapped[str] = mapped_column(String(40))
+    joined_at: Mapped[float] = mapped_column(Float)
+    last_seen: Mapped[float] = mapped_column(Float)
+    score: Mapped[int] = mapped_column(Integer, default=0)
+    streak: Mapped[int] = mapped_column(Integer, default=0)
+    # Removed by the host: kept, but left out of everything anyone is shown.
+    removed: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class LiveAnswer(Base):
+    """One player's answer to one question.
+
+    The unique constraint has the last word on "you have already answered":
+    whichever backend process a second tap reaches, the database refuses it.
+    """
+
+    __tablename__ = "live_answers"
+    __table_args__ = (
+        UniqueConstraint("player_id", "position", name="uq_live_answer_once"),
+        Index("ix_live_answers_game_position", "game_id", "position"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    game_id: Mapped[int] = mapped_column(ForeignKey("live_games.id", ondelete="CASCADE"))
+    player_id: Mapped[int] = mapped_column(ForeignKey("live_players.id", ondelete="CASCADE"))
+    position: Mapped[int] = mapped_column(Integer)
+    choice_id: Mapped[int] = mapped_column(Integer)
+    elapsed: Mapped[float] = mapped_column(Float)
+    correct: Mapped[bool] = mapped_column(Boolean)
+    points: Mapped[int] = mapped_column(Integer)

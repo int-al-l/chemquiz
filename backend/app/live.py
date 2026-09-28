@@ -5,10 +5,12 @@ PIN. Players join from their phones with the PIN and a nickname. The host
 starts the game; every question is shown on the board and answered on the
 phones, against a clock. Faster right answers score more.
 
-Rooms are short-lived and only matter while a lesson is running, so they live
-in this process's memory rather than in the database. That means the backend
-must run as a single process (plain `uvicorn app.main:app`, no `--workers N`),
-and a server restart ends any game in progress.
+Games live in the database (`models.LiveGame`, `LivePlayer`, `LiveAnswer`),
+not in this process: a restart is only a pause, and the backend may run as
+several processes. Every change to a game happens with the game locked (see
+`find_game`), so two processes never act on one game at once. Polls only
+read, apart from closing a question whose time is up and noting who is still
+there.
 
 Time is kept by the server. Every snapshot carries the server's `now`, and the
 clients count down against `starts_at` / `deadline` corrected by the
@@ -29,13 +31,15 @@ from __future__ import annotations
 import random
 import re
 import secrets
-import threading
 import time
-from dataclasses import dataclass, field
 from typing import Optional
 
-from . import crud, models
+from sqlalchemy import delete, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+
+from . import crud, models
+from .database import begin_write
 
 # --- tuning -------------------------------------------------------------------
 
@@ -55,11 +59,17 @@ STREAK_BONUS_CAP = 500
 
 MAX_PLAYERS = 80
 NAME_MAX = 20
-# A room nobody has touched for this long is dropped.
+# A room nobody has touched for this long is archived or dropped.
 ROOM_IDLE_SECONDS = 3 * 60 * 60
 # A player whose phone has not asked for news for this long is shown as away.
 AWAY_SECONDS = 8
 LEADERBOARD_SIZE = 5
+# A poll records that a phone is still there at most this often, so a class of
+# eighty polling every second is not eighty writes a second...
+SEEN_EVERY_SECONDS = 3
+# ...and that the game is still in use at most this often (only the purge reads it).
+TOUCH_EVERY_SECONDS = 60
+PIN_TRIES = 1000
 
 
 class LiveError(Exception):
@@ -74,72 +84,54 @@ def _now() -> float:
     return time.time()
 
 
-# --- state --------------------------------------------------------------------
+# --- one game, as loaded for one request -----------------------------------------
 
 
-@dataclass
-class Answer:
-    choice_id: int
-    elapsed: float
-    correct: bool
-    points: int
-
-
-@dataclass
-class Player:
-    id: int
-    token: str
-    name: str
-    joined_at: float
-    last_seen: float
-    score: int = 0
-    streak: int = 0
-    answers: dict[int, Answer] = field(default_factory=dict)
-    removed: bool = False
-
-
-@dataclass
-class Question:
-    position: int
-    correct_id: int
-    image_url: Optional[str]  # the photo asked about ("choice" mode)
-    prompt: Optional[str]  # the name asked for ("inverted" mode)
-    choices: list[dict]  # {"id", "name"} or {"id", "image_url"}
-    item: dict  # the right answer, revealed after the question
-
-
-@dataclass
 class Room:
-    pin: str
-    host_token: str
-    mode: str
-    time_limit: int
-    category_name: Optional[str]
-    questions: list[Question]
-    created_at: float
-    touched_at: float
-    phase: str = "lobby"
-    position: int = 0  # 1-based once the game has started
-    starts_at: Optional[float] = None
-    deadline: Optional[float] = None
-    closed_at: Optional[float] = None  # when the current question stopped taking answers
-    players: list[Player] = field(default_factory=list)
-    next_player_id: int = 1
-    locked: bool = False  # no new players
+    """A game's row, its players, and the answers to the question on screen.
+
+    Three queries whatever the size of the class. Rules change these objects;
+    the endpoint saves them when it commits.
+    """
+
+    def __init__(self, db: Session, game: models.LiveGame):
+        self.db = db
+        self.game = game
+        self.players: list[models.LivePlayer] = list(
+            db.scalars(
+                select(models.LivePlayer)
+                .where(models.LivePlayer.game_id == game.id)
+                .order_by(models.LivePlayer.joined_at, models.LivePlayer.id)
+                .execution_options(populate_existing=True)
+            )
+        )
+        # player id -> their answer to the question at `game.position`
+        self.answers: dict[int, models.LiveAnswer] = {}
+        if game.position:
+            for answer in db.scalars(
+                select(models.LiveAnswer)
+                .where(
+                    models.LiveAnswer.game_id == game.id,
+                    models.LiveAnswer.position == game.position,
+                )
+                .execution_options(populate_existing=True)
+            ):
+                self.answers[answer.player_id] = answer
 
     # -- lookups --
 
     @property
-    def active_players(self) -> list[Player]:
+    def active_players(self) -> list[models.LivePlayer]:
         return [p for p in self.players if not p.removed]
 
     @property
-    def question(self) -> Optional[Question]:
-        if 1 <= self.position <= len(self.questions):
-            return self.questions[self.position - 1]
+    def question(self) -> Optional[dict]:
+        questions = self.game.questions
+        if 1 <= self.game.position <= len(questions):
+            return questions[self.game.position - 1]
         return None
 
-    def player_by_token(self, token: Optional[str]) -> Optional[Player]:
+    def player_by_token(self, token: Optional[str]) -> Optional[models.LivePlayer]:
         if not token:
             return None
         for p in self.players:
@@ -147,39 +139,43 @@ class Room:
                 return p
         return None
 
-    def standings(self) -> list[Player]:
+    def standings(self) -> list[models.LivePlayer]:
         # Ties go to whoever joined first, so the order never flickers.
-        return sorted(self.active_players, key=lambda p: (-p.score, p.joined_at))
+        return sorted(self.active_players, key=lambda p: (-p.score, p.joined_at, p.id))
 
-    def rank_of(self, player: Player) -> int:
+    def rank_of(self, player: models.LivePlayer) -> int:
         return self.standings().index(player) + 1
+
+    def answered_count(self) -> int:
+        return sum(1 for p in self.active_players if p.id in self.answers)
 
     # -- the clock --
 
+    def due(self, now: float) -> bool:
+        """Should the question on screen close: time up, or everyone answered?"""
+        game = self.game
+        if game.phase != "question":
+            return False
+        active = self.active_players
+        everyone = bool(active) and self.answered_count() >= len(active)
+        return now >= (game.deadline or 0) + GRACE_SECONDS or everyone
+
     def tick(self, now: float) -> None:
-        """Close the current question if its time is up or everyone answered."""
-        if self.phase != "question":
-            return
-        answered = self.answered_count()
-        everyone = self.active_players and answered >= len(self.active_players)
-        if now >= (self.deadline or 0) + GRACE_SECONDS or everyone:
+        if self.due(now):
             self._close(now)
 
-    def answered_count(self) -> int:
-        return sum(1 for p in self.active_players if self.position in p.answers)
-
     def _close(self, now: float) -> None:
-        self.phase = "reveal"
-        self.closed_at = now
+        self.game.phase = "reveal"
+        self.game.closed_at = now
         # Anyone who did not answer loses their streak.
         for p in self.active_players:
-            if self.position not in p.answers:
+            if p.id not in self.answers:
                 p.streak = 0
 
     # -- host actions --
 
     def start(self, now: float) -> None:
-        if self.phase != "lobby":
+        if self.game.phase != "lobby":
             raise LiveError("The game has already started")
         if not self.active_players:
             raise LiveError("Wait for at least one player to join")
@@ -188,38 +184,57 @@ class Room:
     def advance(self, now: float) -> None:
         """The host's Next button, whatever is on screen."""
         self.tick(now)
-        if self.phase == "question":
+        game = self.game
+        if game.phase == "question":
             self._close(now)  # skip the rest of the countdown
-        elif self.phase == "reveal":
-            self.phase = "scoreboard"
-        elif self.phase == "scoreboard":
-            if self.position >= len(self.questions):
-                self.phase = "finished"
+        elif game.phase == "reveal":
+            game.phase = "scoreboard"
+        elif game.phase == "scoreboard":
+            if game.position >= len(game.questions):
+                self._finish(now)
             else:
-                self._open_question(self.position + 1, now)
-        elif self.phase == "lobby":
+                self._open_question(game.position + 1, now)
+        elif game.phase == "lobby":
             self.start(now)
         else:
             raise LiveError("The game is over")
 
     def finish(self, now: float) -> None:
-        if self.phase == "question":
+        if self.game.phase == "question":
             self._close(now)
-        self.phase = "finished"
+        self._finish(now)
+
+    def _finish(self, now: float) -> None:
+        self.game.phase = "finished"
+        if self.game.finished_at is None:
+            self.game.finished_at = now
 
     def _open_question(self, position: int, now: float) -> None:
-        self.position = position
-        self.phase = "question"
-        self.starts_at = now + READ_SECONDS
-        self.deadline = self.starts_at + self.time_limit
-        self.closed_at = None
+        game = self.game
+        game.position = position
+        game.phase = "question"
+        game.starts_at = now + READ_SECONDS
+        game.deadline = game.starts_at + game.time_limit
+        game.closed_at = None
+        if game.started_at is None:
+            game.started_at = now
+        self.answers = {}
+
+    def remove(self, player_id: int, now: float) -> None:
+        for p in self.players:
+            if p.id == player_id:
+                p.removed = True
+                self.tick(now)  # they may have been the last one to answer
+                return
+        raise LiveError("No such player", status=404)
 
     # -- player actions --
 
-    def join(self, name: str, now: float) -> Player:
-        if self.phase == "finished":
+    def join(self, name: str, now: float) -> models.LivePlayer:
+        game = self.game
+        if game.phase == "finished":
             raise LiveError("This game has finished")
-        if self.locked:
+        if game.locked:
             raise LiveError("The host has locked this game")
         clean = clean_name(name)
         taken = {p.name.casefold() for p in self.active_players}
@@ -227,45 +242,61 @@ class Room:
             raise LiveError("Someone already has that name -- pick another")
         if len(self.active_players) >= MAX_PLAYERS:
             raise LiveError("The room is full")
-        player = Player(
-            id=self.next_player_id,
+        player = models.LivePlayer(
+            game_id=game.id,
             token=secrets.token_urlsafe(24),
             name=clean,
             joined_at=now,
             last_seen=now,
+            score=0,
+            streak=0,
+            removed=False,
         )
-        self.next_player_id += 1
+        self.db.add(player)
+        self.db.flush()  # the id goes into the reply
         self.players.append(player)
         return player
 
-    def answer(self, player: Player, position: int, choice_id: int, now: float) -> Answer:
+    def answer(
+        self, player: models.LivePlayer, position: int, choice_id: int, now: float
+    ) -> models.LiveAnswer:
         self.tick(now)
+        game = self.game
         question = self.question
-        if self.phase != "question" or question is None or position != self.position:
+        if game.phase != "question" or question is None or position != game.position:
             raise LiveError("Too late -- this question is closed")
-        if now < (self.starts_at or 0):
+        if now < (game.starts_at or 0):
             raise LiveError("Answers are not open yet")
-        if position in player.answers:
+        if player.id in self.answers:
             raise LiveError("You have already answered")
-        if choice_id not in {c["id"] for c in question.choices}:
+        if choice_id not in {c["id"] for c in question["choices"]}:
             raise LiveError("That is not one of the options", status=422)
 
-        elapsed = max(0.0, min(now - self.starts_at, float(self.time_limit)))
-        correct = choice_id == question.correct_id
+        elapsed = max(0.0, min(now - game.starts_at, float(game.time_limit)))
+        correct = choice_id == question["correct_id"]
         points = 0
         if correct:
             player.streak += 1
-            fraction = elapsed / self.time_limit
+            fraction = elapsed / game.time_limit
             points = round(MAX_POINTS - (MAX_POINTS - MIN_POINTS) * fraction)
             points += min((player.streak - 1) * STREAK_BONUS, STREAK_BONUS_CAP)
         else:
             player.streak = 0
         player.score += points
 
-        result = Answer(choice_id=choice_id, elapsed=elapsed, correct=correct, points=points)
-        player.answers[position] = result
+        answer = models.LiveAnswer(
+            game_id=game.id,
+            player_id=player.id,
+            position=position,
+            choice_id=choice_id,
+            elapsed=elapsed,
+            correct=correct,
+            points=points,
+        )
+        self.db.add(answer)
+        self.answers[player.id] = answer
         self.tick(now)
-        return result
+        return answer
 
 
 def clean_name(name: str) -> str:
@@ -279,44 +310,83 @@ def clean_name(name: str) -> str:
     return clean
 
 
-# --- the registry ---------------------------------------------------------------
+# --- finding and locking games ------------------------------------------------------
 
 
-class Registry:
-    """Every open room, guarded by one lock.
+def find_game(db: Session, pin: Optional[str], *, lock: bool = False) -> models.LiveGame:
+    """The game with this PIN.
 
-    The endpoints are plain `def`s, so FastAPI runs them on a thread pool and
-    two phones can land here at once. The work under the lock is tiny.
+    With `lock`, the transaction becomes the game's only writer until it
+    commits or rolls back: FOR UPDATE on the row (Postgres), or the database's
+    write lock (SQLite, see `database.begin_write`). Rows are always read
+    afresh, never taken from the session's cache.
     """
+    pin = (pin or "").strip()
+    if not pin:
+        raise LiveError("No game with that PIN", status=404)
+    if lock:
+        begin_write(db)
+    stmt = (
+        select(models.LiveGame)
+        .where(models.LiveGame.pin == pin)
+        .execution_options(populate_existing=True)
+    )
+    if lock:
+        stmt = stmt.with_for_update()
+    game = db.scalars(stmt).first()
+    if game is None:
+        raise LiveError("No game with that PIN", status=404)
+    return game
 
-    def __init__(self) -> None:
-        self.lock = threading.Lock()
-        self.rooms: dict[str, Room] = {}
 
-    def purge(self, now: float) -> None:
-        stale = [pin for pin, r in self.rooms.items() if now - r.touched_at > ROOM_IDLE_SECONDS]
-        for pin in stale:
-            del self.rooms[pin]
+def open_room(db: Session, pin: Optional[str], *, lock: bool = False) -> Room:
+    return Room(db, find_game(db, pin, lock=lock))
 
-    def new_pin(self, rng: random.Random) -> str:
-        for _ in range(1000):
-            pin = f"{rng.randint(100000, 999999)}"
-            if pin not in self.rooms:
-                return pin
-        raise LiveError("No free room codes right now", status=503)
 
-    def get(self, pin: str) -> Room:
-        room = self.rooms.get((pin or "").strip())
-        if room is None:
-            raise LiveError("No game with that PIN", status=404)
+def poll(db: Session, room: Room, now: float) -> Room:
+    """The room a poll should show, closing the question first if it is due.
+
+    Only then does a poll take the lock. It checks again once it holds it:
+    another process may have closed the question in between.
+    """
+    if not room.due(now):
         return room
+    locked = open_room(db, room.game.pin, lock=True)
+    locked.tick(now)
+    db.flush()
+    return locked
 
-    def clear(self) -> None:
-        with self.lock:
-            self.rooms.clear()
+
+def check_host(room: Room, token: Optional[str]) -> None:
+    if not token or not secrets.compare_digest(room.game.host_token, token):
+        raise LiveError("Only the host can do that", status=403)
 
 
-registry = Registry()
+def mark_seen(db: Session, room: Room, player: models.LivePlayer, now: float) -> None:
+    """Note that this phone is still here -- at most every few seconds."""
+    # Touch the game row before the player row: every other writer locks
+    # live_games first and live_players second, and taking them in the
+    # opposite order here would let two transactions deadlock on Postgres.
+    mark_touched(db, room, now)
+    if now - player.last_seen >= SEEN_EVERY_SECONDS:
+        db.execute(
+            update(models.LivePlayer)
+            .where(models.LivePlayer.id == player.id)
+            .values(last_seen=now)
+        )
+
+
+def mark_touched(db: Session, room: Room, now: float) -> None:
+    """Note that the game is still in use, for the purge."""
+    if now - room.game.touched_at >= TOUCH_EVERY_SECONDS:
+        db.execute(
+            update(models.LiveGame)
+            .where(models.LiveGame.id == room.game.id)
+            .values(touched_at=now)
+        )
+
+
+# --- creating, archiving, dropping -------------------------------------------------------
 
 
 def create_room(
@@ -326,109 +396,202 @@ def create_room(
     question_count: int,
     time_limit: int,
     category: Optional[models.Category],
+    host_user: Optional[models.User] = None,
+    items: Optional[list[models.Item]] = None,
     rng: Optional[random.Random] = None,
 ) -> Room:
+    """Draw the questions and open a room for them.
+
+    `items` fixes which items are asked (work on mistakes); otherwise
+    `question_count` of the deck's items are drawn at random. The caller
+    builds its reply from the returned room, then commits.
+    """
     rng = rng or random.SystemRandom()
     pool = list(crud.list_items(db, category.id if category else None))
     if not pool:
         raise LiveError("There are no items to ask about here")
-    order = list(pool)
-    rng.shuffle(order)
-    asked = order[: max(1, min(question_count, len(order)))]
+    if items is None:
+        asked = list(pool)
+        rng.shuffle(asked)
+        asked = asked[: max(1, min(question_count, len(asked)))]
+    else:
+        asked = list(items)
+        rng.shuffle(asked)
+    questions = _draw(db, asked, pool, mode, rng)
 
+    # Read everything needed from these objects now: the purge commits, and
+    # a commit expires them.
+    settings = dict(
+        host_user_id=host_user.id if host_user else None,
+        mode=mode,
+        time_limit=time_limit,
+        question_count=len(questions),
+        category_id=category.id if category else None,
+        category_slug=category.slug if category else None,
+        category_name=category.name if category else None,
+        questions=questions,
+    )
+    now = _now()
+    purge(db, now)
+
+    for _ in range(PIN_TRIES):
+        pin = f"{rng.randint(100000, 999999)}"
+        begin_write(db)
+        if db.scalar(select(models.LiveGame.id).where(models.LiveGame.pin == pin)) is not None:
+            db.rollback()
+            continue
+        game = models.LiveGame(
+            pin=pin,
+            host_token=secrets.token_urlsafe(24),
+            phase="lobby",
+            position=0,
+            locked=False,
+            created_at=now,
+            touched_at=now,
+            **settings,
+        )
+        db.add(game)
+        try:
+            db.flush()
+        except IntegrityError:
+            # Another process took this PIN a moment ago (possible on Postgres;
+            # SQLite's single writer rules it out).
+            db.rollback()
+            continue
+        return Room(db, game)
+    raise LiveError("No free room codes right now", status=503)
+
+
+def _draw(db: Session, asked, pool, mode: str, rng: random.Random) -> list[dict]:
+    """The frozen questions: what is shown, the options, and the answer."""
     questions = []
     for position, (item, options, photo, picks) in enumerate(
         crud.draw_questions(db, asked, pool, mode, rng), start=1
     ):
         photo_url = crud.image_url(photo.filename) if photo else crud.image_url(item.cover)
         if mode == "inverted":
-            choices = []
-            for option, pick in zip(options, picks):
-                filename = pick.filename if pick else option.cover
-                choices.append({"id": option.id, "image_url": crud.image_url(filename)})
+            choices = [
+                {"id": option.id, "image_url": crud.image_url(pick.filename if pick else option.cover)}
+                for option, pick in zip(options, picks)
+            ]
         else:
             choices = [{"id": o.id, "name": o.name} for o in options]
         answer = crud.item_payload(item)
         # Reveal the picture that was actually asked about.
         answer["image_url"] = photo_url
         questions.append(
-            Question(
-                position=position,
-                correct_id=item.id,
-                image_url=photo_url if mode == "choice" else None,
-                prompt=item.name if mode == "inverted" else None,
-                choices=choices,
-                item=answer,
-            )
+            {
+                "position": position,
+                "correct_id": item.id,
+                "image_url": photo_url if mode == "choice" else None,
+                "prompt": item.name if mode == "inverted" else None,
+                "choices": choices,
+                "item": answer,
+            }
         )
+    return questions
 
-    now = _now()
-    with registry.lock:
-        registry.purge(now)
-        room = Room(
-            pin=registry.new_pin(rng),
-            host_token=secrets.token_urlsafe(24),
-            mode=mode,
-            time_limit=time_limit,
-            category_name=category.name if category else None,
-            questions=questions,
-            created_at=now,
-            touched_at=now,
+
+def keeps(game: models.LiveGame) -> bool:
+    """Is this game kept once it is over: a signed-in host's, past the lobby?"""
+    return game.host_user_id is not None and game.started_at is not None
+
+
+def retire(db: Session, game: models.LiveGame) -> None:
+    """End a game's life as a room: into its host's history, or gone."""
+    if keeps(game):
+        game.pin = None
+    else:
+        delete_game(db, game.id)
+
+
+def delete_game(db: Session, game_id: int) -> None:
+    """A game and everything in it.
+
+    Deleted explicitly rather than left to ON DELETE CASCADE, which SQLite
+    only honours with foreign keys switched on.
+    """
+    db.execute(delete(models.LiveAnswer).where(models.LiveAnswer.game_id == game_id))
+    db.execute(delete(models.LivePlayer).where(models.LivePlayer.game_id == game_id))
+    db.execute(delete(models.LiveGame).where(models.LiveGame.id == game_id))
+
+
+def purge(db: Session, now: Optional[float] = None) -> None:
+    """Archive or drop the games nobody has touched for ROOM_IDLE_SECONDS."""
+    now = _now() if now is None else now
+    begin_write(db)
+    stale = db.scalars(
+        select(models.LiveGame)
+        .where(
+            models.LiveGame.pin.is_not(None),
+            models.LiveGame.touched_at < now - ROOM_IDLE_SECONDS,
         )
-        registry.rooms[room.pin] = room
-    return room
+        .with_for_update()
+    ).all()
+    for game in stale:
+        retire(db, game)
+    db.commit()
 
 
 # --- what each side is shown ------------------------------------------------------
 
 
-def _question_public(q: Question) -> dict:
+def _question_public(q: dict) -> dict:
     """The question without its answer."""
     return {
-        "position": q.position,
-        "image_url": q.image_url,
-        "prompt": q.prompt,
-        "choices": q.choices,
+        "position": q["position"],
+        "image_url": q["image_url"],
+        "prompt": q["prompt"],
+        "choices": q["choices"],
     }
 
 
 def _reveal(room: Room) -> Optional[dict]:
+    game = room.game
     q = room.question
-    if q is None or room.phase not in ("reveal", "scoreboard", "finished") or room.closed_at is None:
+    if q is None or game.phase not in ("reveal", "scoreboard", "finished") or game.closed_at is None:
         return None
-    counts = {c["id"]: 0 for c in q.choices}
+    counts = {c["id"]: 0 for c in q["choices"]}
+    right = 0
     for p in room.active_players:
-        a = p.answers.get(q.position)
-        if a is not None and a.choice_id in counts:
+        a = room.answers.get(p.id)
+        if a is None:
+            continue
+        if a.choice_id in counts:
             counts[a.choice_id] += 1
-    right = sum(1 for p in room.active_players if (a := p.answers.get(q.position)) and a.correct)
+        if a.correct:
+            right += 1
     return {
-        "correct_id": q.correct_id,
-        "item": q.item,
+        "correct_id": q["correct_id"],
+        "item": q["item"],
         "counts": [{"id": cid, "count": n} for cid, n in counts.items()],
         "right_count": right,
     }
 
 
 def _clock(room: Room, now: float) -> dict:
+    game = room.game
     return {
         "now": now,
-        "starts_at": room.starts_at if room.phase == "question" else None,
-        "deadline": room.deadline if room.phase == "question" else None,
-        "time_limit": room.time_limit,
+        "starts_at": game.starts_at if game.phase == "question" else None,
+        "deadline": game.deadline if game.phase == "question" else None,
+        "time_limit": game.time_limit,
     }
 
 
 def host_view(room: Room, now: float) -> dict:
+    game = room.game
     standings = room.standings()
-    view = {
-        "pin": room.pin,
-        "phase": room.phase,
-        "mode": room.mode,
-        "category_name": room.category_name,
-        "question_count": len(room.questions),
-        "position": room.position,
-        "locked": room.locked,
+    return {
+        "pin": game.pin,
+        "phase": game.phase,
+        "mode": game.mode,
+        "category_name": game.category_name,
+        "question_count": len(game.questions),
+        "position": game.position,
+        "locked": game.locked,
+        # Signed in when the room was opened: the game goes into their history.
+        "owned": game.host_user_id is not None,
         **_clock(room, now),
         "players": [
             {
@@ -436,24 +599,24 @@ def host_view(room: Room, now: float) -> dict:
                 "name": p.name,
                 "score": p.score,
                 "away": now - p.last_seen > AWAY_SECONDS,
-                "answered": room.phase == "question" and room.position in p.answers,
+                "answered": game.phase == "question" and p.id in room.answers,
             }
-            for p in sorted(room.active_players, key=lambda p: p.joined_at)
+            for p in sorted(room.active_players, key=lambda p: (p.joined_at, p.id))
         ],
-        "answered_count": room.answered_count() if room.position else 0,
-        "question": _question_public(room.question) if room.question and room.phase != "lobby" else None,
+        "answered_count": room.answered_count() if game.position else 0,
+        "question": _question_public(room.question) if room.question and game.phase != "lobby" else None,
         "reveal": _reveal(room),
         "leaderboard": [
             {"id": p.id, "name": p.name, "score": p.score, "streak": p.streak}
-            for p in standings[: (len(standings) if room.phase == "finished" else LEADERBOARD_SIZE)]
+            for p in standings[: (len(standings) if game.phase == "finished" else LEADERBOARD_SIZE)]
         ],
     }
-    return view
 
 
-def player_view(room: Room, player: Player, now: float) -> dict:
+def player_view(room: Room, player: models.LivePlayer, now: float) -> dict:
+    game = room.game
     q = room.question
-    answer = player.answers.get(room.position) if room.position else None
+    answer = room.answers.get(player.id) if game.position else None
     reveal = _reveal(room)
     you = {
         "id": player.id,
@@ -470,14 +633,14 @@ def player_view(room: Room, player: Player, now: float) -> dict:
             "points": answer.points if answer else 0,
         }
     return {
-        "pin": room.pin,
-        "phase": room.phase,
-        "mode": room.mode,
-        "question_count": len(room.questions),
-        "position": room.position,
+        "pin": game.pin,
+        "phase": game.phase,
+        "mode": game.mode,
+        "question_count": len(game.questions),
+        "position": game.position,
         **_clock(room, now),
         "player_count": len(room.active_players),
-        "question": _question_public(q) if q and room.phase == "question" else None,
+        "question": _question_public(q) if q and game.phase == "question" else None,
         "reveal": reveal,
         "you": you,
     }

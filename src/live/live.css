@@ -1174,3 +1174,147 @@
 .live-podium-page .live-go-button {
   margin-left: 0;
 }
+
+
+/* ---------- past games (site style) ---------- */
+
+.live-history-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.live-history-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 18px;
+  border: 1px solid var(--outline, #CAC4D0);
+  border-radius: var(--radius-card, 20px);
+  background: var(--surface-bright, #FFFFFF);
+  color: var(--on-surface, #1D1B20);
+  text-decoration: none;
+}
+
+.live-history-row:hover {
+  background: var(--surface-container-hover, #DED5E6);
+}
+
+.live-history-when {
+  margin: 0;
+  font-weight: 600;
+}
+
+.live-history-what {
+  color: var(--on-surface-variant, #49454F);
+}
+
+.live-history-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--on-surface-variant, #49454F);
+}
+
+.live-status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--surface-container, #E7E0EC);
+  color: var(--on-surface, #1D1B20);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.live-status.is-live {
+  background: var(--primary, #6750A4);
+  color: var(--on-primary, #FFFFFF);
+}
+
+.live-status.is-finished {
+  background: var(--success-container, #D6EFE0);
+  color: var(--success, #2E6B4F);
+}
+
+.live-standings {
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.live-standings li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: var(--surface-container, #E7E0EC);
+  font-variant-numeric: tabular-nums;
+}
+
+.live-standings-place {
+  width: 1.6em;
+  color: var(--on-surface-variant, #49454F);
+}
+
+.live-standings-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.live-standings-correct {
+  color: var(--on-surface-variant, #49454F);
+  font-size: 14px;
+}
+
+.live-standings-score {
+  min-width: 4em;
+  text-align: right;
+  font-weight: 700;
+}
+
+.live-history-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.live-history-actions .secondary-button {
+  width: auto;
+  min-height: 48px;
+  margin-top: 0;
+  gap: 8px;
+  font-size: 17px;
+}
+
+.live-history-actions .secondary-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.live-history-delete {
+  margin-left: auto;
+  color: var(--error, #B3261E);
+}
+
+.live-podium-saved {
+  margin: 0;
+  color: var(--live-ink-soft);
+}
+
+.live-podium-saved a {
+  color: inherit;
+}

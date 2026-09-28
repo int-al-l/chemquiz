@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import PageHeader from "../components/PageHeader";
 import { Ring } from "../components/ProgressBits";
+import { IS_DEMO } from "../api/client";
 import { useAuth } from "../auth/context";
 import { useProgress } from "../progress/context";
 import { BADGES, GOAL_CHOICES, deckBadges, deckSummary, recentDays } from "../progress/engine";
@@ -127,6 +128,12 @@ function ProfilePage() {
               );
             })}
           </div>
+
+          {user && !IS_DEMO && (
+            <Link className="secondary-button" to="/live/history">
+              Past class games
+            </Link>
+          )}
 
           {user && (
             <button
