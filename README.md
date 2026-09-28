@@ -65,6 +65,14 @@ can also run as several processes (`uvicorn app.main:app --workers 4`). The
 browser-only demo on GitHub Pages cannot connect phones, so it explains that
 instead.
 
+**Past games.** If you are signed in when you open the room, the game is kept
+once it has started: **Past games** (on the class game screen and in your
+profile) lists them with the final standings, a CSV of who answered what
+(opens in Excel or Google Sheets), and two ways to play again -- the same
+settings with fresh questions, or **Work on mistakes**, which asks only the
+items fewer than 80% of the class got right. Games hosted without signing in
+are not kept.
+
 ## Demo build (no backend)
 
 `npm run build:demo` builds a version that runs entirely in the browser: the
@@ -103,13 +111,15 @@ src/
   live/                the class game: setup, board, join, phone
 backend/
   app/models.py        Category, Item, ItemPhoto, ItemAlias, User, SavedItem,
-                       QuizSession, QuizQuestion
+                       QuizSession, QuizQuestion, LiveGame, LivePlayer, LiveAnswer
   app/crud.py          queries and the quiz rules
   app/routers/         HTTP endpoints
   app/text.py          name normalisation for aliases
   app/security.py      password hashing, one-time codes
   app/mailer.py        sending the verification and reset emails
   app/progress.py      merging progress documents
+  app/live.py          the class game's rules, on the live_* tables
+  app/live_history.py  past class games: standings, CSV, play again
   seed_data.py         the content itself, hand-checked
   seed.py              loads seed_data.py into the database
   static/images/       glassware photographs
@@ -136,6 +146,11 @@ tools/fetch_synthware.py  downloads the Synthware catalogue (run it locally)
 | `/quiz/setup[/:slug]` | choose mode and length |
 | `/quiz/:token` | a quiz in progress |
 | `/quiz/:token/results` | the score afterwards |
+| `/live` | set up a class game |
+| `/live/host/:pin` | the board during a class game |
+| `/live/history` | past class games (signed in) |
+| `/live/history/:id` | one past game: standings, CSV, play again |
+| `/join[/:pin]`, `/play/:pin` | a student joins, and plays on their phone |
 
 ## Learning with cards
 
@@ -262,7 +277,7 @@ the new cards and their text, and the cards dropped for lack of a clean photo.
 ## Tests
 
 ```bash
-cd backend && python -m pytest    # 62 tests: content, quiz, accounts, progress
+cd backend && python -m pytest    # 100 tests: content, quiz, accounts, progress, class games
 npm test                          # vitest: saved-list provider, progress engine
 npm run lint                      # eslint, including the React hooks rules
 npm run build
