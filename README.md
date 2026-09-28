@@ -59,9 +59,11 @@ The phones and the teacher's laptop must be on the same network, and the
 firewall must allow port 5173. If the board is opened as `localhost`, it asks
 the server for the laptop's network address and puts that in the QR code.
 
-Rooms live in the backend's memory (`backend/app/live.py`), so run it as a
-single process (no `--workers`); restarting it ends the game. The browser-only
-demo on GitHub Pages cannot connect phones, so it explains that instead.
+Games are kept in the database, so restarting the backend is only a pause:
+the board and the phones pick the game up again by themselves. The backend
+can also run as several processes (`uvicorn app.main:app --workers 4`). The
+browser-only demo on GitHub Pages cannot connect phones, so it explains that
+instead.
 
 ## Demo build (no backend)
 
