@@ -9,7 +9,7 @@ Interactive API docs are then at http://localhost:8000/docs
 
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, select
@@ -19,6 +19,7 @@ from . import crud, migrate, models, schemas, seeding
 from .live import purge as purge_live_games
 from .config import CORS_ORIGINS, IMAGES_DIR, STATIC_DIR
 from .database import Base, SessionLocal, engine, get_db
+from .i18n import AppError, request_lang
 from .routers import account, content, live, live_history, quiz
 
 
@@ -78,6 +79,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.exception_handler(AppError)
+def app_error(request: Request, exc: AppError):
+    """Refusals say themselves in the game's language, else the request's."""
+    return exc.response(exc.lang or request_lang(request))
+
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 

@@ -8,13 +8,14 @@ from __future__ import annotations
 
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import live, live_history, models
 from ..database import begin_write, get_db
+from ..i18n import AppError
 from .account import current_user
 
 router = APIRouter(prefix="/api/me/live-games", tags=["live"])
@@ -32,7 +33,7 @@ def _own_game(db: Session, user: models.User, game_id: int, lock: bool = False) 
         stmt = stmt.with_for_update()
     game = db.scalars(stmt).first()
     if game is None:
-        raise HTTPException(status_code=404, detail="No such game")
+        raise AppError("no_such_game", status=404)
     return game
 
 
@@ -59,7 +60,7 @@ def remove_game(game_id: int, user: models.User = Depends(current_user), db: Ses
     game = _own_game(db, user, game_id, lock=True)
     if live_history.status(game) == "live":
         db.rollback()
-        raise HTTPException(status_code=409, detail="Finish the game first")
+        raise AppError("finish_first")
     live.delete_game(db, game.id)
     db.commit()
     return None
@@ -90,9 +91,9 @@ def replay(
     game = _own_game(db, user, game_id)
     try:
         room = live_history.replay(db, game, payload.kind, user)
-    except live.LiveError as exc:
+    except live.LiveError:
         db.rollback()
-        raise HTTPException(status_code=exc.status, detail=str(exc)) from exc
+        raise
     view = {"host_token": room.game.host_token, **live.host_view(room, live._now())}
     db.commit()
     return view

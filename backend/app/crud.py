@@ -14,6 +14,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from . import models
+from .i18n import AppError, localized
 from .config import CHOICES_PER_QUESTION, IMAGES_URL_PREFIX, SESSION_TTL_HOURS
 
 
@@ -152,7 +153,7 @@ def create_quiz_session(
 
     pool = list(list_items(db, category.id if category else None))
     if not pool:
-        raise ValueError("no items available for this category")
+        raise AppError("empty_category")
 
     order = list(pool)
     rng.shuffle(order)

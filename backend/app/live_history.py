@@ -155,7 +155,7 @@ def _deck(db: Session, game: models.LiveGame) -> Optional[models.Category]:
         return None
     category = db.get(models.Category, game.category_id) if game.category_id else None
     if category is None:
-        raise live.LiveError("That deck is no longer on the site")
+        raise live.LiveError("deck_gone")
     return category
 
 
@@ -174,14 +174,14 @@ def replay(db: Session, game: models.LiveGame, kind: str, user: models.User) -> 
         )
     ids = Results(db, game).mistake_item_ids()
     if not ids:
-        raise live.LiveError("The class got every question right -- nothing to go over")
+        raise live.LiveError("no_mistakes")
     items = db.scalars(
         select(models.Item)
         .where(models.Item.id.in_(ids))
         .options(selectinload(models.Item.photos), selectinload(models.Item.category))
     ).all()
     if not items:
-        raise live.LiveError("Those items are no longer on the site")
+        raise live.LiveError("items_gone")
     return live.create_room(
         db,
         mode=game.mode,

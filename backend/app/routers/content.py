@@ -1,10 +1,11 @@
 """Read-only content endpoints: the category tree and the items in it."""
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from .. import crud, schemas
 from ..database import get_db
+from ..i18n import AppError, request_lang
 
 router = APIRouter(prefix="/api", tags=["content"])
 
@@ -22,7 +23,7 @@ def list_categories(
     else:
         parent_category = crud.get_category_by_slug(db, parent)
         if parent_category is None:
-            raise HTTPException(status_code=404, detail=f"No category '{parent}'")
+            raise AppError("no_category", status=404, slug=parent)
         categories = parent_category.children
 
     return [crud.category_payload(db, c) for c in categories]
@@ -32,7 +33,7 @@ def list_categories(
 def get_category(slug: str, db: Session = Depends(get_db)):
     category = crud.get_category_by_slug(db, slug)
     if category is None:
-        raise HTTPException(status_code=404, detail=f"No category '{slug}'")
+        raise AppError("no_category", status=404, slug=slug)
 
     payload = crud.category_payload(db, category)
     payload["parent"] = (
@@ -55,7 +56,7 @@ def list_items(
     if category is not None:
         found = crud.get_category_by_slug(db, category)
         if found is None:
-            raise HTTPException(status_code=404, detail=f"No category '{category}'")
+            raise AppError("no_category", status=404, slug=category)
         category_id = found.id
 
     items = crud.list_items(db, category_id, include_descendants=include_descendants)
@@ -72,5 +73,5 @@ def get_item(slug: str, db: Session = Depends(get_db)):
         select(models.Item).where(models.Item.slug == slug)
     ).scalar_one_or_none()
     if item is None:
-        raise HTTPException(status_code=404, detail=f"No item '{slug}'")
+        raise AppError("no_item", status=404, slug=slug)
     return crud.item_payload(item)
