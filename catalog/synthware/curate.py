@@ -36,7 +36,8 @@ PHOTOS = {
     "reagent-bottle": ["8084_1"],
     # --- condensers ------------------------------------------------------------
     "liebig-condenser": ["8856_0", "11259_0"],
-    "coil-condenser": ["15694_0", "4693_0"],
+    "coil-condenser": ["4693_0", "wm:Graham (spiral) condenser-small.jpg", "wm:Graham condenser.jpg"],
+    "dimroth-condenser": ["15694_0", "wm:Dimrothkühler.jpg", "wm:Dimroth kuehler.jpg"],
     "allihn-condenser": ["19943_0", "19943_1", "19943_2", "20167_0", "20167_1"],
     "friedrichs-condenser": ["20182_0", "20182_1", "20182_2", "22511_0"],
     "cold-finger-condenser": ["12227_0"],
@@ -52,10 +53,11 @@ PHOTOS = {
     "kugelrohr-bulb": ["21598_0", "21598_1", "21598_2", "21598_3"],
     "snyder-column": ["15285_0"],
     # --- funnels -----------------------------------------------------------------
-    "buchner-funnel": ["20356_0"],
-    "fritted-filter-funnel": ["17405_0", "17405_1", "17405_2", "17405_3", "3467_0"],
-    "powder-funnel": ["15595_0"],
-    "glass-funnel": ["15477_0", "15477_1", "15477_2", "15725_0"],
+    "buchner-funnel": ["wm:Büchnertrichter frontal.jpg", "wm:Büchnertrichter frontal 02.jpg",
+                       "wm:Ceramic Buchner funnel-03.jpg"],
+    "fritted-filter-funnel": ["17405_0", "17405_1", "17405_2", "17405_3", "3467_0", "20356_0"],
+    "powder-funnel": ["15595_0", "15477_0", "15477_1", "15477_2"],
+    "glass-funnel": ["15725_0", "wm:Analysentrichter.png", "wm:Funnel MET DP234124.jpg"],
     "separatory-funnel": ["11668_0", "11668_2", "11920_0", "11920_2", "14938_0", "14938_2", "18568_0"],
     "pressure-equalizing-funnel": ["14898_0", "14898_1", "3610_0", "3610_2", "23812_0", "16574_0", "16574_2"],
     "fritted-filter-tube": ["3414_0", "3414_2"],
@@ -134,18 +136,18 @@ NEW_OR_CHANGED = {
         "description": (
             "A beaker inside a second glass wall. Water or coolant from a circulator flows "
             "through the gap between the walls and holds whatever is inside at a steady "
-            "temperature -- for crystallisations, titrations and anything that has to stay "
+            "temperature — for crystallisations, titrations and anything that has to stay "
             "cold or warm for hours."
         ),
     },
     "graduated-cylinder": {
-        "category": "flasks",
+        "category": "measuring",
         "name": "Graduated cylinder",
         "aliases": ["Measuring cylinder"],
         "description": (
             "A tall, narrow cylinder on a stable foot, with a scale up the side, for "
             "measuring out a volume of liquid quickly. More accurate than the marks on a "
-            "beaker, less accurate than a volumetric flask or pipette -- the everyday choice "
+            "beaker, less accurate than a volumetric flask or pipette — the everyday choice "
             "when 'about 50 mL' is good enough. Read the level at the bottom of the curved "
             "surface (the meniscus)."
         ),
@@ -167,8 +169,8 @@ NEW_OR_CHANGED = {
         "description": (
             "The simple cone and stem, for pouring a liquid into a narrow opening without "
             "spilling. Lined with a folded filter paper it becomes the most basic filtration "
-            "set-up, gravity filtration. Many lab funnels end in a ground-glass joint so "
-            "they sit firmly in a flask neck instead of wobbling."
+            "set-up, gravity filtration; a long stem fills with filtrate, and its weight helps "
+            "pull the liquid through the paper."
         ),
     },
     "thermowell": {
@@ -214,11 +216,12 @@ PHOTOS.update({
     'crucible': ['wm:Porzellantiegel.jpg', 'wm:TiegelmitSchuh.jpg'],
     'plastic-funnel': ['wm:Entonnoir plastique.JPG', 'wm:Kitchen Funnel.jpg', 'wm:Trichter.jpg'],
     'soxhlet-extractor': ['wm:Soxhlet-Extraktor.png', 'wm:Soxhletův extraktor.jpg', 'wm:Soxhlet-laitteisto.JPG'],
-    'desiccator': ['wm:Exsikkator.png'],
+    'desiccator': ['wm:Exsikkator.png',
+                   'wm:Vacuum desiccator belonging to Rosalind Franklin - DPLA - 98e0f871c48313a61b251e383c16b1e6 (page 4).jpg'],
     'drying-pistol': ['wm:Trockenpistole Abderhalden 02.jpg', 'wm:Abderhalden drying pistol.jpg'],
     'septum': ['wm:Rubberseptum.jpg'],
     'joint-clip': ['wm:Keck clips.jpg'],
-    'volumetric-pipette': ['wm:Vollpipetten.jpg'],
+    'volumetric-pipette': ['wm:Vollpipetten.jpg', 'wm:Vollpipette 50 mL.png'],
     'graduated-pipette': ['wm:Pipette 4.jpg', 'wm:Serological pipette.jpg', 'wm:Graduated pipette 10ml.jpg', '17539_0'],
     'pasteur-pipette': ['wm:Glass pasteur pipette.jpg', 'wm:Pasteur Pipets.jpg'],
     'micropipette': ['wm:Pipette de laboratoire sur fond blanc au Bénin 02.jpg', 'wm:Pipette de laboratoire sur fond blanc au Bénin 04.jpg'],
@@ -575,7 +578,7 @@ NEW_OR_CHANGED.update({
     "soxhlet-extractor": _card(
         "distillation", "Soxhlet extractor", ["Soxhlet", "Soxhlet extraction body", "Soxhlet apparatus"],
         "An extractor that washes a solid with fresh, clean solvent over and over by itself. Solvent boils "
-        "below, condenses above, fills the chamber holding the sample and siphons back when full -- leaving "
+        "below, condenses above, fills the chamber holding the sample and siphons back when full — leaving "
         "the extracted material in the flask and running unattended for hours.", "SOXHLET EXTRACTOR"),
     "septum": _card(
         "closures", "Rubber septum", ["Septum", "Suba seal", "Sleeve stopper septum", "Rubber seal"],
@@ -590,7 +593,7 @@ NEW_OR_CHANGED.update({
     # --- existing cards: extra accepted names --------------------------------------
     "filtering-flask": {"aliases": ["Buchner flask", "Büchner flask", "Bunsen flask", "Side-arm flask",
                                     "Filtering flask", "Suction flask", "Vacuum flask for filtration"]},
-    "glass-stopcock": {"aliases": ["Ground glass stopcock", "Glass tap", "Tap", "Faucet",
+    "glass-stopcock": {"aliases": ["Ground glass stopcock", "Glass tap", "Tap",
                                    "High vacuum glass stopcock"]},
     # --- tubes, vials & dishes -----------------------------------------------------
     "test-tube": _card(
@@ -607,7 +610,7 @@ NEW_OR_CHANGED.update({
         "tubes", "NMR tube", ["NMR sample tube", "5 mm NMR tube"],
         "A long, very thin, perfectly straight tube (usually 5 mm across) with a plastic cap. A solution "
         "of the sample in a deuterated solvent goes in it, and it is lowered into the magnet of the NMR "
-        "spectrometer -- the walls are made uniform so they don't distort the spectrum.", "NMR TUBE"),
+        "spectrometer — the walls are made uniform so they don't distort the spectrum.", "NMR TUBE"),
     "capillary-tube": _card(
         "tubes", "Capillary tube", ["Capillary", "Melting point capillary", "Melting point tube",
                                    "TLC spotter", "Glass capillary"],
@@ -623,7 +626,7 @@ NEW_OR_CHANGED.update({
         "A shallow, flat, round dish with a lid that fits loosely over it. Biologists grow bacteria on a "
         "layer of agar in it; chemists use it to hold, dry or look at a small amount of a solid."),
     "evaporating-dish": _card(
-        "tubes", "Evaporating dish", ["Evaporating basin", "Porcelain dish", "Bowl"],
+        "tubes", "Evaporating dish", ["Evaporating basin", "Porcelain dish"],
         "A shallow porcelain bowl with a pouring lip. Heating a solution in it drives off the solvent and "
         "leaves the dissolved solid behind; porcelain takes direct heat that would crack ordinary glass."),
     "crucible": _card(
@@ -638,7 +641,7 @@ NEW_OR_CHANGED.update({
     "desiccator": _card(
         "vacuum", "Desiccator", ["Exsiccator", "Exicator", "Vacuum desiccator", "Dessicator"],
         "A heavy glass pot with a greased, tight-fitting lid and a perforated plate inside. A drying agent "
-        "sits below the plate and samples above it, so they dry -- or stay dry -- in air with no water "
+        "sits below the plate and samples above it, so they dry — or stay dry — in air with no water "
         "in it. Versions with a tap in the lid can be put under vacuum."),
     "drying-pistol": _card(
         "vacuum", "Drying pistol", ["Abderhalden drying pistol", "Abderhalden apparatus",
@@ -649,10 +652,9 @@ NEW_OR_CHANGED.update({
         "DRYING CHAMBER, ABDERHALDEN"),
     # --- measuring -----------------------------------------------------------------------
     "volumetric-pipette": _card(
-        "measuring", "Volumetric pipette", ["Bulb pipette", "Transfer pipette", "Class A pipette",
-                                           "Single mark pipette"],
+        "measuring", "Volumetric pipette", ["Bulb pipette", "Class A pipette", "Single mark pipette"],
         "A long glass tube with a bulb in the middle and one ring on the upper stem. Filled to the ring, "
-        "it delivers one exact volume -- 10.00 mL, say -- and is the most accurate way to transfer a "
+        "it delivers one exact volume — 10.00 mL, say — and is the most accurate way to transfer a "
         "measured amount of a solution."),
     "graduated-pipette": _card(
         "measuring", "Graduated pipette", ["Measuring pipette", "Mohr pipette", "Serological pipette"],
@@ -663,7 +665,7 @@ NEW_OR_CHANGED.update({
         "measuring", "Pasteur pipette", ["Dropper", "Glass dropper", "Transfer pipette, glass",
                                         "Babbitt pipette"],
         "A short glass tube drawn out to a long thin tip, used with a rubber bulb to move small amounts "
-        "of liquid drop by drop. It has no scale -- it is for transferring, not measuring -- and is "
+        "of liquid drop by drop. It has no scale — it is for transferring, not measuring — and is "
         "usually thrown away after use."),
     "micropipette": _card(
         "measuring", "Micropipette", ["Automatic pipette", "Pipettor", "Air displacement pipette",
@@ -711,7 +713,7 @@ NEW_OR_CHANGED.update({
         "bench", "Clamp", ["Laboratory clamp", "Three-finger clamp", "Retort clamp", "Extension clamp",
                            "Universal clamp"],
         "Adjustable jaws on an arm, fixed to a stand with a boss head. It grips the neck of a flask or the "
-        "body of a condenser and holds it in place -- almost every set-up on the bench hangs from clamps."),
+        "body of a condenser and holds it in place — almost every set-up on the bench hangs from clamps."),
     "burette-clamp": _card(
         "bench", "Burette holder", ["Burette clamp", "Double burette clamp", "Buret holder"],
         "A clamp with two spring-loaded jaws that fixes to a stand and holds one or two burettes "
@@ -727,7 +729,7 @@ NEW_OR_CHANGED.update({
     "stir-bar": _card(
         "bench", "Magnetic stir bar", ["Stir bar", "Stirring bar", "Flea", "Stirring flea", "Stir bean"],
         "A small magnet sealed in white PTFE. Dropped into a flask on a magnetic stirrer, it spins and "
-        "stirs the contents -- which is why nearly every reaction flask has one."),
+        "stirs the contents — which is why nearly every reaction flask has one."),
     # --- bench tools & safety -------------------------------------------------------------------
     "spatula": _card(
         "tools", "Spatula", ["Lab spatula", "Scoopula", "Spoon spatula", "Micro spatula"],
@@ -744,5 +746,161 @@ NEW_OR_CHANGED.update({
     "safety-goggles": _card(
         "tools", "Safety goggles", ["Goggles", "Safety glasses", "Safety spectacles", "Eye protection"],
         "Close-fitting protective glasses worn at all times in the lab. They keep splashes, flying glass "
-        "and dust out of the eyes -- the one piece of equipment that is never optional."),
+        "and dust out of the eyes — the one piece of equipment that is never optional."),
+})
+
+
+# --- fixes after a review of the whole set, 2026-09-29 ----------------------------
+# The coil condenser card showed two different condensers: a Dimroth (water in
+# the coil) and a Graham (vapour in the coil), which do opposite jobs. They are
+# two cards now. The Büchner funnel's only photo was a glass fritted funnel,
+# indistinguishable from the fritted filter funnel card; it moves there and the
+# Büchner card shows the porcelain funnel. Three of the glass funnel's photos
+# were Synthware's powder funnels.
+COMMONS.update({
+    'Büchnertrichter frontal.jpg': {
+        "credit": 'Ichwarsnur, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:B%C3%BCchnertrichter_frontal.jpg',
+    },
+    'Büchnertrichter frontal 02.jpg': {
+        "credit": 'Ichwarsnur, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:B%C3%BCchnertrichter_frontal_02.jpg',
+    },
+    'Ceramic Buchner funnel-03.jpg': {
+        "credit": 'Lilly_M, CC BY-SA 3.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Ceramic_Buchner_funnel-03.jpg',
+    },
+    'Analysentrichter.png': {
+        "credit": 'MediaLab TH Köln, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Analysentrichter.png',
+    },
+    'Funnel MET DP234124.jpg': {
+        "credit": 'The Metropolitan Museum of Art, CC0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Funnel_MET_DP234124.jpg',
+    },
+    'Dimrothkühler.jpg': {
+        "credit": 'HaJo88, CC0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Dimrothk%C3%BChler.jpg',
+    },
+    'Dimroth kuehler.jpg': {
+        "credit": 'Armin Kübelbeck, CC BY-SA 3.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Dimroth_kuehler.jpg',
+    },
+    'Graham (spiral) condenser-small.jpg': {
+        "credit": 'Lilly_M, CC BY-SA 3.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Graham_(spiral)_condenser-small.jpg',
+    },
+    'Graham condenser.jpg': {
+        "credit": 'Fleximus, CC0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Graham_condenser.jpg',
+    },
+    'Vacuum desiccator belonging to Rosalind Franklin - DPLA - 98e0f871c48313a61b251e383c16b1e6 (page 4).jpg': {
+        "credit": 'Science History Institute, CC BY 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Vacuum_desiccator_belonging_to_Rosalind_Franklin_-_DPLA_-_98e0f871c48313a61b251e383c16b1e6_(page_4).jpg',
+    },
+    'Vollpipette 50 mL.png': {
+        "credit": 'MediaLab TH Köln, CC BY-SA 4.0, via Wikimedia Commons',
+        "url": 'https://commons.wikimedia.org/wiki/File:Vollpipette_50_mL.png',
+    },
+})
+
+NEW_OR_CHANGED.update({
+    # --- condensers ----------------------------------------------------------------
+    "coil-condenser": {
+        "name": "Graham condenser",
+        "catalog_name": "CONDENSER, GRAHAM",
+        "aliases": ["Coil condenser", "Coiled condenser", "Graham", "Spiral condenser"],
+        "description": (
+            "A glass spiral runs down the middle of a water jacket, and the vapour travels through "
+            "the spiral itself, so it meets a long cooled path in a short piece of glass. It is a "
+            "condenser for distillation: stood upright for reflux, the returning liquid gathers in "
+            "the narrow coils and can block them."
+        ),
+    },
+    "dimroth-condenser": _card(
+        "condensers", "Dimroth condenser", ["Dimroth", "Dimroth coil condenser"],
+        "A condenser turned inside out: cooling water runs through a glass coil in the middle, and the "
+        "vapour rises around the coil inside the outer tube. Both water connections are at the top. The "
+        "coil packs in a large cold surface while the returning liquid runs freely down past it, which "
+        "makes the Dimroth one of the most efficient reflux condensers.", "CONDENSER, DIMROTH"),
+    # --- funnels --------------------------------------------------------------------
+    "buchner-funnel": {
+        "aliases": ["Buchner funnel", "Porcelain Buchner funnel", "Filter funnel, Buchner"],
+        "description": (
+            "A porcelain funnel with a flat, perforated plate across its wide top. A disc of filter "
+            "paper lies on the plate, the funnel sits in a filter flask on a rubber collar, and "
+            "suction pulls the liquid through. It is the fast way to collect a solid and the usual "
+            "last step of a precipitation. Glass funnels with a sintered disc in place of the plate "
+            "and paper are fritted filter funnels."
+        ),
+    },
+    "fritted-filter-funnel": {
+        "aliases": ["Sintered filter funnel", "Sintered glass funnel", "Fritted Buchner funnel",
+                    "Conical fritted funnel", "Glass frit funnel", "Filter funnel with fritted disc"],
+    },
+    "powder-funnel": {
+        "description": (
+            "A funnel with a short, very wide stem, so a dry solid can be tipped into a narrow flask "
+            "neck without bridging in the stem and without dusting over the bench. Most end in a "
+            "ground-glass joint, so they sit firmly in the neck instead of wobbling."
+        ),
+    },
+    # --- adapters: the two differ only in the bend, so the names say so -------------
+    "inlet-adapter": {
+        "name": "Straight inlet adapter",
+        "aliases": ["Inlet adapter", "Gas inlet adapter", "Straight hose adapter", "Hose adapter, straight"],
+        "description": (
+            "A ground-glass joint that ends in a straight hose barb. Pushed into the top of a "
+            "condenser or a flask neck, it connects the apparatus to a gas line, a bubbler or a "
+            "vacuum hose: the simplest way to keep a set-up under nitrogen or argon, or to lead "
+            "fumes away from it."
+        ),
+    },
+    "vacuum-gas-adapter": {
+        "name": "Bent inlet adapter",
+        "aliases": ["Inert gas adapter", "Bent hose adapter", "90° inlet adapter",
+                    "Gas inlet adapter with hose connection", "Argon adapter", "Nitrogen adapter",
+                    "Vacuum / inert gas adapter"],
+        "description": (
+            "A ground-glass joint with a hose barb bent through a right angle, so the tubing leaves "
+            "sideways instead of straight up. On a flask neck that keeps the hose out of the way and "
+            "stops its weight levering on the joint. Pumping a flask down and refilling it with "
+            "nitrogen or argon through one of these is the usual way to get the air out before a "
+            "sensitive reaction."
+        ),
+    },
+    "stopcock-vacuum-adapter": {
+        "description": (
+            "An adapter with a hose connection and a tap, for joining a flask to a vacuum or "
+            "inert-gas line. With the tap closed the flask stays sealed, so it can be taken off the "
+            "line and carried away, or pumped out and refilled again and again without "
+            "disconnecting anything."
+        ),
+    },
+    "vacuum-takeoff-adapter": {
+        "aliases": ["Vacuum adapter", "Distillation adapter", "Bend adapter", "Take-off adapter",
+                    "Distilling adapter", "Vacuum takeoff"],
+    },
+    "anti-splash-adapter": {
+        "aliases": ["Bump trap", "Rotovap bump trap", "Splash head", "Anti splash head",
+                    "Splash adapter", "Anti-climb adapter"],
+    },
+    # --- vessels ----------------------------------------------------------------------
+    "crystallizing-dish": {
+        "description": (
+            "A shallow, flat-bottomed glass dish with straight sides. In a synthesis lab it is most "
+            "often a bath: filled with ice, water or oil, it sits on the stirrer under the flask. Its "
+            "wide open surface also lets a solvent evaporate quickly and leave the dissolved solid "
+            "behind as crystals."
+        ),
+    },
+    "erlenmeyer-flask": {"aliases": ["Conical flask"]},
+    "schlenk-tube": {
+        "description": (
+            "A narrow tube with a side arm and a stopcock or PTFE valve: the tube-shaped relative "
+            "of the Schlenk flask. Small amounts of air-sensitive material are made or stored in it "
+            "under inert gas, and like the flask it can be pumped out and refilled on a Schlenk line."
+        ),
+    },
+    "gas-washing-bottle": {"aliases": ["Drechsel bottle", "Gas scrubber", "Gas wash bottle"]},
 })
