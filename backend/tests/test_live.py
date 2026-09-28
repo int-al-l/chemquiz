@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
+import random
 
-from app import live
+import pytest
+from sqlalchemy import select
+
+from app import live, models
 from test_api import client  # noqa: F401 -- the seeded test app
 
 
@@ -23,19 +26,17 @@ class Clock:
 def clock(monkeypatch):
     c = Clock()
     monkeypatch.setattr(live, "_now", c)
-    live.registry.clear()
     yield c
-    live.registry.clear()
 
 
 def host(token):
     return {"X-Live-Token": token}
 
 
-def make_room(client, **kw):
+def make_room(client, headers=None, **kw):
     body = {"category_slug": "condensers", "mode": "choice", "question_count": 3, "time_limit": 20}
     body.update(kw)
-    res = client.post("/api/live", json=body)
+    res = client.post("/api/live", json=body, headers=headers or {})
     assert res.status_code == 201, res.text
     return res.json()
 
@@ -46,8 +47,21 @@ def join(client, pin, name):
     return res.json()
 
 
-def correct_id(pin, position):
-    return live.registry.rooms[pin].questions[position - 1].correct_id
+def correct_id(client, pin, position):
+    with client.session_factory() as db:
+        game = db.scalars(select(models.LiveGame).where(models.LiveGame.pin == pin)).one()
+        return game.questions[position - 1]["correct_id"]
+
+
+class SamePins(random.Random):
+    """Hands out the given PINs in order; everything else stays random."""
+
+    def __init__(self, pins):
+        super().__init__()
+        self.pins = list(pins)
+
+    def randint(self, a, b):
+        return int(self.pins.pop(0))
 
 
 def test_create_and_join(client, clock):
@@ -104,7 +118,7 @@ def test_full_game(client, clock):
     me = client.get(f"/api/live/{pin}/me", headers=host(ann["token"])).json()
     assert me["question"]["choices"] and me["reveal"] is None
 
-    right = correct_id(pin, 1)
+    right = correct_id(client, pin, 1)
     wrong = next(c["id"] for c in me["question"]["choices"] if c["id"] != right)
 
     # Too early: still reading time.
@@ -142,7 +156,7 @@ def test_full_game(client, clock):
     view = client.post(f"/api/live/{pin}/next", headers=host(token)).json()
     assert view["phase"] == "question" and view["position"] == 2
     clock.advance(live.READ_SECONDS + 10)
-    client.post(f"/api/live/{pin}/answer", json={"position": 2, "choice_id": correct_id(pin, 2)},
+    client.post(f"/api/live/{pin}/answer", json={"position": 2, "choice_id": correct_id(client, pin, 2)},
                 headers=host(ann["token"]))
     clock.advance(10 + live.GRACE_SECONDS)  # time up
     view = client.get(f"/api/live/{pin}/host", headers=host(token)).json()
@@ -154,7 +168,7 @@ def test_full_game(client, clock):
     assert me["you"]["result"]["answered"] is False and me["you"]["rank"] == 2
 
     # A late answer is refused.
-    res = client.post(f"/api/live/{pin}/answer", json={"position": 2, "choice_id": correct_id(pin, 2)},
+    res = client.post(f"/api/live/{pin}/answer", json={"position": 2, "choice_id": correct_id(client, pin, 2)},
                       headers=host(bob["token"]))
     assert res.status_code == 409
 
@@ -193,7 +207,7 @@ def test_removing_last_answerer_closes_question(client, clock):
     bob = join(client, pin, "Bob")
     client.post(f"/api/live/{pin}/next", headers=host(token))
     clock.advance(live.READ_SECONDS + 1)
-    client.post(f"/api/live/{pin}/answer", json={"position": 1, "choice_id": correct_id(pin, 1)},
+    client.post(f"/api/live/{pin}/answer", json={"position": 1, "choice_id": correct_id(client, pin, 1)},
                 headers=host(ann["token"]))
     view = client.post(f"/api/live/{pin}/players/{bob['you']['id']}/remove", headers=host(token)).json()
     assert view["phase"] == "reveal"
@@ -221,3 +235,14 @@ def test_idle_rooms_are_dropped(client, clock):
     clock.advance(live.ROOM_IDLE_SECONDS + 1)
     make_room(client)
     assert client.get(f"/api/live/{old['pin']}").status_code == 404
+
+
+def test_a_taken_pin_is_skipped(client, clock):
+    first = make_room(client)
+    with client.session_factory() as db:
+        room = live.create_room(
+            db, mode="choice", question_count=1, time_limit=20, category=None,
+            rng=SamePins([first["pin"], "654321"]),
+        )
+        db.commit()
+        assert room.game.pin == "654321"

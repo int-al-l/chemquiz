@@ -16,6 +16,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from . import crud, migrate, models, schemas, seeding
+from .live import purge as purge_live_games
 from .config import CORS_ORIGINS, IMAGES_DIR, STATIC_DIR
 from .database import Base, SessionLocal, engine, get_db
 from .routers import account, content, live, quiz
@@ -58,6 +59,7 @@ async def lifespan(app: FastAPI):
                     )
 
         crud.purge_stale_sessions(db)
+        purge_live_games(db)
 
     yield
 
