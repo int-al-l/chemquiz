@@ -165,7 +165,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
                  'stable and easy to swirl without splashing, which is why it is used for '
                  'titrations, for dissolving and mixing, and for storing solutions under a '
                  'stopper.',
-  'aliases': ['Conical flask', 'Evaporation flask'],
+  'aliases': ['Conical flask'],
   'source_products': [{'id': 15657,
                        'url': 'https://chengduglassware.com/product/synthware-triangular-flask-conical-flask-capacity-5ml-125ml-250ml-2000ml-female-joint-heavy-wall-high-strength-erlenmeyer-flask-flask-erlenmeyer-borosilicate-glass-f66/'}],
   'photos': [{'file': 'erlenmeyer-flask-1.jpg', 'source': '15657_0'},
@@ -272,9 +272,10 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'category': 'flasks',
   'name': 'Crystallizing dish',
   'catalog_name': 'DISH, CRYSTALLIZING, WITH SPOUTS',
-  'description': 'A shallow, flat-bottomed dish with a wide open surface. Solvent evaporates from '
-                 'it quickly and leaves the dissolved solid behind as crystals, which is the '
-                 'simplest way to grow crystals or to dry a solid.',
+  'description': 'A shallow, flat-bottomed glass dish with straight sides. In a synthesis lab it '
+                 'is most often a bath: filled with ice, water or oil, it sits on the stirrer '
+                 'under the flask. Its wide open surface also lets a solvent evaporate quickly and '
+                 'leave the dissolved solid behind as crystals.',
   'aliases': ['Crystallising dish', 'Crystallisation dish'],
   'source_products': [{'id': 515,
                        'url': 'https://chengduglassware.com/product/synthware-crystallizing-dish-capacity-150ml-250ml-900ml-2000ml-thick-walled-heavy-wall-dish-crystallizing-with-spouts-borosilicate-glass-p29/'}],
@@ -365,22 +366,24 @@ ITEMS = [{'slug': 'round-bottom-flask',
              {'file': 'liebig-condenser-2.jpg', 'source': '11259_0'}]},
  {'slug': 'coil-condenser',
   'category': 'condensers',
-  'name': 'Coil condenser',
-  'catalog_name': 'CONDENSER, REFLUX',
-  'description': 'A spiral of tubing inside a jacket, which packs far more cooled surface into the '
-                 'same length of glass than a straight tube. The extra contact suits refluxing and '
-                 'low-boiling solvents that a plain Liebig would let escape.',
-  'aliases': ['Coiled condenser',
-              'Graham condenser',
-              'Reflux condenser',
-              'Spiral condenser',
-              'Coil reflux condenser'],
-  'source_products': [{'id': 15694,
-                       'url': 'https://chengduglassware.com/product/synthware-efficient-serpentine-reflux-condenser-joint-14-20-19-22-24-40-%cf%868mm-%cf%8610mm-small-nozzles-condenser-reflux-borosilicate-glass-c26/'},
-                      {'id': 4693,
-                       'url': 'https://chengduglassware.com/product/synthware-grignard-snake-condenser-graham-joint-14-20-19-22-24-40-29-42-effective-length-120mm-500mm-condenser-graham-borosilicate-glass-c14/'}],
-  'photos': [{'file': 'coil-condenser-1.jpg', 'source': '15694_0'},
-             {'file': 'coil-condenser-2.jpg', 'source': '4693_0'}]},
+  'name': 'Graham condenser',
+  'catalog_name': 'CONDENSER, GRAHAM',
+  'description': 'A glass spiral runs down the middle of a water jacket, and the vapour travels '
+                 'through the spiral itself, so it meets a long cooled path in a short piece of '
+                 'glass. It is a condenser for distillation: stood upright for reflux, the '
+                 'returning liquid gathers in the narrow coils and can block them.',
+  'aliases': ['Coil condenser', 'Coiled condenser', 'Graham', 'Spiral condenser'],
+  'source_products': [{'id': 4693,
+                       'url': 'https://chengduglassware.com/product/synthware-grignard-snake-condenser-graham-joint-14-20-19-22-24-40-29-42-effective-length-120mm-500mm-condenser-graham-borosilicate-glass-c14/'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Graham_(spiral)_condenser-small.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Graham_condenser.jpg'}],
+  'photos': [{'file': 'coil-condenser-1.jpg', 'source': '4693_0'},
+             {'file': 'coil-condenser-2.jpg',
+              'source': 'wm:Graham (spiral) condenser-small.jpg',
+              'credit': 'Lilly_M, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'coil-condenser-3.jpg',
+              'source': 'wm:Graham condenser.jpg',
+              'credit': 'Fleximus, CC0, via Wikimedia Commons'}]},
  {'slug': 'allihn-condenser',
   'category': 'condensers',
   'name': 'Allihn condenser',
@@ -572,17 +575,24 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'category': 'funnels',
   'name': 'Büchner funnel',
   'catalog_name': 'FILTER FUNNEL, BUCHNER',
-  'description': 'A flat filter plate on a wide cylinder. Paper (or a built-in glass frit) sits on '
-                 'the plate, the funnel goes into a filtering flask, and suction pulls the liquid '
-                 'through. It is the fast way to collect a solid and the usual last step of a '
-                 'precipitation.',
-  'aliases': ['Buchner funnel',
-              'Sintered glass funnel',
-              'Fritted Buchner funnel',
-              'Filter funnel, Buchner'],
-  'source_products': [{'id': 20356,
-                       'url': 'https://chengduglassware.com/product/synthware-bush-funnel-filter-funnel-buchner-capacity-2ml-30ml-150ml-5000ml-with-sand-board-filter-funnel-buchner-borosilicate-glass-f60/'}],
-  'photos': [{'file': 'buchner-funnel-1.jpg', 'source': '20356_0'}]},
+  'description': 'A porcelain funnel with a flat, perforated plate across its wide top. A disc of '
+                 'filter paper lies on the plate, the funnel sits in a filter flask on a rubber '
+                 'collar, and suction pulls the liquid through. It is the fast way to collect a '
+                 'solid and the usual last step of a precipitation. Glass funnels with a sintered '
+                 'disc in place of the plate and paper are fritted filter funnels.',
+  'aliases': ['Buchner funnel', 'Porcelain Buchner funnel', 'Filter funnel, Buchner'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:B%C3%BCchnertrichter_frontal.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:B%C3%BCchnertrichter_frontal_02.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Ceramic_Buchner_funnel-03.jpg'}],
+  'photos': [{'file': 'buchner-funnel-1.jpg',
+              'source': 'wm:Büchnertrichter frontal.jpg',
+              'credit': 'Ichwarsnur, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'buchner-funnel-2.jpg',
+              'source': 'wm:Büchnertrichter frontal 02.jpg',
+              'credit': 'Ichwarsnur, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'buchner-funnel-3.jpg',
+              'source': 'wm:Ceramic Buchner funnel-03.jpg',
+              'credit': 'Lilly_M, CC BY-SA 3.0, via Wikimedia Commons'}]},
  {'slug': 'fritted-filter-funnel',
   'category': 'funnels',
   'name': 'Fritted filter funnel',
@@ -591,29 +601,40 @@ ITEMS = [{'slug': 'round-bottom-flask',
                  'porosities, does not tear or react, and can be washed and used again — which '
                  'matters when the liquid would attack paper or must not pick up fibres.',
   'aliases': ['Sintered filter funnel',
+              'Sintered glass funnel',
+              'Fritted Buchner funnel',
               'Conical fritted funnel',
               'Glass frit funnel',
               'Filter funnel with fritted disc'],
   'source_products': [{'id': 17405,
                        'url': 'https://chengduglassware.com/product/synthware-sand-core-bush-funnel-with-grinding-joint-capacity-15ml-150ml-250ml-2000ml-lower-male-joint-filter-funnel-buchner-inner-joint-borosilicate-glass-f36/'},
                       {'id': 3467,
-                       'url': 'https://chengduglassware.com/product/synthware-funnel-filter-with-14-20-joints-and-a-20mm-o-d-fritted-disc-sand-core-g2c-g3m-borosilicate-glass-f38/'}],
+                       'url': 'https://chengduglassware.com/product/synthware-funnel-filter-with-14-20-joints-and-a-20mm-o-d-fritted-disc-sand-core-g2c-g3m-borosilicate-glass-f38/'},
+                      {'id': 20356,
+                       'url': 'https://chengduglassware.com/product/synthware-bush-funnel-filter-funnel-buchner-capacity-2ml-30ml-150ml-5000ml-with-sand-board-filter-funnel-buchner-borosilicate-glass-f60/'}],
   'photos': [{'file': 'fritted-filter-funnel-1.jpg', 'source': '17405_0'},
              {'file': 'fritted-filter-funnel-2.jpg', 'source': '17405_1'},
              {'file': 'fritted-filter-funnel-3.jpg', 'source': '17405_2'},
              {'file': 'fritted-filter-funnel-4.jpg', 'source': '17405_3'},
-             {'file': 'fritted-filter-funnel-5.jpg', 'source': '3467_0'}]},
+             {'file': 'fritted-filter-funnel-5.jpg', 'source': '3467_0'},
+             {'file': 'fritted-filter-funnel-6.jpg', 'source': '20356_0'}]},
  {'slug': 'powder-funnel',
   'category': 'funnels',
   'name': 'Powder funnel',
   'catalog_name': 'FUNNEL, POWDER',
   'description': 'A funnel with a short, very wide stem, so a dry solid can be tipped into a '
                  'narrow flask neck without bridging in the stem and without dusting over the '
-                 'bench.',
+                 'bench. Most end in a ground-glass joint, so they sit firmly in the neck instead '
+                 'of wobbling.',
   'aliases': ['Solids funnel', 'Wide stem funnel', 'Powder addition funnel'],
   'source_products': [{'id': 15595,
-                       'url': 'https://chengduglassware.com/product/synthware-triangular-funnel-upper-diameter-%cf%8650mm-%cf%8675mm-%cf%86100mm-lower-male-joint-19-22-24-40-29-42-addition-funnel-funnel-powder-borosilicate-glass-f18/'}],
-  'photos': [{'file': 'powder-funnel-1.jpg', 'source': '15595_0'}]},
+                       'url': 'https://chengduglassware.com/product/synthware-triangular-funnel-upper-diameter-%cf%8650mm-%cf%8675mm-%cf%86100mm-lower-male-joint-19-22-24-40-29-42-addition-funnel-funnel-powder-borosilicate-glass-f18/'},
+                      {'id': 15477,
+                       'url': 'https://chengduglassware.com/product/synthware-60-triangular-funnel-approx-diameter-at-top-%cf%8675mm-%cf%8690mm-%cf%86100mm-male-joint-24-40-29-42-funnel-powder-60-offset-borosilicate-glass-f39/'}],
+  'photos': [{'file': 'powder-funnel-1.jpg', 'source': '15595_0'},
+             {'file': 'powder-funnel-2.jpg', 'source': '15477_0'},
+             {'file': 'powder-funnel-3.jpg', 'source': '15477_1'},
+             {'file': 'powder-funnel-4.jpg', 'source': '15477_2'}]},
  {'slug': 'separatory-funnel',
   'category': 'funnels',
   'name': 'Separatory funnel',
@@ -712,12 +733,16 @@ ITEMS = [{'slug': 'round-bottom-flask',
              {'file': 'ball-socket-adapter-2.jpg', 'source': '13055_0'}]},
  {'slug': 'inlet-adapter',
   'category': 'adapters',
-  'name': 'Gas inlet adapter',
+  'name': 'Straight inlet adapter',
   'catalog_name': 'ADAPTER, INLET',
-  'description': 'A tube that carries gas through a joint and into a flask. Used to sweep an '
-                 'apparatus with nitrogen or argon, or to bubble a reagent gas through the '
-                 'reaction itself.',
-  'aliases': ['Inlet adapter', 'Gas inlet tube adapter', 'Gas adapter'],
+  'description': 'A ground-glass joint that ends in a straight hose barb. Pushed into the top of a '
+                 'condenser or a flask neck, it connects the apparatus to a gas line, a bubbler or '
+                 'a vacuum hose: the simplest way to keep a set-up under nitrogen or argon, or to '
+                 'lead fumes away from it.',
+  'aliases': ['Inlet adapter',
+              'Gas inlet adapter',
+              'Straight hose adapter',
+              'Hose adapter, straight'],
   'source_products': [{'id': 8306,
                        'url': 'https://chengduglassware.com/product/synthware-straight-suction-joint-male-joint-adapter-vacuum-or-argon-nitrogen-adapter-gas-inlet-outlet-borosilicate-glass-a30/'},
                       {'id': 3835,
@@ -747,15 +772,19 @@ ITEMS = [{'slug': 'round-bottom-flask',
              {'file': 'thermometer-adapter-5.jpg', 'source': '4646_0'}]},
  {'slug': 'vacuum-gas-adapter',
   'category': 'adapters',
-  'name': 'Inert gas adapter',
+  'name': 'Bent inlet adapter',
   'catalog_name': 'ADAPTER, VACUUM OR ARGON',
-  'description': 'An adapter with a hose connection, for putting a flask on a vacuum line or under '
-                 'inert gas. Pumping down and refilling with nitrogen or argon through one of '
-                 'these is the usual way to get the air out before a sensitive reaction.',
-  'aliases': ['Gas inlet adapter with hose connection',
+  'description': 'A ground-glass joint with a hose barb bent through a right angle, so the tubing '
+                 'leaves sideways instead of straight up. On a flask neck that keeps the hose out '
+                 'of the way and stops its weight levering on the joint. Pumping a flask down and '
+                 'refilling it with nitrogen or argon through one of these is the usual way to get '
+                 'the air out before a sensitive reaction.',
+  'aliases': ['Inert gas adapter',
+              'Bent hose adapter',
+              '90° inlet adapter',
+              'Gas inlet adapter with hose connection',
               'Argon adapter',
               'Nitrogen adapter',
-              'Vacuum adapter',
               'Vacuum / inert gas adapter'],
   'source_products': [{'id': 8419,
                        'url': 'https://chengduglassware.com/product/synthware-90-extraction-joint-male-joint-14-20-19-22-24-40-29-42-%cf%86-8mm-10mm-small-nozzle-interface-adapter-vacuum-inert-gas-90-borosilicate-glass-a92/'}],
@@ -767,8 +796,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'category': 'adapters',
   'name': 'Vacuum adapter with stopcock',
   'catalog_name': 'ADAPTER, VACUUM, PTFE STOPCOCK',
-  'description': 'The same connection to a vacuum or gas line, with a tap on it. The tap means the '
-                 'flask can be isolated, carried away, or pumped and refilled again and again '
+  'description': 'An adapter with a hose connection and a tap, for joining a flask to a vacuum or '
+                 'inert-gas line. With the tap closed the flask stays sealed, so it can be taken '
+                 'off the line and carried away, or pumped out and refilled again and again '
                  'without disconnecting anything.',
   'aliases': ['Gas adapter with stopcock',
               'Vacuum adapter with PTFE stopcock',
@@ -816,7 +846,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'ADAPTER, DISTILLATION, BENT, 105°',
   'description': 'The bend that carries the distillate from the condenser down into the receiving '
                  'flask, with a side port for the vacuum line.',
-  'aliases': ['Distillation adapter',
+  'aliases': ['Vacuum adapter',
+              'Distillation adapter',
               'Bend adapter',
               'Take-off adapter',
               'Distilling adapter',
@@ -851,7 +882,12 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A bulb with a baffle inside, placed between the flask and the condenser. Liquid '
                  'that bumps upwards hits the baffle and falls back instead of contaminating the '
                  'distillate. It is standard on a rotary evaporator.',
-  'aliases': ['Splash head', 'Anti splash head', 'Splash adapter', 'Anti-climb adapter'],
+  'aliases': ['Bump trap',
+              'Rotovap bump trap',
+              'Splash head',
+              'Anti splash head',
+              'Splash adapter',
+              'Anti-climb adapter'],
   'source_products': [{'id': 14085,
                        'url': 'https://chengduglassware.com/product/synthware-splash-proof-ball-capacity-100ml-250ml-female-joint-24-40-29-42-male-joint-14-20-19-22-24-40-29-42-adapter-anti-splash-borosilicate-glass-a28/'},
                       {'id': 16049,
@@ -947,9 +983,17 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'category': 'vacuum',
   'name': 'Schlenk tube',
   'catalog_name': 'FLASK, REACTION TUBE',
-  'description': 'The tube-shaped member of the same family: a narrow vessel with a stopcock, for '
-                 'reacting or storing small amounts of air-sensitive material under inert gas.',
-  'aliases': ['Reaction tube', 'Storage tube', 'Schlenk storage tube', 'J Young tube', "Young's ampoule", 'J Young ampoule', 'Young ampoule'],
+  'description': 'A narrow tube with a side arm and a stopcock or PTFE valve: the tube-shaped '
+                 'relative of the Schlenk flask. Small amounts of air-sensitive material are made '
+                 'or stored in it under inert gas, and like the flask it can be pumped out and '
+                 'refilled on a Schlenk line.',
+  'aliases': ['Reaction tube',
+              'Storage tube',
+              'Schlenk storage tube',
+              'J Young tube',
+              "Young's ampoule",
+              'J Young ampoule',
+              'Young ampoule'],
   'source_products': [{'id': 2190,
                        'url': 'https://chengduglassware.com/product/synthware-reaction-tube-with-2mm-aperture-glass-valve-flask-reaction-tube-borosilicate-glass-f89/'},
                       {'id': 20963,
@@ -1031,7 +1075,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A bottle in which gas is bubbled through a liquid on its way past — to dry it, '
                  'to wash out an impurity, or to trap something harmful before it reaches the '
                  'room.',
-  'aliases': ['Drechsel bottle', 'Gas scrubber', 'Washing bottle'],
+  'aliases': ['Drechsel bottle', 'Gas scrubber', 'Gas wash bottle'],
   'source_products': [{'id': 12708,
                        'url': 'https://chengduglassware.com/product/synthware-g2-sand-plate-gas-washing-device-capacity-125ml-350ml-joint-24-40-bottle-gas-washing-fritted-borosilicate-glass-b31/'}],
   'photos': [{'file': 'gas-washing-bottle-1.jpg', 'source': '12708_0'}]},
@@ -1199,7 +1243,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'The traditional tap: a ground glass plug in a ground glass barrel, sealed with a '
                  'film of grease. Cheap, chemically inert and still standard on high-vacuum '
                  'glassware, though the grease has to be renewed.',
-  'aliases': ['Ground glass stopcock', 'Glass tap', 'Tap', 'Faucet', 'High vacuum glass stopcock'],
+  'aliases': ['Ground glass stopcock', 'Glass tap', 'Tap', 'High vacuum glass stopcock'],
   'source_products': [{'id': 13356,
                        'url': 'https://chengduglassware.com/product/synthware-stopcock-glass-high-vacuum-straight-bore-borosilicate-glass-s33/'},
                       {'id': 16172,
@@ -1229,7 +1273,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
                   'GL14mm detachable small nozzle, Borosilicate glass, B18',
   'description': 'A beaker inside a second glass wall. Water or coolant from a circulator flows '
                  'through the gap between the walls and holds whatever is inside at a steady '
-                 'temperature -- for crystallisations, titrations and anything that has to stay '
+                 'temperature — for crystallisations, titrations and anything that has to stay '
                  'cold or warm for hours.',
   'aliases': ['Double-walled beaker'],
   'source_products': [{'id': 11452,
@@ -1241,13 +1285,13 @@ ITEMS = [{'slug': 'round-bottom-flask',
              {'file': 'jacketed-beaker-3.jpg', 'source': '11444_1'},
              {'file': 'jacketed-beaker-4.jpg', 'source': '11444_2'}]},
  {'slug': 'graduated-cylinder',
-  'category': 'flasks',
+  'category': 'measuring',
   'name': 'Graduated cylinder',
   'catalog_name': 'SYNTHWARE Hexagonal base measuring cylinder, Capacity 10mL-2000mL, With batch '
                   'testing certificate, Borosilicate glass, F08',
   'description': 'A tall, narrow cylinder on a stable foot, with a scale up the side, for '
                  'measuring out a volume of liquid quickly. More accurate than the marks on a '
-                 'beaker, less accurate than a volumetric flask or pipette -- the everyday choice '
+                 'beaker, less accurate than a volumetric flask or pipette — the everyday choice '
                  "when 'about 50 mL' is good enough. Read the level at the bottom of the curved "
                  'surface (the meniscus).',
   'aliases': ['Measuring cylinder'],
@@ -1275,17 +1319,20 @@ ITEMS = [{'slug': 'round-bottom-flask',
                   'Male joint 24/40 29/42, FUNNEL, POWDER, 60° OFFSET, Borosilicate glass, F39',
   'description': 'The simple cone and stem, for pouring a liquid into a narrow opening without '
                  'spilling. Lined with a folded filter paper it becomes the most basic filtration '
-                 'set-up, gravity filtration. Many lab funnels end in a ground-glass joint so they '
-                 'sit firmly in a flask neck instead of wobbling.',
+                 'set-up, gravity filtration; a long stem fills with filtrate, and its weight '
+                 'helps pull the liquid through the paper.',
   'aliases': ['Filling funnel', 'Funnel'],
-  'source_products': [{'id': 15477,
-                       'url': 'https://chengduglassware.com/product/synthware-60-triangular-funnel-approx-diameter-at-top-%cf%8675mm-%cf%8690mm-%cf%86100mm-male-joint-24-40-29-42-funnel-powder-60-offset-borosilicate-glass-f39/'},
-                      {'id': 15725,
-                       'url': 'https://chengduglassware.com/product/synthware-filling-funnel-diameter-%cf%8675mm-%cf%8690mm-outer-diameter-of-lower-pipe-12mm-19mm-28mm-triangular-funnel-funnel-solvent-addition-borosilicate-glass-f29/'}],
-  'photos': [{'file': 'glass-funnel-1.jpg', 'source': '15477_0'},
-             {'file': 'glass-funnel-2.jpg', 'source': '15477_1'},
-             {'file': 'glass-funnel-3.jpg', 'source': '15477_2'},
-             {'file': 'glass-funnel-4.jpg', 'source': '15725_0'}]},
+  'source_products': [{'id': 15725,
+                       'url': 'https://chengduglassware.com/product/synthware-filling-funnel-diameter-%cf%8675mm-%cf%8690mm-outer-diameter-of-lower-pipe-12mm-19mm-28mm-triangular-funnel-funnel-solvent-addition-borosilicate-glass-f29/'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Analysentrichter.png'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Funnel_MET_DP234124.jpg'}],
+  'photos': [{'file': 'glass-funnel-1.jpg', 'source': '15725_0'},
+             {'file': 'glass-funnel-2.jpg',
+              'source': 'wm:Analysentrichter.png',
+              'credit': 'MediaLab TH Köln, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'glass-funnel-3.jpg',
+              'source': 'wm:Funnel MET DP234124.jpg',
+              'credit': 'The Metropolitan Museum of Art, CC0, via Wikimedia Commons'}]},
  {'slug': 'thermowell',
   'category': 'adapters',
   'name': 'Thermowell',
@@ -1361,7 +1408,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'NMR TUBE',
   'description': 'A long, very thin, perfectly straight tube (usually 5 mm across) with a plastic '
                  'cap. A solution of the sample in a deuterated solvent goes in it, and it is '
-                 'lowered into the magnet of the NMR spectrometer -- the walls are made uniform so '
+                 'lowered into the magnet of the NMR spectrometer — the walls are made uniform so '
                  "they don't distort the spectrum.",
   'aliases': ['NMR sample tube', '5 mm NMR tube'],
   'source_products': [{'id': 5457,
@@ -1418,7 +1465,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A shallow porcelain bowl with a pouring lip. Heating a solution in it drives off '
                  'the solvent and leaves the dissolved solid behind; porcelain takes direct heat '
                  'that would crack ordinary glass.',
-  'aliases': ['Evaporating basin', 'Porcelain dish', 'Bowl'],
+  'aliases': ['Evaporating basin', 'Porcelain dish'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Abdampfschalen_verschiedene_Groessen.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Abdampfschalen,_porzellan_innen_glasiert.jpg'}],
   'photos': [{'file': 'evaporating-dish-1.jpg',
@@ -1469,7 +1516,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'SOXHLET EXTRACTOR',
   'description': 'An extractor that washes a solid with fresh, clean solvent over and over by '
                  'itself. Solvent boils below, condenses above, fills the chamber holding the '
-                 'sample and siphons back when full -- leaving the extracted material in the flask '
+                 'sample and siphons back when full — leaving the extracted material in the flask '
                  'and running unattended for hours.',
   'aliases': ['Soxhlet', 'Soxhlet extraction body', 'Soxhlet apparatus'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Soxhlet-Extraktor.png'},
@@ -1489,14 +1536,19 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'name': 'Desiccator',
   'catalog_name': None,
   'description': 'A heavy glass pot with a greased, tight-fitting lid and a perforated plate '
-                 'inside. A drying agent sits below the plate and samples above it, so they dry -- '
-                 'or stay dry -- in air with no water in it. Versions with a tap in the lid can be '
+                 'inside. A drying agent sits below the plate and samples above it, so they dry — '
+                 'or stay dry — in air with no water in it. Versions with a tap in the lid can be '
                  'put under vacuum.',
   'aliases': ['Exsiccator', 'Exicator', 'Vacuum desiccator', 'Dessicator'],
-  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Exsikkator.png'}],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Exsikkator.png'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Vacuum_desiccator_belonging_to_Rosalind_Franklin_-_DPLA_-_98e0f871c48313a61b251e383c16b1e6_(page_4).jpg'}],
   'photos': [{'file': 'desiccator-1.jpg',
               'source': 'wm:Exsikkator.png',
-              'credit': 'Hannes Grobe/AWI, CC BY 3.0, via Wikimedia Commons'}]},
+              'credit': 'Hannes Grobe/AWI, CC BY 3.0, via Wikimedia Commons'},
+             {'file': 'desiccator-2.jpg',
+              'source': 'wm:Vacuum desiccator belonging to Rosalind Franklin - DPLA - '
+                        '98e0f871c48313a61b251e383c16b1e6 (page 4).jpg',
+              'credit': 'Science History Institute, CC BY 4.0, via Wikimedia Commons'}]},
  {'slug': 'drying-pistol',
   'category': 'vacuum',
   'name': 'Drying pistol',
@@ -1546,13 +1598,17 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'name': 'Volumetric pipette',
   'catalog_name': None,
   'description': 'A long glass tube with a bulb in the middle and one ring on the upper stem. '
-                 'Filled to the ring, it delivers one exact volume -- 10.00 mL, say -- and is the '
+                 'Filled to the ring, it delivers one exact volume — 10.00 mL, say — and is the '
                  'most accurate way to transfer a measured amount of a solution.',
-  'aliases': ['Bulb pipette', 'Transfer pipette', 'Class A pipette', 'Single mark pipette'],
-  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Vollpipetten.jpg'}],
+  'aliases': ['Bulb pipette', 'Class A pipette', 'Single mark pipette'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Vollpipetten.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Vollpipette_50_mL.png'}],
   'photos': [{'file': 'volumetric-pipette-1.jpg',
               'source': 'wm:Vollpipetten.jpg',
-              'credit': 'Gmhofmann, CC BY-SA 3.0, via Wikimedia Commons'}]},
+              'credit': 'Gmhofmann, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'volumetric-pipette-2.jpg',
+              'source': 'wm:Vollpipette 50 mL.png',
+              'credit': 'MediaLab TH Köln, CC BY-SA 4.0, via Wikimedia Commons'}]},
  {'slug': 'graduated-pipette',
   'category': 'measuring',
   'name': 'Graduated pipette',
@@ -1583,8 +1639,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'name': 'Pasteur pipette',
   'catalog_name': None,
   'description': 'A short glass tube drawn out to a long thin tip, used with a rubber bulb to move '
-                 'small amounts of liquid drop by drop. It has no scale -- it is for transferring, '
-                 'not measuring -- and is usually thrown away after use.',
+                 'small amounts of liquid drop by drop. It has no scale — it is for transferring, '
+                 'not measuring — and is usually thrown away after use.',
   'aliases': ['Dropper', 'Glass dropper', 'Transfer pipette, glass', 'Babbitt pipette'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Glass_pasteur_pipette.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Pasteur_Pipets.jpg'}],
@@ -1743,7 +1799,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'name': 'Clamp',
   'catalog_name': None,
   'description': 'Adjustable jaws on an arm, fixed to a stand with a boss head. It grips the neck '
-                 'of a flask or the body of a condenser and holds it in place -- almost every '
+                 'of a flask or the body of a condenser and holds it in place — almost every '
                  'set-up on the bench hangs from clamps.',
   'aliases': ['Laboratory clamp',
               'Three-finger clamp',
@@ -1822,7 +1878,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'name': 'Magnetic stir bar',
   'catalog_name': None,
   'description': 'A small magnet sealed in white PTFE. Dropped into a flask on a magnetic stirrer, '
-                 'it spins and stirs the contents -- which is why nearly every reaction flask has '
+                 'it spins and stirs the contents — which is why nearly every reaction flask has '
                  'one.',
   'aliases': ['Stir bar', 'Stirring bar', 'Flea', 'Stirring flea', 'Stir bean'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Barreau_magnetique.JPG'},
@@ -1891,7 +1947,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'name': 'Safety goggles',
   'catalog_name': None,
   'description': 'Close-fitting protective glasses worn at all times in the lab. They keep '
-                 'splashes, flying glass and dust out of the eyes -- the one piece of equipment '
+                 'splashes, flying glass and dust out of the eyes — the one piece of equipment '
                  'that is never optional.',
   'aliases': ['Goggles', 'Safety glasses', 'Safety spectacles', 'Eye protection'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:2023_Okulary_ochronne_(1).jpg'},
@@ -1901,7 +1957,28 @@ ITEMS = [{'slug': 'round-bottom-flask',
               'credit': 'Jacek Halicki, CC BY-SA 4.0, via Wikimedia Commons'},
              {'file': 'safety-goggles-2.jpg',
               'source': 'wm:Empiral Vision Grey goggles.jpg',
-              'credit': 'Wishofflying, CC BY-SA 4.0, via Wikimedia Commons'}]}]
+              'credit': 'Wishofflying, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'dimroth-condenser',
+  'category': 'condensers',
+  'name': 'Dimroth condenser',
+  'catalog_name': 'CONDENSER, DIMROTH',
+  'description': 'A condenser turned inside out: cooling water runs through a glass coil in the '
+                 'middle, and the vapour rises around the coil inside the outer tube. Both water '
+                 'connections are at the top. The coil packs in a large cold surface while the '
+                 'returning liquid runs freely down past it, which makes the Dimroth one of the '
+                 'most efficient reflux condensers.',
+  'aliases': ['Dimroth', 'Dimroth coil condenser'],
+  'source_products': [{'id': 15694,
+                       'url': 'https://chengduglassware.com/product/synthware-efficient-serpentine-reflux-condenser-joint-14-20-19-22-24-40-%cf%868mm-%cf%8610mm-small-nozzles-condenser-reflux-borosilicate-glass-c26/'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Dimrothk%C3%BChler.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Dimroth_kuehler.jpg'}],
+  'photos': [{'file': 'dimroth-condenser-1.jpg', 'source': '15694_0'},
+             {'file': 'dimroth-condenser-2.jpg',
+              'source': 'wm:Dimrothkühler.jpg',
+              'credit': 'HaJo88, CC0, via Wikimedia Commons'},
+             {'file': 'dimroth-condenser-3.jpg',
+              'source': 'wm:Dimroth kuehler.jpg',
+              'credit': 'Armin Kübelbeck, CC BY-SA 3.0, via Wikimedia Commons'}]}]
 
 # Cards taken out because the catalogue has no clean photograph of them.
 DROPPED = {'four-neck-flask': 'posters only',
