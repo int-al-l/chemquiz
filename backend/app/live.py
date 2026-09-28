@@ -364,13 +364,16 @@ def check_host(room: Room, token: Optional[str]) -> None:
 
 def mark_seen(db: Session, room: Room, player: models.LivePlayer, now: float) -> None:
     """Note that this phone is still here -- at most every few seconds."""
+    # Touch the game row before the player row: every other writer locks
+    # live_games first and live_players second, and taking them in the
+    # opposite order here would let two transactions deadlock on Postgres.
+    mark_touched(db, room, now)
     if now - player.last_seen >= SEEN_EVERY_SECONDS:
         db.execute(
             update(models.LivePlayer)
             .where(models.LivePlayer.id == player.id)
             .values(last_seen=now)
         )
-    mark_touched(db, room, now)
 
 
 def mark_touched(db: Session, room: Room, now: float) -> None:
