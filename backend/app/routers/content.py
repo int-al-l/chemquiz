@@ -13,6 +13,7 @@ router = APIRouter(prefix="/api", tags=["content"])
 @router.get("/categories", response_model=list[schemas.CategoryOut])
 def list_categories(
     db: Session = Depends(get_db),
+    lang: str = Depends(request_lang),
     parent: str | None = Query(
         default=None,
         description="Slug of a parent category. Omit for top-level categories.",
@@ -26,27 +27,28 @@ def list_categories(
             raise AppError("no_category", status=404, slug=parent)
         categories = parent_category.children
 
-    return [crud.category_payload(db, c) for c in categories]
+    return [crud.category_payload(db, c, lang) for c in categories]
 
 
 @router.get("/categories/{slug}", response_model=schemas.CategoryDetailOut)
-def get_category(slug: str, db: Session = Depends(get_db)):
+def get_category(slug: str, db: Session = Depends(get_db), lang: str = Depends(request_lang)):
     category = crud.get_category_by_slug(db, slug)
     if category is None:
         raise AppError("no_category", status=404, slug=slug)
 
-    payload = crud.category_payload(db, category)
+    payload = crud.category_payload(db, category, lang)
     payload["parent"] = (
-        crud.category_payload(db, category.parent) if category.parent else None
+        crud.category_payload(db, category.parent, lang) if category.parent else None
     )
-    payload["children"] = [crud.category_payload(db, c) for c in category.children]
-    payload["items"] = [crud.item_payload(i) for i in category.items]
+    payload["children"] = [crud.category_payload(db, c, lang) for c in category.children]
+    payload["items"] = [crud.item_payload(i, lang) for i in crud.sort_items(category.items, lang)]
     return payload
 
 
 @router.get("/items", response_model=list[schemas.ItemOut])
 def list_items(
     db: Session = Depends(get_db),
+    lang: str = Depends(request_lang),
     category: str | None = Query(default=None, description="Category slug to filter by."),
     include_descendants: bool = Query(
         default=True, description="Include items in child categories."
@@ -59,12 +61,12 @@ def list_items(
             raise AppError("no_category", status=404, slug=category)
         category_id = found.id
 
-    items = crud.list_items(db, category_id, include_descendants=include_descendants)
-    return [crud.item_payload(i) for i in items]
+    items = crud.list_items(db, category_id, include_descendants=include_descendants, lang=lang)
+    return [crud.item_payload(i, lang) for i in items]
 
 
 @router.get("/items/{slug}", response_model=schemas.ItemOut)
-def get_item(slug: str, db: Session = Depends(get_db)):
+def get_item(slug: str, db: Session = Depends(get_db), lang: str = Depends(request_lang)):
     from sqlalchemy import select
 
     from .. import models
@@ -74,4 +76,4 @@ def get_item(slug: str, db: Session = Depends(get_db)):
     ).scalar_one_or_none()
     if item is None:
         raise AppError("no_item", status=404, slug=slug)
-    return crud.item_payload(item)
+    return crud.item_payload(item, lang)

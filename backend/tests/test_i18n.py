@@ -46,3 +46,51 @@ def test_sign_in_errors_are_localised(client):
     assert res.status_code == 401
     assert res.json()["code"] == "sign_in_required"
     assert res.json()["detail"] == "Войдите, чтобы пользоваться списком."
+
+
+from sqlalchemy import select  # noqa: E402
+
+from app import models  # noqa: E402
+from test_api import db_session  # noqa: E402,F401
+
+RU = {"Accept-Language": "ru"}
+
+
+def russian(db_session):
+    """Give two condensers and their deck Russian texts; leave the rest English."""
+    deck = db_session.scalars(select(models.Category).where(models.Category.slug == "condensers")).one()
+    deck.name_ru = "Холодильники"
+    deck.description_ru = "Охлаждают пар"
+    for slug, name in (("condenser-0", "Холодильник 0"), ("condenser-1", "Альфа-холодильник")):
+        item = db_session.scalars(select(models.Item).where(models.Item.slug == slug)).one()
+        item.name_ru = name
+        item.description_ru = f"Описание: {name}"
+    db_session.commit()
+
+
+def test_cards_and_decks_in_russian_with_english_fallback(client, db_session):
+    russian(db_session)
+    deck = client.get("/api/categories/condensers", headers=RU).json()
+    assert deck["name"] == "Холодильники"
+    names = [i["name"] for i in deck["items"]]
+    assert "Холодильник 0" in names
+    assert "Condenser 2" in names  # no Russian text: English, not blank
+    assert client.get("/api/categories/condensers").json()["name"] == "Condensers"
+
+
+def test_lists_sort_by_the_shown_name(client, db_session):
+    russian(db_session)
+    names = [i["name"] for i in client.get("/api/items?category=condensers", headers=RU).json()]
+    assert names.index("Альфа-холодильник") < names.index("Холодильник 0")
+
+
+def test_a_quiz_speaks_the_request_language(client, db_session):
+    russian(db_session)
+    quiz = client.post("/api/quiz/start", json={"category_slug": "condensers", "mode": "choice",
+                                                "question_count": 5}, headers=RU).json()
+    assert quiz["category_name"] == "Холодильники"
+    shown = {c["name"] for q in quiz["questions"] for c in q["choices"]}
+    assert "Холодильник 0" in shown
+    # the same quiz read in English
+    again = client.get(f"/api/quiz/{quiz['token']}").json()
+    assert again["category_name"] == "Condensers"

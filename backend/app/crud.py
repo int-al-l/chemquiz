@@ -78,13 +78,20 @@ def list_root_categories(db: Session) -> Sequence[models.Category]:
     ).scalars().all()
 
 
+def sort_items(items: Iterable[models.Item], lang: str = "en") -> list[models.Item]:
+    """By sort order, then by the name the reader sees."""
+    return sorted(items, key=lambda i: (i.sort_order, (localized(i, "name", lang) or "").casefold()))
+
+
 def list_items(
-    db: Session, category_id: Optional[int] = None, include_descendants: bool = True
-) -> Sequence[models.Item]:
+    db: Session,
+    category_id: Optional[int] = None,
+    include_descendants: bool = True,
+    lang: str = "en",
+) -> list[models.Item]:
     stmt = (
         select(models.Item)
         .options(selectinload(models.Item.photos), selectinload(models.Item.category))
-        .order_by(models.Item.sort_order, models.Item.name)
     )
     if category_id is not None:
         ids = (
@@ -93,7 +100,7 @@ def list_items(
             else [category_id]
         )
         stmt = stmt.where(models.Item.category_id.in_(ids))
-    return db.execute(stmt).scalars().all()
+    return sort_items(db.execute(stmt).scalars().all(), lang)
 
 
 # --- quiz -----------------------------------------------------------------
@@ -292,13 +299,13 @@ def purge_stale_sessions(db: Session) -> int:
 # --- serialisation --------------------------------------------------------
 
 
-def item_payload(item: models.Item) -> dict:
+def item_payload(item: models.Item, lang: str = "en") -> dict:
     return {
         "id": item.id,
         "slug": item.slug,
-        "name": item.name,
+        "name": localized(item, "name", lang),
         "catalog_name": item.catalog_name,
-        "description": item.description,
+        "description": localized(item, "description", lang),
         "image_url": image_url(item.cover),
         "photo_urls": [image_url(p.filename) for p in item.photos],
         "photo_count": len(item.photos),
@@ -308,12 +315,12 @@ def item_payload(item: models.Item) -> dict:
     }
 
 
-def category_payload(db: Session, category: models.Category) -> dict:
+def category_payload(db: Session, category: models.Category, lang: str = "en") -> dict:
     return {
         "id": category.id,
         "slug": category.slug,
-        "name": category.name,
-        "description": category.description,
+        "name": localized(category, "name", lang),
+        "description": localized(category, "description", lang),
         "image_url": image_url(category.image),
         "child_count": len(category.children),
         "item_count": len(category.items),
@@ -321,7 +328,7 @@ def category_payload(db: Session, category: models.Category) -> dict:
     }
 
 
-def question_payload(db: Session, question: models.QuizQuestion, mode: str) -> dict:
+def question_payload(db: Session, question: models.QuizQuestion, mode: str, lang: str = "en") -> dict:
     """Serialise a question for the player -- never including the answer."""
     ids = question.choice_ids
     by_id = {}
@@ -354,13 +361,13 @@ def question_payload(db: Session, question: models.QuizQuestion, mode: str) -> d
         return {
             "position": question.position,
             "image_url": None,
-            "prompt": question.item.name,
+            "prompt": localized(question.item, "name", lang),
             "choices": choices,
             "answered": question.answered_at is not None,
         }
 
     # Preserve the order fixed at start time.
-    choices = [{"id": i, "name": by_id[i].name} for i in ids if i in by_id]
+    choices = [{"id": i, "name": localized(by_id[i], "name", lang)} for i in ids if i in by_id]
     return {
         "position": question.position,
         "image_url": question_image_url(question),
@@ -377,23 +384,29 @@ def question_image_url(question: models.QuizQuestion) -> Optional[str]:
     return image_url(question.item.cover)
 
 
-def session_payload(db: Session, session: models.QuizSession) -> dict:
+def _session_category_name(db: Session, session: models.QuizSession, lang: str) -> Optional[str]:
+    """The deck's name in `lang` (the stored copy is English, kept for a removed deck)."""
+    category = get_category_by_slug(db, session.category_slug) if session.category_slug else None
+    return localized(category, "name", lang) if category is not None else session.category_name
+
+
+def session_payload(db: Session, session: models.QuizSession, lang: str = "en") -> dict:
     return {
         "token": session.token,
         "mode": session.mode,
         "question_count": session.question_count,
         "category_slug": session.category_slug,
-        "category_name": session.category_name,
+        "category_name": _session_category_name(db, session, lang),
         "answered_count": session.answered_count,
         "correct_count": session.correct_count,
         "is_complete": session.is_complete,
         "questions": [
-            question_payload(db, q, session.mode) for q in session.questions
+            question_payload(db, q, session.mode, lang) for q in session.questions
         ],
     }
 
 
-def results_payload(session: models.QuizSession) -> dict:
+def results_payload(session: models.QuizSession, lang: str = "en", db: Optional[Session] = None) -> dict:
     """Serialise a session's results.
 
     An unanswered question carries no item. Otherwise this endpoint would be a
@@ -406,11 +419,11 @@ def results_payload(session: models.QuizSession) -> dict:
         questions.append(
             {
                 "position": q.position,
-                "item": item_payload(q.item) if answered else None,
+                "item": item_payload(q.item, lang) if answered else None,
                 # The photograph asked about, not the item's cover -- the review
                 # list should show the picture the player actually saw.
                 "image_url": question_image_url(q),
-                "given_answer": q.given_answer,
+                "given_answer": _given_answer(q, lang, db),
                 "is_correct": q.is_correct,
                 "answered": answered,
             }
@@ -420,7 +433,9 @@ def results_payload(session: models.QuizSession) -> dict:
         "token": session.token,
         "mode": session.mode,
         "category_slug": session.category_slug,
-        "category_name": session.category_name,
+        "category_name": (
+            _session_category_name(db, session, lang) if db is not None else session.category_name
+        ),
         "question_count": session.question_count,
         "answered_count": session.answered_count,
         "correct_count": session.correct_count,
@@ -429,3 +444,12 @@ def results_payload(session: models.QuizSession) -> dict:
         "completed_at": session.completed_at,
         "questions": questions,
     }
+
+
+def _given_answer(question: models.QuizQuestion, lang: str, db: Optional[Session]) -> Optional[str]:
+    """The name the player picked, in `lang` (the stored copy is the English one)."""
+    if db is not None and question.given_choice_id is not None:
+        picked = db.get(models.Item, question.given_choice_id)
+        if picked is not None:
+            return localized(picked, "name", lang)
+    return question.given_answer

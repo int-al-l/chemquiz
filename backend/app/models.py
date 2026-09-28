@@ -55,6 +55,9 @@ class Category(Base):
     slug: Mapped[str] = mapped_column(String(80), unique=True, index=True)
     name: Mapped[str] = mapped_column(String(160))
     description: Mapped[Optional[str]] = mapped_column(Text, default=None)
+    # Russian texts from content_ru.py; None means "show the English one".
+    name_ru: Mapped[Optional[str]] = mapped_column(String(160), default=None)
+    description_ru: Mapped[Optional[str]] = mapped_column(Text, default=None)
 
     parent_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("categories.id", ondelete="CASCADE"), default=None, index=True
@@ -132,6 +135,8 @@ class Item(Base):
     # Exactly as it appears in the source catalog, kept for traceability.
     catalog_name: Mapped[Optional[str]] = mapped_column(String(200), default=None)
     description: Mapped[Optional[str]] = mapped_column(Text, default=None)
+    name_ru: Mapped[Optional[str]] = mapped_column(String(200), default=None)
+    description_ru: Mapped[Optional[str]] = mapped_column(Text, default=None)
 
     category_id: Mapped[int] = mapped_column(
         ForeignKey("categories.id", ondelete="CASCADE"), index=True
@@ -185,6 +190,8 @@ class ItemAlias(Base):
     )
     text: Mapped[str] = mapped_column(String(200))
     normalized: Mapped[str] = mapped_column(String(200))
+    # "en" or "ru": which language this spelling belongs to.
+    lang: Mapped[str] = mapped_column(String(2), default="en")
 
     item: Mapped["Item"] = relationship(back_populates="aliases")
 

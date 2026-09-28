@@ -341,7 +341,8 @@ def put_progress(payload: schemas.ProgressIn,
 
 
 @router.get("/me/list", response_model=list[schemas.ItemOut])
-def my_list(user: models.User = Depends(current_user), db: Session = Depends(get_db)):
+def my_list(user: models.User = Depends(current_user), db: Session = Depends(get_db),
+            lang: str = Depends(request_lang)):
     rows = db.execute(
         select(models.SavedItem)
         .where(models.SavedItem.user_id == user.id)
@@ -350,7 +351,7 @@ def my_list(user: models.User = Depends(current_user), db: Session = Depends(get
         )
         .order_by(models.SavedItem.created_at.desc())
     ).scalars().all()
-    return [crud.item_payload(row.item) for row in rows]
+    return [crud.item_payload(row.item, lang) for row in rows]
 
 
 @router.put("/me/list/{slug}", response_model=schemas.SavedOut, status_code=201)
@@ -397,7 +398,8 @@ def unsave_item(slug: str, user: models.User = Depends(current_user),
 @router.post("/me/list/import", response_model=list[schemas.ItemOut])
 def import_list(payload: schemas.ImportListIn,
                 user: models.User = Depends(current_user),
-                db: Session = Depends(get_db)):
+                db: Session = Depends(get_db),
+                lang: str = Depends(request_lang)):
     """Adopt a list that was saved in the browser before signing in.
 
     Adds rather than replaces, so signing in on a second device cannot wipe
@@ -420,4 +422,4 @@ def import_list(payload: schemas.ImportListIn,
             db.add(models.SavedItem(user_id=user.id, item_id=item.id))
     db.commit()
 
-    return my_list(user=user, db=db)
+    return my_list(user=user, db=db, lang=lang)

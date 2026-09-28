@@ -28,7 +28,13 @@ def load_seed_module():
     return seed_data
 
 
-def upsert_category(db: Session, data: dict, parent=None) -> models.Category:
+def load_ru_module():
+    import content_ru  # noqa: PLC0415 - beside seed_data.py, after sys.path is set
+
+    return content_ru
+
+
+def upsert_category(db: Session, data: dict, parent=None, ru: dict | None = None) -> models.Category:
     category = db.execute(
         select(models.Category).where(models.Category.slug == data["slug"])
     ).scalar_one_or_none()
@@ -39,18 +45,21 @@ def upsert_category(db: Session, data: dict, parent=None) -> models.Category:
 
     category.name = data["name"]
     category.description = data.get("description")
+    texts = (ru or {}).get(data["slug"], {})
+    category.name_ru = texts.get("name")
+    category.description_ru = texts.get("description")
     category.image = data.get("image")
     category.sort_order = data.get("sort_order", 0)
     category.parent = parent
     db.flush()
 
     for child in data.get("children", []):
-        upsert_category(db, child, parent=category)
+        upsert_category(db, child, parent=category, ru=ru)
 
     return category
 
 
-def upsert_item(db: Session, data: dict, categories_by_slug: dict, source: str):
+def upsert_item(db: Session, data: dict, categories_by_slug: dict, source: str, ru: dict | None = None):
     category = categories_by_slug.get(data["category"])
     if category is None:
         raise ValueError(
@@ -71,6 +80,9 @@ def upsert_item(db: Session, data: dict, categories_by_slug: dict, source: str):
     item.name = data["name"]
     item.catalog_name = data.get("catalog_name")
     item.description = data.get("description")
+    texts = (ru or {}).get(data["slug"], {})
+    item.name_ru = texts.get("name")
+    item.description_ru = texts.get("description")
     # The card image: an explicit one, else the first photograph.
     item.image = data.get("image") or (photos[0]["file"] if photos else None)
     item.source = source
@@ -103,6 +115,12 @@ def upsert_item(db: Session, data: dict, categories_by_slug: dict, source: str):
             continue
         seen.add(key)
         db.add(models.ItemAlias(item=item, text=text, normalized=key))
+    for text in texts.get("aliases", []):
+        key = normalize(text)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        db.add(models.ItemAlias(item=item, text=text, normalized=key, lang="ru"))
 
     db.flush()
     return item
@@ -115,9 +133,10 @@ def load_seed(db: Session) -> dict:
     static/images.
     """
     seed_data = load_seed_module()
+    ru = load_ru_module()
 
     for data in seed_data.CATEGORIES:
-        upsert_category(db, data)
+        upsert_category(db, data, ru=ru.CATEGORIES)
 
     categories_by_slug = {
         category.slug: category
@@ -126,7 +145,7 @@ def load_seed(db: Session) -> dict:
 
     missing: list[str] = []
     for data in seed_data.ITEMS:
-        item = upsert_item(db, data, categories_by_slug, seed_data.SOURCE)
+        item = upsert_item(db, data, categories_by_slug, seed_data.SOURCE, ru=ru.ITEMS)
         for photo in item.photos:
             if not (IMAGES_DIR / photo.filename).exists():
                 missing.append(f"{item.slug} -> {photo.filename}")

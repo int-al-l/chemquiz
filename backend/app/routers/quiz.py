@@ -9,13 +9,15 @@ from sqlalchemy.orm import Session
 
 from .. import crud, models, schemas
 from ..database import get_db
-from ..i18n import AppError
+from ..i18n import AppError, request_lang
 
 router = APIRouter(prefix="/api/quiz", tags=["quiz"])
 
 
 @router.post("/start", response_model=schemas.QuizSessionOut, status_code=201)
-def start_quiz(payload: schemas.QuizStartIn, db: Session = Depends(get_db)):
+def start_quiz(
+    payload: schemas.QuizStartIn, db: Session = Depends(get_db), lang: str = Depends(request_lang)
+):
     category = None
     if payload.category_slug:
         category = crud.get_category_by_slug(db, payload.category_slug)
@@ -29,20 +31,23 @@ def start_quiz(payload: schemas.QuizStartIn, db: Session = Depends(get_db)):
         category=category,
     )
 
-    return crud.session_payload(db, session)
+    return crud.session_payload(db, session, lang)
 
 
 @router.get("/{token}", response_model=schemas.QuizSessionOut)
-def get_quiz(token: str, db: Session = Depends(get_db)):
+def get_quiz(token: str, db: Session = Depends(get_db), lang: str = Depends(request_lang)):
     session = crud.get_quiz_session(db, token)
     if session is None:
         raise AppError("quiz_not_found", status=404)
-    return crud.session_payload(db, session)
+    return crud.session_payload(db, session, lang)
 
 
 @router.post("/{token}/answer", response_model=schemas.QuizAnswerOut)
 def answer_question(
-    token: str, payload: schemas.QuizAnswerIn, db: Session = Depends(get_db)
+    token: str,
+    payload: schemas.QuizAnswerIn,
+    db: Session = Depends(get_db),
+    lang: str = Depends(request_lang),
 ):
     session = crud.get_quiz_session(db, token)
     if session is None:
@@ -68,7 +73,7 @@ def answer_question(
     return {
         "position": question.position,
         "is_correct": question.is_correct,
-        "correct_item": crud.item_payload(question.item),
+        "correct_item": crud.item_payload(question.item, lang),
         "correct_choice_id": question.item_id,
         "given_choice_id": question.given_choice_id,
         "given_answer": question.given_answer,
@@ -79,11 +84,11 @@ def answer_question(
 
 
 @router.get("/{token}/results", response_model=schemas.QuizResultsOut)
-def get_results(token: str, db: Session = Depends(get_db)):
+def get_results(token: str, db: Session = Depends(get_db), lang: str = Depends(request_lang)):
     session = crud.get_quiz_session(db, token)
     if session is None:
         raise AppError("quiz_not_found", status=404)
-    return crud.results_payload(session)
+    return crud.results_payload(session, lang, db)
 
 
 @router.delete("/{token}", status_code=204)
