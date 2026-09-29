@@ -1,0 +1,540 @@
+/* =========================================================================
+   HOME — after the OdanQuiz Figma ("Desktop · Главная", "Mobile · Главная").
+   Tokens, the sidebar / tab bar and the shared motion live in
+   src/theme/odan.css; this file is the home screen's own layout.
+   ========================================================================= */
+
+.oq-home {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--oq-text);
+}
+
+.oq-home a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.oq-home p,
+.oq-home h1,
+.oq-home h2 {
+  margin: 0;
+}
+
+/* ---------- main column ---------- */
+
+.oq-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px;
+  max-width: 1184px;
+}
+
+.oq-greeting {
+  display: flex;
+  flex-direction: column;
+  font-size: 40px;
+  line-height: 48px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.oq-word {
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 0.25em;
+}
+
+/* The greeting drops in letter by letter and lands with a bounce */
+.oq-letter {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  animation: oq-letter 0.6s var(--spring) backwards;
+  animation-delay: calc(0.05s + var(--l) * 0.03s);
+  transition: transform 0.35s var(--spring), color 0.2s;
+}
+
+.oq-letter:hover {
+  transform: translateY(-8px) rotate(-8deg);
+  color: var(--oq-brand);
+}
+
+.oq-greeting-sub {
+  display: block;
+}
+
+/* ---------- progress card ---------- */
+
+.oq-progress {
+  align-items: center;
+  gap: 32px;
+  transition: transform 0.3s var(--spring), box-shadow 0.2s;
+}
+
+.oq-progress:hover { transform: translateY(-2px); box-shadow: var(--oq-shadow-hover); }
+.oq-progress:active { transform: scale(0.99); }
+
+.oq-level {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.oq-level-badge {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--oq-mint);
+  color: var(--oq-mint-text);
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 700;
+}
+
+.oq-progress:hover .oq-level-badge { animation: oq-boing 0.6s var(--spring); }
+
+.oq-level-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.oq-level-bar { width: 300px; max-width: 100%; }
+
+.oq-divider {
+  flex: none;
+  width: 1px;
+  height: 56px;
+  background: var(--oq-divider);
+}
+
+.oq-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.oq-stat-icon { font-size: 32px; }
+.oq-stat-icon.is-hot { animation: oq-flicker 1.4s ease-in-out infinite; }
+
+.oq-goal {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.oq-goal .oq-bar { width: 240px; }
+
+.oq-goal-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.oq-goal-inline .oq-icon { font-size: 16px; }
+.oq-goal-inline .oq-bar { flex: 1; max-width: 110px; }
+.oq-goal-inline strong { font-weight: 500; }
+
+/* ---------- learn / in class ---------- */
+
+.oq-row {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.oq-learn {
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.oq-learn-tiles {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.oq-class {
+  flex: none;
+  width: 360px;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.oq-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  min-height: 150px;
+  padding: 16px;
+  border: 1px solid var(--oq-line);
+  border-radius: 12px;
+  background: var(--oq-surface);
+  transition: transform 0.3s var(--spring), box-shadow 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.oq-tile.is-row {
+  flex-direction: row;
+  min-height: 0;
+}
+
+.oq-tile:hover {
+  transform: translateY(-4px) rotate(-0.4deg);
+  border-color: rgba(13, 123, 210, 0.35);
+  box-shadow: var(--oq-shadow-hover);
+}
+
+.oq-tile:active { transform: scale(0.96); }
+.oq-tile:hover .oq-icon-box { animation: oq-wiggle 0.6s ease-in-out; }
+
+.oq-tile.is-primary {
+  border-color: rgba(13, 123, 210, 0.35);
+  background: var(--oq-brand-soft);
+}
+
+.oq-tile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.oq-tile-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: -8px;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 500;
+  color: var(--oq-brand);
+}
+
+.oq-tile.is-row .oq-tile-title { margin-bottom: 0; }
+
+.oq-icon-box {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--oq-generic);
+  color: var(--oq-brand-text);
+}
+
+.oq-icon-box .oq-icon { font-size: 22px; }
+.oq-icon-box.is-blue { background: var(--oq-brand); color: #fff; }
+.oq-icon-box.is-white { background: #fff; color: var(--oq-brand); }
+.oq-icon-box.is-white .oq-icon { font-size: 23px; }
+
+/* ---------- decks ---------- */
+
+.oq-decks {
+  flex-direction: column;
+  gap: 16px;
+}
+
+.oq-decks-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.oq-deck-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.oq-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  transition: transform 0.3s var(--spring);
+}
+
+.oq-deck:nth-child(n + 7) { display: none; }
+.oq-deck:hover { transform: translateY(-4px); }
+.oq-deck:active { transform: scale(0.96); }
+
+.oq-deck-photo {
+  width: 100%;
+  height: 128px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.oq-deck-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s var(--spring);
+}
+
+.oq-deck:hover .oq-deck-photo img { transform: scale(1.08) rotate(-2deg); }
+
+.oq-deck-name {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.oq-deck .oq-bar { width: 92%; }
+
+.oq-demo { text-align: center; }
+
+/* ---------- phone-only pieces ---------- */
+
+.oq-mobile-header,
+.oq-mobile-only {
+  display: none !important;
+}
+
+.oq-cta {
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--oq-brand);
+  color: #fff !important;
+  box-shadow: 0 6px 14px rgba(13, 122, 209, 0.25);
+  transition: transform 0.3s var(--spring), box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* a light sweep across the main button every few seconds */
+.oq-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.28) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: oq-shine 5s ease-in-out 1.8s infinite;
+  pointer-events: none;
+}
+
+.oq-cta:active { transform: scale(0.97); }
+.oq-cta:hover .oq-icon-box { animation: oq-wiggle 0.6s ease-in-out; }
+
+.oq-cta-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.oq-cta-text .oq-body-2 { color: rgba(255, 255, 255, 0.85); }
+.oq-cta-chevron { font-size: 24px; animation: oq-nudge 1.8s ease-in-out 1.5s infinite; }
+
+.oq-continue {
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  transition: transform 0.3s var(--spring);
+}
+
+.oq-continue:active { transform: scale(0.97); }
+
+.oq-continue-photo {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.oq-continue-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+.oq-continue-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.oq-continue-text .oq-bar { max-width: 190px; }
+
+.oq-play {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--oq-brand-soft);
+  color: var(--oq-brand-text);
+}
+
+.oq-play .oq-icon { font-size: 24px; }
+.oq-continue:hover .oq-play { animation: oq-boing 0.6s var(--spring); }
+
+.oq-class-mobile {
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.oq-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.oq-with-icon .oq-icon { font-size: 20px; }
+
+.oq-pin-row {
+  display: flex;
+  gap: 8px;
+}
+
+.oq-input {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--oq-input-line);
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.oq-input:focus-within {
+  border-color: var(--oq-brand);
+  box-shadow: 0 0 0 3px var(--oq-brand-soft);
+}
+
+.oq-input input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--oq-text);
+  font: inherit;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.oq-input input::placeholder { color: var(--oq-text-3); }
+.oq-input-icon { color: var(--oq-brand-text) !important; }
+.oq-input-icon .oq-icon { font-size: 20px; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1280px) {
+  .oq-deck-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .oq-deck:nth-child(n + 5) { display: none; }
+  .oq-class { width: 300px; }
+}
+
+@media (max-width: 1100px) {
+  .oq-progress { gap: 20px; }
+  .oq-level-bar { width: 220px; }
+  .oq-goal .oq-bar { width: 160px; }
+  .oq-row { flex-direction: column; }
+  .oq-class { width: auto; }
+}
+
+@media (max-width: 860px) {
+  .oq-desktop-only { display: none !important; }
+  .oq-mobile-only { display: flex !important; }
+  p.oq-mobile-only { display: block !important; }
+
+  .oq-mobile-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 6px;
+  }
+
+  .oq-mobile-header .oq-logo { font-size: 22px; }
+
+  .oq-mobile-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .oq-main {
+    gap: 14px;
+    padding: 12px 16px 16px;
+  }
+
+  .oq-greeting { font-size: 28px; line-height: 36px; }
+  .oq-greeting-sub { display: none; }
+
+  .oq-progress { padding: 16px; gap: 12px; }
+  .oq-level { gap: 12px; flex: 1; }
+  .oq-level-badge { width: 44px; height: 44px; font-size: 20px; line-height: 24px; }
+  .oq-level-text { flex: 1; }
+  .oq-level-text .oq-subheader { font-size: 15px; line-height: 20px; }
+  .oq-level-bar { width: 100%; height: 6px; border-radius: 3px; }
+
+  .oq-decks {
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    gap: 14px;
+  }
+
+  .oq-decks .oq-header { font-size: 17px; line-height: 24px; }
+
+  .oq-deck-strip {
+    display: flex;
+    gap: 10px;
+    margin: 0 -16px;
+    padding: 0 16px 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+    scrollbar-width: none;
+  }
+
+  .oq-deck-strip::-webkit-scrollbar { display: none; }
+
+  .oq-deck,
+  .oq-deck:nth-child(n + 5),
+  .oq-deck:nth-child(n + 7) {
+    display: flex;
+    flex: none;
+    width: 128px;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 14px;
+    background: var(--oq-surface);
+    box-shadow: var(--oq-shadow);
+    scroll-snap-align: start;
+  }
+
+  .oq-deck-photo { height: 84px; border-radius: 8px; }
+  .oq-deck .oq-bar { width: 100%; }
+}
+
+.oq-home .oq-logo { color: var(--oq-brand-text); }

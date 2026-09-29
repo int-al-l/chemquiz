@@ -139,6 +139,7 @@ function QuizPage() {
         <button className="icon-button" onClick={() => navigate("/")} aria-label={t("quiz.leave")} type="button">
           <span className="material-symbols-outlined">close</span>
         </button>
+        <span className="quiz-logo">OdanQuiz</span>
         <div
           className="quiz-progress-bar"
           role="progressbar"
@@ -162,7 +163,7 @@ function QuizPage() {
       </header>
 
       {inverted ? (
-        <section className="quiz-stage">
+        <section className="quiz-stage" key={position}>
           <div className="quiz-prompt">
             <span className="quiz-prompt-label">{t("quiz.findThe")}</span>
             <span className="quiz-prompt-name">{question.prompt}</span>
@@ -190,29 +191,34 @@ function QuizPage() {
           </div>
         </section>
       ) : (
-        <section className="quiz-stage">
+        <section className="quiz-stage is-named" key={position}>
           <div className="quiz-photo">
             <img src={imageSrc(question.image_url)} alt={t("quiz.namePhoto")} draggable="false" />
           </div>
-          <div className="name-options">
-            {question.choices.map((choice, i) => (
-              <button
-                key={choice.id}
-                className={`name-option ${stateOf(choice.id)}`}
-                onClick={() => send(choice.id)}
-                disabled={answered || submitting}
-                type="button"
-              >
-                <span className="option-key" aria-hidden="true">{i + 1}</span>
-                <span className="name-option-text">{choice.name}</span>
-                {answered && choice.id === correctId && (
-                  <span className="material-symbols-outlined" aria-hidden="true">check</span>
-                )}
-                {answered && choice.id === pickedId && choice.id !== correctId && (
-                  <span className="material-symbols-outlined" aria-hidden="true">close</span>
-                )}
-              </button>
-            ))}
+          <div className="quiz-answers">
+            <span className="quiz-q-pill">{t("quiz.progress", { n: position, total: session.question_count })}</span>
+            <h2 className="quiz-question">{t("quiz.whatIsIt")}</h2>
+            <div className="name-options">
+              {question.choices.map((choice, i) => (
+                <button
+                  key={choice.id}
+                  className={`name-option ${stateOf(choice.id)}`}
+                  onClick={() => send(choice.id)}
+                  disabled={answered || submitting}
+                  type="button"
+                >
+                  <span className="option-key" aria-hidden="true">{i + 1}</span>
+                  <span className="name-option-text">{choice.name}</span>
+                  {answered && choice.id === correctId && (
+                    <span className="material-symbols-outlined" aria-hidden="true">check_circle</span>
+                  )}
+                  {answered && choice.id === pickedId && choice.id !== correctId && (
+                    <span className="material-symbols-outlined" aria-hidden="true">cancel</span>
+                  )}
+                </button>
+              ))}
+            </div>
+            <p className="quiz-keys-hint">{t("quiz.keysHint")}</p>
           </div>
         </section>
       )}
