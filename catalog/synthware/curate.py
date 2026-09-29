@@ -904,3 +904,11 @@ NEW_OR_CHANGED.update({
     },
     "gas-washing-bottle": {"aliases": ["Drechsel bottle", "Gas scrubber", "Gas wash bottle"]},
 })
+
+# Sharper photos and new cards from the Synthware shop at labware-shop.com.
+from labware import NEW_CARDS as _LABWARE_CARDS, PHOTOS as _LABWARE_PHOTOS  # noqa: E402
+
+PHOTOS.update(_LABWARE_PHOTOS)
+NEW_OR_CHANGED.update(_LABWARE_CARDS)
+for _slug in _LABWARE_PHOTOS:
+    DROPPED.pop(_slug, None)
