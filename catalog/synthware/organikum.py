@@ -65,13 +65,11 @@ PHOTOS = {'ground-glass-joint': ['wm:Ground glass joint open.jpg', 'wm:Ground gl
                       'wm:High-vacuum pump.jpg',
                       'wm:Öl-Rotations-Vakuumpumpe der Firma Vacuubrand Wertheim - LABW - Staatsarchiv '
                       'Wertheim S-N 70 G 3173.jpg'],
- 'diffusion-pump': ['wm:Me holding a mercury based diffusion pump (for size comparison).jpg',
+ 'diffusion-pump': [
                     'wm:A simplified oil diffusion pump.jpg',
                     'wm:M6 Diffusion Pump.jpg'],
  'mcleod-gauge': ['wm:McLeod gauge.jpg', 'wm:McLeod gauge 01.jpg'],
- 'three-way-stopcock': ['lw:stopcock-glass-t-bore-1_0',
-                        'lw:stopcock-glass-t-bore-1_1',
-                        'lw:stopcock-glass-t-bore_0'],
+ 'three-way-stopcock': ['lw:stopcock-glass-t-bore_0'],
  'drying-column': ['lw:gas-drying-chamber_0', 'lw:gas-drying-chamber_1'],
  'hickman-head': ['lw:adapter-distillation-hickman_2',
                   'lw:adapter-distillation-hickman-hinkle_2',
@@ -92,8 +90,7 @@ PHOTOS = {'ground-glass-joint': ['wm:Ground glass joint open.jpg', 'wm:Ground gl
                       'lw:liquid-extraction-apparatus_0',
                       'lw:extractor-liquid-liquid-continuous_0'],
  'uv-lamp': ['wm:UV cabinet for thin layer chromatography.jpg',
-             'wm:UV-handlamp hg.jpg',
-             "wm:Wood's UV lamp.JPG"],
+             'wm:UV-handlamp hg.jpg'],
  'fraction-collector': ['wm:Fraction collector - sampler LAMBDA OMNICOLL.jpg',
                         'wm:Fraction Collector Tube Rack.jpg'],
  'hplc': ['wm:HPLC to ICP-MS.JPG'],
@@ -112,7 +109,7 @@ PHOTOS = {'ground-glass-joint': ['wm:Ground glass joint open.jpg', 'wm:Ground gl
  'saccharimeter': ['wm:Polarimeter Saccharimeter-UNIL 603.867-IMG 2052-white.jpg',
                    'wm:Saccharimeter Zucker-Museum.jpg',
                    'wm:Saccharimeter c1906 Zucker-Museum.jpg'],
- 'cuvette': ['wm:Cuvette.jpg', 'wm:分光液槽.jpg', 'wm:Cuvette with penny.jpg'],
+ 'cuvette': ['wm:Cuvette.jpg', 'wm:分光液槽.jpg'],
  'uv-vis-spectrometer': ['wm:DU640 spectrophotometer.jpg', 'wm:Spektrofotometri.jpg', 'wm:Wiki21039722.jpg'],
  'ir-spectrometer': ['wm:FTIR spectrometer.png', 'wm:FTIR Spectrometer + ATR.jpg', 'wm:FTIR 3000 1.jpg'],
  'nmr-spectrometer': ['wm:Bruker 300 MHz NMR Spectrometer.jpg',
@@ -1070,10 +1067,6 @@ COMMONS = {'Ground glass joint open.jpg': {'credit': 'Phasmatisnox, CC BY-SA 3.0
                                                                                                                        'Wikimedia '
                                                                                                                        'Commons',
                                                                                                              'url': 'https://commons.wikimedia.org/wiki/File:%C3%96l-Rotations-Vakuumpumpe_der_Firma_Vacuubrand_Wertheim_-_LABW_-_Staatsarchiv_Wertheim_S-N_70_G_3173.jpg'},
- 'Me holding a mercury based diffusion pump (for size comparison).jpg': {'credit': 'LetsGame999, CC BY-SA '
-                                                                                   '4.0, via Wikimedia '
-                                                                                   'Commons',
-                                                                         'url': 'https://commons.wikimedia.org/wiki/File:Me_holding_a_mercury_based_diffusion_pump_(for_size_comparison).jpg'},
  'A simplified oil diffusion pump.jpg': {'credit': 'Antigng, CC BY-SA 4.0, via Wikimedia Commons',
                                          'url': 'https://commons.wikimedia.org/wiki/File:A_simplified_oil_diffusion_pump.jpg'},
  'M6 Diffusion Pump.jpg': {'credit': 'Kkmurray, CC BY 3.0, via Wikimedia Commons',
@@ -1103,8 +1096,6 @@ COMMONS = {'Ground glass joint open.jpg': {'credit': 'Phasmatisnox, CC BY-SA 3.0
                                                   'url': 'https://commons.wikimedia.org/wiki/File:UV_cabinet_for_thin_layer_chromatography.jpg'},
  'UV-handlamp hg.jpg': {'credit': 'Hannes Grobe, CC BY-SA 3.0, via Wikimedia Commons',
                         'url': 'https://commons.wikimedia.org/wiki/File:UV-handlamp_hg.jpg'},
- "Wood's UV lamp.JPG": {'credit': 'Seawind60, CC BY-SA 4.0, via Wikimedia Commons',
-                        'url': 'https://commons.wikimedia.org/wiki/File:Wood%27s_UV_lamp.JPG'},
  'Fraction collector - sampler LAMBDA OMNICOLL.jpg': {'credit': 'LAMBDA CZ s.r.o, CC BY-SA 4.0, via '
                                                                 'Wikimedia Commons',
                                                       'url': 'https://commons.wikimedia.org/wiki/File:Fraction_collector_-_sampler_LAMBDA_OMNICOLL.jpg'},
@@ -1167,8 +1158,6 @@ COMMONS = {'Ground glass joint open.jpg': {'credit': 'Phasmatisnox, CC BY-SA 3.0
                  'url': 'https://commons.wikimedia.org/wiki/File:Cuvette.jpg'},
  '分光液槽.jpg': {'credit': 'GOKLuLe, CC BY-SA 3.0, via Wikimedia Commons',
               'url': 'https://commons.wikimedia.org/wiki/File:%E5%88%86%E5%85%89%E6%B6%B2%E6%A7%BD.jpg'},
- 'Cuvette with penny.jpg': {'credit': 'Jeffrey M. Vinocur, CC BY 2.5, via Wikimedia Commons',
-                            'url': 'https://commons.wikimedia.org/wiki/File:Cuvette_with_penny.jpg'},
  'DU640 spectrophotometer.jpg': {'credit': 'TimVickers, public domain, via Wikimedia Commons',
                                  'url': 'https://commons.wikimedia.org/wiki/File:DU640_spectrophotometer.jpg'},
  'Spektrofotometri.jpg': {'credit': 'Skorpion87, public domain, via Wikimedia Commons',
