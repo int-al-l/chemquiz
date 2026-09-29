@@ -19,6 +19,7 @@ import LivePlayPage from "./live/LivePlayPage";
 import LiveHistoryPage from "./live/LiveHistoryPage";
 import LiveGamePage from "./live/LiveGamePage";
 import Toaster from "./components/Toaster";
+import AppShell from "./components/AppShell";
 
 import { AuthProvider } from "./auth/AuthProvider";
 import { LanguageProvider } from "./i18n/LanguageProvider";
@@ -28,6 +29,8 @@ import { SavedProvider } from "./saved/SavedProvider";
 import "./App.css";
 import "./learn.css";
 import "./live/live.css";
+import "./theme/odan.css";
+import "./pages/MainPage.css";
 
 /**
  * Every screen has a URL, so the browser's back button, a refresh mid-quiz and
@@ -60,33 +63,37 @@ function App() {
       <SavedProvider>
         <ProgressProvider>
           <Routes>
-            <Route path="/" element={<MainPage />} />
+            {/* Places: inside the sidebar / tab-bar frame. */}
+            <Route element={<AppShell />}>
+              <Route path="/" element={<MainPage />} />
 
-            <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/list" element={<MyListPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+
+              <Route path="/quiz/setup" element={<QuizSetupPage />} />
+              <Route path="/quiz/setup/:slug" element={<QuizSetupPage />} />
+              <Route path="/quiz/:token/results" element={<QuizResultsPage />} />
+
+              <Route path="/live" element={<LiveSetupPage />} />
+              <Route path="/live/history" element={<LiveHistoryPage />} />
+              <Route path="/live/history/:id" element={<LiveGamePage />} />
+              <Route path="/join" element={<JoinPage />} />
+              <Route path="/join/:pin" element={<JoinPage />} />
+
+              <Route path="/sign-in" element={<SignInPage />} />
+              <Route path="/verify-email" element={<VerifyEmailPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+
+            {/* Focused screens: the whole window. */}
             <Route path="/explore/:slug" element={<DeckPage />} />
             <Route path="/review" element={<DeckPage review />} />
-
-            <Route path="/list" element={<MyListPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-
-            <Route path="/quiz/setup" element={<QuizSetupPage />} />
-            <Route path="/quiz/setup/:slug" element={<QuizSetupPage />} />
             <Route path="/quiz/:token" element={<QuizPage />} />
-            <Route path="/quiz/:token/results" element={<QuizResultsPage />} />
-
-            <Route path="/live" element={<LiveSetupPage />} />
             <Route path="/live/host/:pin" element={<LiveHostPage />} />
-            <Route path="/live/history" element={<LiveHistoryPage />} />
-            <Route path="/live/history/:id" element={<LiveGamePage />} />
-            <Route path="/join" element={<JoinPage />} />
-            <Route path="/join/:pin" element={<JoinPage />} />
             <Route path="/play/:pin" element={<LivePlayPage />} />
-
-            <Route path="/sign-in" element={<SignInPage />} />
-            <Route path="/verify-email" element={<VerifyEmailPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-
-            <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <Toaster />
         </ProgressProvider>
