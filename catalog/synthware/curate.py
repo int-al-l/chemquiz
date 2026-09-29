@@ -1109,6 +1109,24 @@ NEW_OR_CHANGED.update({
         "a stain."),
 })
 
+# --- Organikum, vol. 1 (2026-09-29) --------------------------------------------------
+# Equipment described in the book: new cards, and the book's practical points added to
+# the text of cards that already existed. See organikum.py.
+from organikum import (  # noqa: E402
+    COMMONS as _ORG_COMMONS,
+    DESCRIPTIONS as _ORG_DESCRIPTIONS,
+    NEW_CARDS as _ORG_CARDS,
+    NEW_CATEGORIES as _ORG_CATEGORIES,
+    PHOTOS as _ORG_PHOTOS,
+)
+
+PHOTOS.update(_ORG_PHOTOS)
+NEW_OR_CHANGED.update(_ORG_CARDS)
+for _slug, _change in _ORG_DESCRIPTIONS.items():
+    NEW_OR_CHANGED.setdefault(_slug, {}).update(_change)
+COMMONS.update(_ORG_COMMONS)
+NEW_CATEGORIES += _ORG_CATEGORIES
+
 # Photos Nik flagged as damaged or wrong (2026-09-29). They are taken out of
 # every card; a card with no photo left is dropped.
 REJECTED = {
