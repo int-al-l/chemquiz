@@ -85,7 +85,13 @@ CATEGORIES = [{'slug': 'labware',
                 'description': 'Hand tools used every day at the bench, and the goggles you wear '
                                'there.',
                 'sort_order': 140,
-                'image': 'spatula-2.jpg'}]}]
+                'image': 'spatula-2.jpg'},
+               {'slug': 'instruments',
+                'image': 'polarimeter-1.jpg',
+                'name': 'Instruments',
+                'description': 'Instruments for measuring melting points, refractive index, '
+                               'optical rotation and spectra, and for chromatography.',
+                'sort_order': 125}]}]
 
 ITEMS = [{'slug': 'round-bottom-flask',
   'category': 'flasks',
@@ -94,7 +100,10 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'The standard vessel for running a reaction. Its curved bottom spreads heat '
                  'evenly and lets the liquid swirl without corners where solid can settle, and the '
                  'ground-glass neck takes a condenser or a stopper. Almost anything that is '
-                 'heated, stirred or distilled starts here.',
+                 'heated, stirred or distilled starts here. Under vacuum only round-bottom flasks '
+                 'are used, because a flat base can be crushed by the air outside. For a '
+                 'distillation fill it no more than half full under vacuum and two-thirds at '
+                 'normal pressure.',
   'aliases': ['RBF', 'Round bottomed flask', 'Boiling flask', 'Single neck round bottom flask'],
   'source_products': [{'id': 5688,
                        'url': 'https://chengduglassware.com/product/synthware-single-neck-round-bottom-ball-bottle-capacity-5ml-5000ml-flask-round-bottom-single-neck-borosilicate-glass-f30/'},
@@ -113,7 +122,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'FLASK, TWO NECK, ANGLED',
   'description': 'A round-bottom flask with a second opening, so something can be added or '
                  'measured while the first neck is occupied. Usually the middle neck carries a '
-                 'condenser and the side neck a thermometer, a gas line or a dropping funnel.',
+                 'condenser and the side neck a thermometer, a gas line or a dropping funnel. On '
+                 'small flasks angled side necks are easier to work with than parallel ones, '
+                 'leaving room for a stirrer and a condenser side by side.',
   'aliases': ['Two necked flask', '2-neck flask', 'Double neck round bottom flask'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/flask-two-neck-angled-13'},
                       {'url': 'https://www.labware-shop.com/product-page/flask-two-neck-angled-7'},
@@ -145,7 +156,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'Three openings on one flask: typically a condenser in the middle, a thermometer '
                  'or inert-gas line on one side and an addition funnel on the other. It is the '
                  'workhorse for reactions that have to be stirred, heated and fed at the same '
-                 'time.',
+                 'time. An Anschütz adapter on one neck adds a fourth opening when a thermometer '
+                 'is needed as well.',
   'aliases': ['Three necked flask', '3-neck flask', 'Triple neck flask'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/flask-three-neck-vertical-12'},
                       {'url': 'https://www.labware-shop.com/product-page/flask-three-neck-small-angled-11'},
@@ -176,7 +188,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'FLASK, PEAR SHAPED, SINGLE NECK',
   'description': 'A flask that tapers to a point, so the last few millilitres collect in a narrow '
                  'tip instead of spreading over a wide floor. That makes it the flask of choice '
-                 'for evaporating a small sample down and recovering it afterwards.',
+                 'for evaporating a small sample down and recovering it afterwards. Pear-shaped '
+                 'flasks also make good distilling flasks and receivers, and 5–10 mL ones are the '
+                 'everyday flask of microscale work.',
   'aliases': ['Recovery flask', 'Pear flask', 'Teardrop flask'],
   'source_products': [{'id': 6992,
                        'url': 'https://chengduglassware.com/product/synthware-thick-walled-heart-shaped-flask-pear-shaped-flask-capacity-5ml-10ml-15ml-25ml-50ml-100ml-200ml-250ml-flask-pear-shaped-single-neck-borosilicate-glass-f32/'}],
@@ -191,7 +205,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'The cone-shaped flask: narrow at the neck, wide at the base. The shape makes it '
                  'stable and easy to swirl without splashing, which is why it is used for '
                  'titrations, for dissolving and mixing, and for storing solutions under a '
-                 'stopper.',
+                 'stopper. Closed with a ground-glass stopper it is the right container for '
+                 'volatile, flammable solvents, which would evaporate from a beaker. Like every '
+                 'flat-bottomed vessel it must never be put under vacuum.',
   'aliases': ['Conical flask'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/flask-erlenmeyer-3'},
                       {'url': 'https://www.labware-shop.com/product-page/flask-erlenmeyer-2'},
@@ -220,7 +236,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A thick-walled conical flask with a side arm for a vacuum hose. A Büchner funnel '
                  'sits in the neck, the pump pulls the liquid through the filter paper, and the '
                  'filtrate collects below. The heavy wall matters: a thin flask under vacuum can '
-                 'implode.',
+                 'implode. It is connected to a water-jet pump only through a safety bottle (a '
+                 'Woulfe bottle), so that water cannot be sucked back into the filtrate.',
   'aliases': ['Buchner flask',
               'Büchner flask',
               'Bunsen flask',
@@ -301,7 +318,10 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'FLASK, DEWAR, LOW FORM, HEMISPHERICAL',
   'description': 'A double-walled vessel with a vacuum between the walls, which blocks almost all '
                  'heat flow. It holds liquid nitrogen and dry-ice baths for hours. A domestic '
-                 'thermos works on exactly the same principle.',
+                 'thermos works on exactly the same principle. The gap is pumped down to below '
+                 '10⁻⁵ mm Hg and the walls are silvered. Thin evacuated glass can implode, so a '
+                 'Dewar is wrapped in tape or cloth or kept in a wire or wooden case, and it must '
+                 'be completely dry before liquid nitrogen goes in.',
   'aliases': ['Dewar', 'Vacuum flask', 'Cryogenic flask'],
   'source_products': [{'id': 1648,
                        'url': 'https://chengduglassware.com/product/synthware-dewar-flask-cylindrical-shape-xpe-imperforate-cover-upper-outer-plastic-mesh-lower-aluminum-housing-f11/'},
@@ -323,7 +343,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'HEAVY WALL BEAKER, LOW FORM, DUAL GRADUATION',
   'description': 'The plain, straight-sided cup of the laboratory. Its graduations are rough, so '
                  'it is for mixing, dissolving, heating and holding liquids — never for measuring '
-                 'a volume you intend to trust.',
+                 'a volume you intend to trust. Low-boiling and flammable solvents are not kept in '
+                 'a beaker: from its wide open top they evaporate quickly.',
   'aliases': ['Glass beaker', 'Low form beaker'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/beaker-heavy-wall-double-scaled'}],
   'photos': [{'file': 'beaker-1.jpg',
@@ -410,7 +431,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A heavy-walled tube that can be sealed and heated well above the boiling point '
                  'of its contents. Holding the solvent liquid under its own pressure lets a '
                  'reaction run far hotter than open glassware allows; the thick wall and the screw '
-                 'seal are what make that safe.',
+                 'seal are what make that safe. The classic form is a thick-walled Duran ampoule '
+                 'sealed in a flame, good for 20–30 atm and 400 °C; it is heated inside an iron '
+                 'jacket in a special furnace and opened only after cooling.',
   'aliases': ['Heavy-wall pressure vessel',
               'Sealed tube',
               'Ace pressure tube',
@@ -471,7 +494,10 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'CONDENSER, LIEBIG',
   'description': 'A straight inner tube inside a water jacket: the classic condenser. Vapour '
                  'passes down the middle, cooling water flows around it, and the vapour turns back '
-                 'into liquid. This is the standard condenser for a simple distillation.',
+                 'into liquid. This is the standard condenser for a simple distillation. It is '
+                 'used mainly as a downward condenser up to about 160 °C — with running water for '
+                 'liquids boiling below 120 °C and standing water between 120 and 160 °C. As a '
+                 'reflux condenser it is weak.',
   'aliases': ['Straight condenser',
               'West condenser',
               'Distillation condenser',
@@ -503,7 +529,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A glass spiral runs down the middle of a water jacket, and the vapour travels '
                  'through the spiral itself, so it meets a long cooled path in a short piece of '
                  'glass. It is a condenser for distillation: stood upright for reflux, the '
-                 'returning liquid gathers in the narrow coils and can block them.',
+                 'returning liquid gathers in the narrow coils and can block them. Stood strictly '
+                 'upright it is the most efficient downward condenser, especially for low-boiling '
+                 'liquids; it must never be tilted.',
   'aliases': ['Coil condenser', 'Coiled condenser', 'Graham', 'Spiral condenser'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Graham_(spiral)_condenser-small.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Graham_condenser.jpg'},
@@ -538,7 +566,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'CONDENSER, ALLIHN',
   'description': 'A condenser whose inner tube is a chain of bulbs. They add surface and hold the '
                  'returning liquid a moment longer, which makes this the traditional choice for '
-                 'reflux — boiling a reaction for hours without losing solvent.',
+                 'reflux — boiling a reaction for hours without losing solvent. The bulbs make the '
+                 'vapour flow turbulent, so it cools far better than a Liebig condenser; it is '
+                 'used only for reflux.',
   'aliases': ['Bulb condenser', 'Allihn', 'Reflux bulb condenser'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/condenser-allihn-removable-hose-connections-3'},
                       {'url': 'https://www.labware-shop.com/product-page/condenser-allihn-removable-hose-connections'},
@@ -595,7 +625,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'CONDENSER, COLD FINGER, WITH DRIP TIP',
   'description': 'A finger of glass cooled from the inside and dipped into the vapour. Whatever '
                  'touches it condenses on its outer surface and drips back. Cold fingers are used '
-                 'for reflux in tight spaces and for collecting sublimed solids.',
+                 'for reflux in tight spaces and for collecting sublimed solids. Put in through a '
+                 'stopper or a piece of tubing, it leaves the apparatus open. The water flow must '
+                 'never stop: a condenser that runs dry can start a fire.',
   'aliases': ['Cold finger', 'Cold finger with drip tip'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/condenser-cold-finger-with-drip-tip-2'},
                       {'url': 'https://www.labware-shop.com/product-page/condenser-cold-finger-with-drip-tip-1'},
@@ -664,7 +696,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'COLUMN, AIR REFLUX, 14/20 JOINT',
   'description': 'A plain tube with no water jacket, cooled by the air around it. For solvents '
                  'that boil high enough that is cooling enough, and with no hoses it is simpler '
-                 'and safer, especially for a reaction left running overnight.',
+                 'and safer, especially for a reaction left running overnight. Air cooling is '
+                 'enough only for liquids boiling above about 150 °C.',
   'aliases': ['Air reflux condenser', 'Air cooled condenser'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/conderser-air-cooling-3'},
                       {'url': 'https://www.labware-shop.com/product-page/conderser-air-cooling-2'},
@@ -688,7 +721,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A tube with rows of indentations pointing inwards, fitted between the flask and '
                  'the still head. Vapour condenses on them and re-evaporates over and over, and '
                  'each of those cycles enriches it in the lower-boiling component. That is what '
-                 'separates two liquids whose boiling points are close.',
+                 'separates two liquids whose boiling points are close. Its hold-up and pressure '
+                 'drop are small, so it suits vacuum and semimicro distillations, though its '
+                 'efficiency is modest.',
   'aliases': ['Vigreux', 'Distilling column', 'Fractionating column'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/column-distilling-vigreux-4'},
                       {'url': 'https://www.labware-shop.com/product-page/column-distilling-vigreux-1'},
@@ -715,7 +750,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'DISTILLING HEAD',
   'description': 'The piece that sits on the boiling flask and turns the vapour towards the '
                  'condenser, with an opening on top for a thermometer. Reading the vapour '
-                 'temperature there is how you know which component is coming over.',
+                 'temperature there is how you know which component is coming over. The '
+                 'thermometer bulb must sit just below the side arm, so that the vapour bathes it '
+                 'completely.',
   'aliases': ['Still head', 'Distillation head', 'Three-way head'],
   'source_products': [{'id': 8434,
                        'url': 'https://chengduglassware.com/product/synthware-75-distillation-head-distilling-tube-adapter-distillation-connecting-borosilicate-glass-a35/'},
@@ -738,7 +775,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'Boiling flask, condenser and receiver joined over the shortest possible '
                  'distance. Little surface means little material lost on the way, so it is used '
                  'for small or precious samples, and under vacuum for compounds that would '
-                 'decompose at their normal boiling point.',
+                 'decompose at their normal boiling point. Because the evaporating and condensing '
+                 'surfaces are so close, the distillate runs as a thin film; it is the method for '
+                 'heat-sensitive, high-boiling substances.',
   'aliases': ['Short path apparatus',
               'Short path distillation head',
               'Short path head',
@@ -774,7 +813,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'DISTILLATION COW RECEIVER',
   'description': 'A rotating receiver with several flasks hanging from it. Turning the cow brings '
                  'a fresh flask under the outlet, so one fraction after another can be collected '
-                 'without breaking the vacuum.',
+                 'without breaking the vacuum. It is cheaper and more vacuum-tight than a receiver '
+                 'with taps, but it can collect only as many fractions as it has flasks.',
   'aliases': ['Pig', 'Distillation cow', 'Multi-receiver adapter', 'Cow'],
   'source_products': [{'id': 14573,
                        'url': 'https://chengduglassware.com/product/synthware-trident-shaped-receiver-tube-joint-14-20-19-22-with-graduated-distillation-receiver-tube-12ml-with-plastic-clip-distilling-receiv-er-borosilicate-glass-d38/'},
@@ -803,7 +843,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'DISTILLING BULB, KUGELROHR',
   'description': 'One of a chain of bulbs used to distil small amounts over a very short path. The '
                  'sample is heated in an oven while the chain rotates, and each fraction condenses '
-                 'in the next, cooler bulb — with almost no glassware for it to be lost on.',
+                 'in the next, cooler bulb — with almost no glassware for it to be lost on. It is '
+                 'excellent for separating liquids and low-melting solids from polymeric and tarry '
+                 'residues.',
   'aliases': ['Kugelrohr', 'Kugelrohr bulb', 'Bulb-to-bulb distillation bulb'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/distilling-bulb-kugelror'}],
   'photos': [{'file': 'kugelrohr-bulb-1.jpg',
@@ -838,7 +880,10 @@ ITEMS = [{'slug': 'round-bottom-flask',
                  'filter paper lies on the plate, the funnel sits in a filter flask on a rubber '
                  'collar, and suction pulls the liquid through. It is the fast way to collect a '
                  'solid and the usual last step of a precipitation. Glass funnels with a sintered '
-                 'disc in place of the plate and paper are fritted filter funnels.',
+                 'disc in place of the plate and paper are fritted filter funnels. The filter '
+                 'flask is evacuated through a safety bottle; the cake is pressed down with a flat '
+                 'glass stopper and washed with small portions of cold solvent while the vacuum is '
+                 'off.',
   'aliases': ['Buchner funnel', 'Porcelain Buchner funnel', 'Filter funnel, Buchner'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:B%C3%BCchnertrichter_frontal.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:B%C3%BCchnertrichter_frontal_02.jpg'},
@@ -858,7 +903,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'FILTER FUNNEL',
   'description': 'A funnel with a disc of fused glass instead of paper. The frit comes in graded '
                  'porosities, does not tear or react, and can be washed and used again — which '
-                 'matters when the liquid would attack paper or must not pick up fibres.',
+                 'matters when the liquid would attack paper or must not pick up fibres. '
+                 'Porosities No. 2 and 3 are the usual ones. A frit is required when strong acids, '
+                 'alkalis or oxidants would destroy paper, and for samples meant for analysis.',
   'aliases': ['Sintered filter funnel',
               'Sintered glass funnel',
               'Fritted Buchner funnel',
@@ -907,7 +954,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A pear-shaped funnel with a stopcock, for separating two liquids that do not '
                  'mix. Shaking moves a compound into whichever solvent dissolves it better; the '
                  'layers settle and the lower one is run off through the tap. This extraction is '
-                 'one of the most-used operations in organic chemistry.',
+                 'one of the most-used operations in organic chemistry. Fill it no more than '
+                 'two-thirds, turn it tap-up and open the tap to let the vapour out before shaking '
+                 'hard. The lower layer leaves through the tap, the upper one through the top.',
   'aliases': ['Sep funnel', 'Separating funnel', 'Squibb funnel', 'Sepfunnel'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/funnel-separatory-squibb-glass-stopcock-4'},
                       {'url': 'https://www.labware-shop.com/product-page/funnel-separatory-squibb-glass-stopcock-2'},
@@ -1166,7 +1215,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'ADAPTER, CLAISEN',
   'description': 'A Y-shaped adapter that turns one flask neck into two. It is the quickest way to '
                  'give a single-neck flask room for both a condenser and a thermometer, or a '
-                 'stirrer and an addition funnel.',
+                 'stirrer and an addition funnel. In a vacuum distillation one neck carries the '
+                 'boiling capillary and the other the thermometer, and the bend keeps froth from '
+                 'reaching the condenser.',
   'aliases': ['Claisen head', 'Claisen', 'Claisen connecting adapter'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/adapter-claisen-two-neck'},
                       {'url': 'https://www.labware-shop.com/product-page/adapter-claisen-three-neck'}],
@@ -1184,7 +1235,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'name': 'Vacuum take-off adapter',
   'catalog_name': 'ADAPTER, DISTILLATION, BENT, 105°',
   'description': 'The bend that carries the distillate from the condenser down into the receiving '
-                 'flask, with a side port for the vacuum line.',
+                 'flask, with a side port for the vacuum line. Its bore should be at least 5–6 mm '
+                 'wide, or a vacuum distillation is held back.',
   'aliases': ['Vacuum adapter',
               'Distillation adapter',
               'Bend adapter',
@@ -1214,7 +1266,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'ADAPTER, DRYING TUBE, STRAIGHT',
   'description': 'A small tube of drying agent fitted to the top of an apparatus. Air can move in '
                  'and out as things heat and cool, but the moisture in it is caught on the way — '
-                 'the simple protection for a reaction that water would spoil.',
+                 'the simple protection for a reaction that water would spoil. It is filled with '
+                 'calcium chloride or soda lime between plugs of glass wool. Blow through a filled '
+                 'tube before use to check that gas still passes.',
   'aliases': ['Drying tube adapter', 'Calcium chloride tube', 'Guard tube'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/adapter-drying-tube-75'},
                       {'url': 'https://www.labware-shop.com/product-page/adapter-drying-tube-straight-1'},
@@ -1467,7 +1521,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'VACUUM TRAP, SPHERICAL JOINTS',
   'description': 'A cold trap in the line ahead of a vacuum pump. Solvent vapour freezes on its '
                  'cold wall instead of reaching the pump oil, which protects the pump and keeps '
-                 'the vacuum deep.',
+                 'the vacuum deep. It is cooled in a Dewar with dry ice and ethanol or with liquid '
+                 'nitrogen. Liquid air, which grows richer in oxygen as it stands, must never be '
+                 'used to cool organic substances.',
   'aliases': ['Cold trap', 'Solvent trap', 'Vacuum line trap'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/vacuum-trap-with-hose-connector'},
                       {'url': 'https://www.labware-shop.com/product-page/vacuum-trap-without-joint'},
@@ -1497,7 +1553,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'BUBBLER',
   'description': 'A small vessel of oil in the gas line. Gas leaving the apparatus bubbles out '
                  'through the oil, so the flow can be seen and counted, and the oil stops air '
-                 'coming back the other way.',
+                 'coming back the other way. With a chosen liquid and height of liquid it also '
+                 'keeps a slight overpressure in a closed apparatus.',
   'aliases': ['Oil bubbler', 'Mineral oil bubbler', 'Gas bubbler', 'Bubbler trap'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/bubbler-mineral-oil-anti-blow-back-conical'},
                       {'url': 'https://www.labware-shop.com/product-page/bubbler-mineral-oil-anti-blow-back'},
@@ -1524,7 +1581,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'BOTTLE, GAS WASHING, FRITTED',
   'description': 'A bottle in which gas is bubbled through a liquid on its way past — to dry it, '
                  'to wash out an impurity, or to trap something harmful before it reaches the '
-                 'room.',
+                 'room. The head is held on with metal springs, an empty safety bottle is put '
+                 'before and after it, and a bottle of acid is never placed directly next to one '
+                 'of alkali.',
   'aliases': ['Drechsel bottle', 'Gas scrubber', 'Gas wash bottle'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/bottle-gas-washing-porous-tube-with-hook'},
                       {'url': 'https://www.labware-shop.com/product-page/bottle-gas-washing-straight-tube-with-hook'},
@@ -1561,7 +1620,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'SUBLIMATOR',
   'description': 'A vessel with a cold finger above the sample. Under vacuum a solid that sublimes '
                  'passes straight to vapour and re-forms as crystals on the cold surface — a '
-                 'purification that never involves a solvent.',
+                 'purification that never involves a solvent. The cold finger should be as close '
+                 'to the sample as possible, and the apparatus is opened gently, after warming the '
+                 'joint, so the crystals do not fall off.',
   'aliases': ['Sublimator', 'Cold finger sublimator', 'Vacuum sublimation apparatus'],
   'source_products': [{'id': 34040,
                        'url': 'https://chengduglassware.com/product/synthware-micro-sublimator-capacity-25ml-joint-24-40-with-glass-valve-borosilicate-glass-d232440g/'},
@@ -1643,7 +1704,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A vertical glass tube packed with silica gel, with a tap at the bottom. The '
                  'mixture is loaded on top and solvent pushed through; compounds travel at '
                  'different speeds and come out one after another. This is how most organic '
-                 'products are purified.',
+                 'products are purified. A loose plug of cotton or glass wool (or a sieve plate) '
+                 'holds the packing, which is poured in as a slurry. The solvent must never fall '
+                 'below the top of the packing, or the packing cracks.',
   'aliases': ['Flash column',
               'Flash chromatography column',
               'Column',
@@ -1718,7 +1781,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A flat glass chamber with a lid, for thin-layer chromatography. A little solvent '
                  'lies in the bottom, the plate stands in it, and the solvent climbs the plate by '
                  'capillary action and separates the spots as it goes. It is the quickest way to '
-                 'see whether a reaction has finished.',
+                 'see whether a reaction has finished. Its walls are lined with filter paper, so '
+                 'the air inside is saturated with solvent vapour before the plate goes in.',
   'aliases': ['TLC tank', 'Developing chamber', 'TLC chamber'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/tank-thin-layer-chromatography-rectangular-groove'},
                       {'url': 'https://www.labware-shop.com/product-page/tank-thin-layer-chromatography-rectangular-flat'}],
@@ -1743,7 +1807,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'STOPPER, PENNY-HEAD, GLASS, HOLLOW',
   'description': 'A ground-glass plug that closes a joint. Glass on glass seals tightly with no '
                  'plastic or rubber for a solvent to attack, which is why stoppered flasks are '
-                 'used for storing reactive solutions.',
+                 'used for storing reactive solutions. A stuck stopper can often be freed by '
+                 'rocking it, by warming the outer joint briefly in a smoky flame while the '
+                 'stopper stays cool, or by tapping it with a small wooden mallet.',
   'aliases': ['Penny-head stopper', 'Ground glass stopper', 'Stopper'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/stopper-penny-head-glass-hollow-1'},
                       {'url': 'https://www.labware-shop.com/product-page/stopper-glass-flsk-length-pennyhead'}],
@@ -1824,7 +1890,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'STOPCOCK, STRAIGHT BORE, GLASS, INTERCHANGEABLE',
   'description': 'The traditional tap: a ground glass plug in a ground glass barrel, sealed with a '
                  'film of grease. Cheap, chemically inert and still standard on high-vacuum '
-                 'glassware, though the grease has to be renewed.',
+                 'glassware, though the grease has to be renewed. A fine notch filed along the '
+                 'bore makes it possible to let in air very gradually, for example to set the '
+                 'pressure of a vacuum line.',
   'aliases': ['Ground glass stopcock', 'Glass tap', 'Tap', 'High vacuum glass stopcock'],
   'source_products': [{'id': 13356,
                        'url': 'https://chengduglassware.com/product/synthware-stopcock-glass-high-vacuum-straight-bore-borosilicate-glass-s33/'},
@@ -2012,7 +2080,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'A narrow glass tube, closed and rounded at one end. The quickest place to try a '
                  'small reaction, warm a sample or watch for a colour change; a rack holds a row '
-                 'of them upright. Screw-cap versions store samples.',
+                 'of them upright. Screw-cap versions store samples. For semimicro work short, '
+                 'wide tubes (about 15 mm across and 60–80 mm long) are used.',
   'aliases': ['Culture tube', 'Reagent tube'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Test_tube_blue_background.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Glass_tube_with_screw_cap_1.jpg'},
@@ -2097,7 +2166,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'A shallow porcelain bowl with a pouring lip. Heating a solution in it drives off '
                  'the solvent and leaves the dissolved solid behind; porcelain takes direct heat '
-                 'that would crack ordinary glass.',
+                 'that would crack ordinary glass. Covered with an upturned glass funnel, it '
+                 'becomes the simplest sublimation apparatus.',
   'aliases': ['Evaporating basin', 'Porcelain dish'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Abdampfschalen_verschiedene_Groessen.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Abdampfschalen,_porzellan_innen_glasiert.jpg'}],
@@ -2150,7 +2220,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'An extractor that washes a solid with fresh, clean solvent over and over by '
                  'itself. Solvent boils below, condenses above, fills the chamber holding the '
                  'sample and siphons back when full — leaving the extracted material in the flask '
-                 'and running unattended for hours.',
+                 'and running unattended for hours. The solid in the thimble must be heavier than '
+                 'the solvent. Unlike a simple flow-through extractor, the siphon empties the '
+                 'chamber in pulses.',
   'aliases': ['Soxhlet', 'Soxhlet extraction body', 'Soxhlet apparatus'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Soxhlet-Extraktor.png'},
                       {'url': 'https://www.labware-shop.com/product-page/extractor-soxhlet'}],
@@ -2176,7 +2248,10 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A heavy glass pot with a greased, tight-fitting lid and a perforated plate '
                  'inside. A drying agent sits below the plate and samples above it, so they dry — '
                  'or stay dry — in air with no water in it. Versions with a tap in the lid can be '
-                 'put under vacuum.',
+                 'put under vacuum. A vacuum desiccator is wrapped in a towel before it is '
+                 'evacuated. The air inlet inside ends in a capillary pointing upwards, so the '
+                 'incoming air does not scatter the sample, and glass rings on the bottom stop '
+                 'sulfuric acid from splashing.',
   'aliases': ['Exsiccator', 'Exicator', 'Vacuum desiccator', 'Dessicator'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Exsikkator.png'},
                       {'url': 'https://www.labware-shop.com/product-page/desiccator-amber'},
@@ -2313,7 +2388,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'A short glass tube drawn out to a long thin tip, used with a rubber bulb to move '
                  'small amounts of liquid drop by drop. It has no scale — it is for transferring, '
-                 'not measuring — and is usually thrown away after use.',
+                 'not measuring — and is usually thrown away after use. It is easily drawn out '
+                 'from a 12–15 cm glass tube, and it is worth calibrating at 0.5, 1, 1.5 and 2 mL.',
   'aliases': ['Dropper', 'Glass dropper', 'Transfer pipette, glass', 'Babbitt pipette'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Glass_pasteur_pipette.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Pasteur_Pipets.jpg'}],
@@ -2385,7 +2461,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'A sealed glass tube with a bulb of liquid at the bottom and a temperature scale '
                  'up the stem. The liquid expands as it warms and climbs the scale; in the lab it '
-                 'measures baths, reactions and the vapour in a distillation head.',
+                 'measures baths, reactions and the vapour in a distillation head. When part of '
+                 'the mercury column sticks out of the heated liquid, the reading needs an '
+                 'emergent-stem correction.',
   'aliases': ['Laboratory thermometer', 'Glass thermometer', 'Liquid-in-glass thermometer'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Laboratory_thermometer-03.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Thermometer,_max.JPG'}],
@@ -2437,7 +2515,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'A metal tube on a heavy base that burns gas from the bench tap. A collar at the '
                  'bottom lets in air: closed, the flame is yellow and cool; open, it turns into a '
-                 'hot, roaring blue cone.',
+                 'hot, roaring blue cone. Flammable liquids are never heated over an open flame.',
   'aliases': ['Bunsen', 'Gas burner', 'Laboratory burner'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Mechero_Bunsen.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Bunsen_burner_2.jpg'}],
@@ -2469,7 +2547,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'A heavy metal base with an upright rod. Clamps and rings fixed to the rod hold '
                  'flasks, condensers, funnels and burettes, and whole apparatus is built up around '
-                 'it.',
+                 'it. A reaction apparatus is best clamped to a single stand; the bosses are fixed '
+                 'with the open side facing up.',
   'aliases': ['Retort stand', 'Ring stand', 'Lab stand', 'Stand'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Retort_stand.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Ringstand_with_a_ring_clamp.jpg'},
@@ -2489,7 +2568,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'Adjustable jaws on an arm, fixed to a stand with a boss head. It grips the neck '
                  'of a flask or the body of a condenser and holds it in place — almost every '
-                 'set-up on the bench hangs from clamps.',
+                 'set-up on the bench hangs from clamps. Its jaws are lined with cork or rubber '
+                 'and tightened only enough to hold the glass without straining it.',
   'aliases': ['Laboratory clamp',
               'Three-finger clamp',
               'Retort clamp',
@@ -2541,7 +2621,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'A flat platform on a scissor mechanism, raised or lowered by turning a knob. It '
                  'holds a heating bath or stirrer under a flask, and can be wound down to drop the '
-                 'heat away quickly.',
+                 'heat away quickly. A heat source has to be removable at any moment, and a lab '
+                 'jack is the usual way to do it.',
   'aliases': ['Laboratory jack', 'Lab lift', 'Lifting platform', 'Jack stand', 'Scissor jack'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Juchheim_Laborger%C3%A4te_lifting_stage.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Lab_jack-swissboy.jpg'},
@@ -2560,7 +2641,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'name': 'Magnetic stirrer',
   'catalog_name': None,
   'description': 'A flat plate with a spinning magnet inside. It turns a stir bar in the flask on '
-                 'top without anything passing through the glass; most models also heat the plate.',
+                 'top without anything passing through the glass; most models also heat the plate. '
+                 'The bar has to lie flat on the bottom, so it works best in flat-bottomed vessels '
+                 'and small flasks.',
   'aliases': ['Stirrer', 'Stir plate', 'Hot plate stirrer', 'Magnetic hotplate stirrer'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:RCT_basic_IKAMAG%C2%AE_safety_control_magnetic_stirrer.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Magnetic_stirrer_(15549).jpg'},
@@ -2633,7 +2716,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'name': 'Mortar and pestle',
   'catalog_name': None,
   'description': 'A thick porcelain bowl and a club-shaped grinder. Grinding a solid between them '
-                 'turns lumps and crystals into a fine powder that dissolves or reacts faster.',
+                 'turns lumps and crystals into a fine powder that dissolves or reacts faster. Dry '
+                 'ice is crushed in a metal mortar, not a porcelain one.',
   'aliases': ['Mortar', 'Pestle', 'Mortar & pestle'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Mortar_and_pestle-laboratory.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:M%C3%B6rser.png'}],
@@ -2649,7 +2733,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'Close-fitting protective glasses worn at all times in the lab. They keep '
                  'splashes, flying glass and dust out of the eyes — the one piece of equipment '
-                 'that is never optional.',
+                 'that is never optional. They are mandatory for any work under vacuum or pressure '
+                 'and when a melting point is measured.',
   'aliases': ['Goggles', 'Safety glasses', 'Safety spectacles', 'Eye protection'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:2023_Okulary_ochronne_(1).jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Empiral_Vision_Grey_goggles.jpg'}],
@@ -2667,7 +2752,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
                  'middle, and the vapour rises around the coil inside the outer tube. Both water '
                  'connections are at the top. The coil packs in a large cold surface while the '
                  'returning liquid runs freely down past it, which makes the Dimroth one of the '
-                 'most efficient reflux condensers.',
+                 'most efficient reflux condensers. Its outside stays at room temperature, so no '
+                 'dew forms on it; but very low boilers such as ether can creep up the outer wall '
+                 'past the coil.',
   'aliases': ['Dimroth', 'Dimroth coil condenser'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Dimrothk%C3%BChler.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Dimroth_kuehler.jpg'},
@@ -2748,7 +2835,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A double-walled quartz or glass tube that holds a UV lamp and dips into the '
                  'reaction. Light shines outward into the solution while cooling water between the '
                  'walls stops the lamp from boiling it. Used to drive reactions with light '
-                 '(photochemistry). Never look at the lit lamp.',
+                 '(photochemistry). Never look at the lit lamp. Without an immersion lamp, the '
+                 'flask can be lit from outside by a 500 W photolamp, though the reaction then '
+                 'runs more slowly.',
   'aliases': ['Photoreactor', 'Immersion well', 'Photochemical reactor'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/immersion-well-photochemical-quartz-without-joint'},
                       {'url': 'https://www.labware-shop.com/product-page/reaction-vessel-photochemical-internal-thread'}],
@@ -2764,7 +2853,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'The small version of a Büchner funnel, with sloping sides and a filter plate '
                  'only a centimetre or two across. It is for collecting a few milligrams of '
-                 'crystals by suction filtration without losing them on a large filter.',
+                 'crystals by suction filtration without losing them on a large filter. It is used '
+                 'with a suction test tube rather than a filter flask.',
   'aliases': ['Small filter funnel'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/filter-funnel-hirsch-1'},
                       {'url': 'https://www.labware-shop.com/product-page/filter-funnel-hirsch'},
@@ -2923,7 +3013,10 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'A thick silicone paste smeared thinly on ground-glass joints and stopcocks. It '
                  'makes them airtight under vacuum and keeps them turning freely. Use a thin band '
-                 'at the top of the joint only, because excess grease creeps into the reaction.',
+                 'at the top of the joint only, because excess grease creeps into the reaction. A '
+                 'correctly greased joint looks clear all the way round. Petroleum jelly is enough '
+                 'at normal pressure; for vacuum, silicone or Apiezon greases are used, and '
+                 'water-soluble greases wash off easily.',
   'aliases': ['Silicone grease', 'Joint grease', 'High-vacuum grease'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/vacuum-silicone-grease-7501'}],
   'photos': [{'file': 'vacuum-grease-1.jpg',
@@ -2935,7 +3028,10 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'Flexible tubing that connects glassware to a pump, a gas line or a water tap. '
                  'Tubing for vacuum has thick walls so it does not collapse flat when the air is '
-                 'pumped out. Thin latex or silicone tubing is fine for cooling water.',
+                 'pumped out. Thin latex or silicone tubing is fine for cooling water. For '
+                 'chlorine, hydrogen bromide, phosgene or ozone, PVC or polyethylene tubing is '
+                 'used instead of rubber; warmed briefly in boiling water, it slips easily onto a '
+                 'glass tube.',
   'aliases': ['Rubber tubing', 'Thick-walled tubing', 'Hose'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/silicone-tubings'},
                       {'url': 'https://www.labware-shop.com/product-page/latex-tubings'},
@@ -3192,7 +3288,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
                  'condenser. The solvent — usually toluene — boils off together with the water the '
                  'reaction makes; both condense and drip into the tube, where the heavier water '
                  'sinks and the solvent overflows back into the flask. Taking the water out drives '
-                 'the reaction to completion, and the scale shows how far it has got.',
+                 'the reaction to completion, and the scale shows how far it has got. For solvents '
+                 'heavier than water, such as chloroform or carbon tetrachloride, a different trap '
+                 'is used, in which the solvent collects at the bottom.',
   'aliases': ['Dean-Stark apparatus', 'Dean Stark', 'Dean-Stark receiver', 'Water separator'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Dean-Stark.JPG'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Dean-Stark_trap_in_use.jpg'}],
@@ -3210,7 +3308,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
                  'spins, half dipped in a warm water bath, so the liquid spreads into a thin film; '
                  'under vacuum the solvent boils far below its normal boiling point, condenses on '
                  'a cooled coil and runs into a receiving flask. Almost every organic product is '
-                 'concentrated on one.',
+                 'concentrated on one. Start the rotation first, then the vacuum, and only then '
+                 'warm the bath, or the solution foams. Low-boiling solvents are not fully caught '
+                 'by a water-cooled condenser, so the receiver is chilled as well.',
   'aliases': ['Rotovap', 'Rotavap', 'Rotary evaporation apparatus'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Rotationsverdampfer_ohne_Vakuumpumpe.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Rotationsverdampfer.jpg'},
@@ -3308,7 +3408,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A round, slightly curved disc of glass, like the glass of an old pocket watch. '
                  'It covers a beaker to keep dust out while vapour escapes, holds a little solid '
                  'for weighing or drying, and lets a drop of solution evaporate where the residue '
-                 'can be seen.',
+                 'can be seen. Rubbing a drop of an oily product on it with a little volatile '
+                 'solvent is one way to make it crystallise.',
   'aliases': ['Watch-glass', 'Clock glass'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Uhrglas.png'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Chroman_sodn%C3%BD.JPG'}],
@@ -3325,7 +3426,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'A tapered plug of rubber for a flask or a test tube without a ground-glass '
                  'joint. Bored through, it holds a thermometer, a glass tube or a funnel stem. '
                  'Rubber swells in many organic solvents, so it belongs to aqueous work and to '
-                 'teaching labs.',
+                 'teaching labs. Halogens and strong acids attack rubber as well. In modern '
+                 'set-ups a screw connection with a PTFE seal often takes its place.',
   'aliases': ['Rubber bung', 'Bung', 'Bored stopper'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Rubber_stopper_holes.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Rubber_stopper.jpeg'},
@@ -3376,12 +3478,1212 @@ ITEMS = [{'slug': 'round-bottom-flask',
               'credit': 'Dvnyn, CC BY-SA 4.0, via Wikimedia Commons'},
              {'file': 'tlc-plate-2.jpg',
               'source': 'wm:Chiral TLC Baclofen.jpg',
-              'credit': 'RBn53, CC BY-SA 4.0, via Wikimedia Commons'}]}]
+              'credit': 'RBn53, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'four-neck-flask',
+  'category': 'flasks',
+  'name': 'Four-neck flask',
+  'catalog_name': None,
+  'description': 'A round-bottom flask with four necks, for reactions that need many things at '
+                 'once: a stirrer in the middle, and a condenser, a thermometer and a dropping '
+                 'funnel in the side necks. Counting the necks is the quickest way to tell it from '
+                 'its two- and three-neck relatives.',
+  'aliases': ['Four-necked round-bottom flask', 'Multi-neck flask'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/flask-round-bottom-4-neck-angled-2'},
+                      {'url': 'https://www.labware-shop.com/product-page/flask-round-bottom-4-neck-small-angled-20'}],
+  'photos': [{'file': 'four-neck-flask-1.jpg',
+              'source': 'lw:flask-round-bottom-4-neck-angled-2_1',
+              'page': 'https://www.labware-shop.com/product-page/flask-round-bottom-4-neck-angled-2'},
+             {'file': 'four-neck-flask-2.jpg',
+              'source': 'lw:flask-round-bottom-4-neck-angled-2_3',
+              'page': 'https://www.labware-shop.com/product-page/flask-round-bottom-4-neck-angled-2'},
+             {'file': 'four-neck-flask-3.jpg',
+              'source': 'lw:flask-round-bottom-4-neck-small-angled-20_0',
+              'page': 'https://www.labware-shop.com/product-page/flask-round-bottom-4-neck-small-angled-20'},
+             {'file': 'four-neck-flask-4.jpg',
+              'source': 'lw:flask-round-bottom-4-neck-small-angled-20_3',
+              'page': 'https://www.labware-shop.com/product-page/flask-round-bottom-4-neck-small-angled-20'}]},
+ {'slug': 'ground-glass-joint',
+  'category': 'adapters',
+  'name': 'Ground-glass joint',
+  'catalog_name': None,
+  'description': 'The standard way glassware is joined: a ground inner cone (the male part) slides '
+                 'into a ground outer socket (the female part). Joints are made to standard sizes, '
+                 'written as the widest diameter and the length in millimetres (NS 29/32, NS '
+                 '14.5/23), so any flask fits any condenser of the same size and an apparatus goes '
+                 'together like a construction kit. Turn the parts gently as you join them, and '
+                 'keep resins and strong alkali off the ground surfaces.',
+  'aliases': ['Taper joint', 'Standard taper joint', 'Cone and socket', 'Ground joint', 'NS joint'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Ground_glass_joint_open.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Ground_glass_joint_closed.jpg'}],
+  'photos': [{'file': 'ground-glass-joint-1.jpg',
+              'source': 'wm:Ground glass joint open.jpg',
+              'credit': 'Phasmatisnox, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'ground-glass-joint-2.jpg',
+              'source': 'wm:Ground glass joint closed.jpg',
+              'credit': 'Phasmatisnox, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'screw-clamp',
+  'category': 'bench',
+  'name': 'Screw clamp',
+  'catalog_name': None,
+  'description': 'A small metal frame with a screw that squeezes a piece of rubber tubing. '
+                 'Tightened fully it closes the tube; opened a little it lets through a controlled '
+                 'trickle of gas or air — for example to set the pressure of a water-pump vacuum '
+                 'by letting in a tiny leak.',
+  'aliases': ['Hoffman clamp', 'Tubing clamp', 'Hose clamp', 'Pinchcock'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Tubing_clamp-single_1.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Tubing_clamp-single_2.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Tubing_clamp-single_3.jpg'}],
+  'photos': [{'file': 'screw-clamp-1.jpg',
+              'source': 'wm:Tubing clamp-single 1.jpg',
+              'credit': 'Nadina Wiórkiewicz, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'screw-clamp-2.jpg',
+              'source': 'wm:Tubing clamp-single 2.jpg',
+              'credit': 'Nadina Wiórkiewicz, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'screw-clamp-3.jpg',
+              'source': 'wm:Tubing clamp-single 3.jpg',
+              'credit': 'Nadina Wiórkiewicz, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'microscope-slide',
+  'category': 'tubes',
+  'name': 'Microscope slide and cover slip',
+  'catalog_name': None,
+  'description': 'A thin flat strip of glass, with an even thinner square cover glass laid on top. '
+                 'A few crystals pressed between them can be watched under a microscope — on a '
+                 'hot-stage microscope, as they melt.',
+  'aliases': ['Slide', 'Glass slide', 'Cover slip', 'Cover glass', 'Microscope slide'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Fedolemez.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Glass_slide.jpg'}],
+  'photos': [{'file': 'microscope-slide-1.jpg',
+              'source': 'wm:Fedolemez.jpg',
+              'credit': 'Szőcs Tamás, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'microscope-slide-2.jpg',
+              'source': 'wm:Glass slide.jpg',
+              'credit': 'Whispyhistory, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'pointed-flask',
+  'category': 'flasks',
+  'name': 'Pointed flask',
+  'catalog_name': None,
+  'description': 'A flask whose bottom narrows to a point. The last drops of a liquid gather in '
+                 'the tip, so a distillation of a few millilitres can be taken almost to dryness '
+                 'without loss — the reason it is used as a distilling flask for semimicro '
+                 'amounts.',
+  'aliases': ['Conical-bottom flask', 'Pointed-bottom flask', 'Kjeldahl-type pointed flask'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Spitzkolben.png'}],
+  'photos': [{'file': 'pointed-flask-1.jpg',
+              'source': 'wm:Spitzkolben.png',
+              'credit': 'MediaLab TH Köln, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'centrifuge-tube',
+  'category': 'tubes',
+  'name': 'Centrifuge tube',
+  'catalog_name': None,
+  'description': 'A strong tube, often with a conical bottom, made to be spun in a centrifuge. The '
+                 'solid is packed into the tip, the liquid is poured or sucked off, and the last '
+                 'solvent can be pumped away with the tube connected to a vacuum line. Ordinary '
+                 'test tubes must not go into a centrifuge.',
+  'aliases': ['Conical centrifuge tube', 'Falcon tube', 'Glass centrifuge tube'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:50ml_Falcon_tubes-01.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Zentrifugenglas.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:25ml_tube.jpg'}],
+  'photos': [{'file': 'centrifuge-tube-1.jpg',
+              'source': 'wm:50ml Falcon tubes-01.jpg',
+              'credit': 'Lilly_M, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'centrifuge-tube-2.jpg',
+              'source': 'wm:Zentrifugenglas.jpg',
+              'credit': 'Gmhofmann, public domain, via Wikimedia Commons'},
+             {'file': 'centrifuge-tube-3.jpg',
+              'source': 'wm:25ml tube.jpg',
+              'credit': 'Karbohut, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'ampoule',
+  'category': 'tubes',
+  'name': 'Ampoule',
+  'catalog_name': None,
+  'description': 'A small glass vessel sealed shut in a flame. Small amounts of a substance, or '
+                 'substances that air, light or moisture would spoil, are kept in ampoules; one '
+                 'can be made from a test tube by drawing out its neck. It is filled no more than '
+                 'half-way through a long-stemmed funnel, so nothing touches the neck that is to '
+                 'be sealed.',
+  'aliases': ['Ampule', 'Sealed ampoule', 'Glass ampoule'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/ampul-drying'},
+                      {'url': 'https://www.labware-shop.com/product-page/ampul-drying-1'}],
+  'photos': [{'file': 'ampoule-1.jpg',
+              'source': 'lw:ampul-drying_0',
+              'page': 'https://www.labware-shop.com/product-page/ampul-drying'},
+             {'file': 'ampoule-2.jpg',
+              'source': 'lw:ampul-drying_2',
+              'page': 'https://www.labware-shop.com/product-page/ampul-drying'},
+             {'file': 'ampoule-3.jpg',
+              'source': 'lw:ampul-drying-1_0',
+              'page': 'https://www.labware-shop.com/product-page/ampul-drying-1'}]},
+ {'slug': 'stoppered-bottle',
+  'category': 'flasks',
+  'name': 'Glass-stoppered bottle',
+  'catalog_name': None,
+  'description': 'The traditional bottle for keeping reagents, closed with a ground-glass stopper. '
+                 'Wide-mouthed ones take solids and thick liquids, narrow-mouthed ones liquids; '
+                 'brown glass protects substances that light decomposes. Every bottle must carry a '
+                 'clear label.',
+  'aliases': ['Reagent bottle with glass stopper',
+              'Ground-glass stoppered bottle',
+              'Narrow-mouth bottle',
+              'Wide-mouth bottle',
+              'Powder bottle'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Pharmacy-bottles-blue_hg.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Bottle,_apothecary_(AM_629318-1).jpg'}],
+  'photos': [{'file': 'stoppered-bottle-1.jpg',
+              'source': 'wm:Pharmacy-bottles-blue hg.jpg',
+              'credit': 'Hannes Grobe, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'stoppered-bottle-2.jpg',
+              'source': 'wm:Bottle, apothecary (AM 629318-1).jpg',
+              'credit': 'Auckland Museum, CC BY 4.0, via Wikimedia Commons'}]},
+ {'slug': 'test-tube-rack',
+  'category': 'tubes',
+  'name': 'Test tube rack',
+  'catalog_name': None,
+  'description': 'A stand with rows of holes that holds test tubes upright, so several small '
+                 'reactions can be set up and watched side by side.',
+  'aliases': ['Tube rack', 'Test tube stand', 'Test-tube rack'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Reagenzglasst%C3%A4nder_Zucker-Museum.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:3D_printed_test_tube_rack_in_use.jpg'}],
+  'photos': [{'file': 'test-tube-rack-1.jpg',
+              'source': 'wm:Reagenzglasständer Zucker-Museum.jpg',
+              'credit': 'FA2010, public domain, via Wikimedia Commons'},
+             {'file': 'test-tube-rack-2.jpg',
+              'source': 'wm:3D printed test tube rack in use.jpg',
+              'credit': 'Frank Markesteijn, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'test-tube-holder',
+  'category': 'tools',
+  'name': 'Test tube holder',
+  'catalog_name': None,
+  'description': 'A spring clip on a handle, wooden or metal, that grips a test tube so it can be '
+                 'held in a flame or shaken without burning the fingers.',
+  'aliases': ['Test tube clamp', 'Test tube tongs', 'Tube holder'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Test_Tube_Holder2_2015.JPG'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Two_small_test_tubes_held_in_spring_clamps.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Vorsicht_beim_Erhitzen_von_Fl%C3%BCssigkeiten_im_Reagenzglas.jpg'}],
+  'photos': [{'file': 'test-tube-holder-1.jpg',
+              'source': 'wm:Test Tube Holder2 2015.JPG',
+              'credit': 'Nacharee.jung, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'test-tube-holder-2.jpg',
+              'source': 'wm:Two small test tubes held in spring clamps.jpg',
+              'credit': 'Amitchell125, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'test-tube-holder-3.jpg',
+              'source': 'wm:Vorsicht beim Erhitzen von Flüssigkeiten im Reagenzglas.jpg',
+              'credit': 'B.Lachner, CC0, via Wikimedia Commons'}]},
+ {'slug': 'intensive-condenser',
+  'category': 'condensers',
+  'name': 'Intensive condenser',
+  'catalog_name': None,
+  'description': 'A condenser that combines a Liebig water jacket with a Dimroth cooling coil '
+                 'inside, so the vapour is cooled from both sides. It condenses even diethyl '
+                 'ether. It is expensive and, full of water, heavy, so it must be clamped '
+                 'especially firmly.',
+  'aliases': ['Double-surface condenser', 'Jacketed coil condenser', 'Liebig-Dimroth condenser'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Intensivkuehler.jpg'},
+                      {'url': 'https://www.labware-shop.com/product-page/condenser-reflux-large-cooling-capacity'}],
+  'photos': [{'file': 'intensive-condenser-1.jpg',
+              'source': 'lw:condenser-reflux-large-cooling-capacity_0',
+              'page': 'https://www.labware-shop.com/product-page/condenser-reflux-large-cooling-capacity'},
+             {'file': 'intensive-condenser-2.jpg',
+              'source': 'lw:condenser-reflux-large-cooling-capacity_1',
+              'page': 'https://www.labware-shop.com/product-page/condenser-reflux-large-cooling-capacity'},
+             {'file': 'intensive-condenser-3.jpg',
+              'source': 'lw:condenser-reflux-large-cooling-capacity_2',
+              'page': 'https://www.labware-shop.com/product-page/condenser-reflux-large-cooling-capacity'},
+             {'file': 'intensive-condenser-4.jpg',
+              'source': 'wm:Intensivkuehler.jpg',
+              'credit': 'Armin Kübelbeck, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'anschutz-adapter',
+  'category': 'adapters',
+  'name': 'Anschütz adapter',
+  'catalog_name': None,
+  'description': 'An adapter with two parallel joints on top, fitted into one neck of a flask. On '
+                 'a three-neck flask it gives a fourth opening, so a liquid can be added to a '
+                 'stirred, refluxing mixture while its temperature is measured.',
+  'aliases': ['Anschuetz adapter', 'Anschütz head', 'Two-neck adapter, straight'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/adapter-connecting-y-shaped'}],
+  'photos': [{'file': 'anschutz-adapter-1.jpg',
+              'source': 'lw:adapter-connecting-y-shaped_0',
+              'page': 'https://www.labware-shop.com/product-page/adapter-connecting-y-shaped'},
+             {'file': 'anschutz-adapter-2.jpg',
+              'source': 'lw:adapter-connecting-y-shaped_1',
+              'page': 'https://www.labware-shop.com/product-page/adapter-connecting-y-shaped'},
+             {'file': 'anschutz-adapter-3.jpg',
+              'source': 'lw:adapter-connecting-y-shaped_2',
+              'page': 'https://www.labware-shop.com/product-page/adapter-connecting-y-shaped'}]},
+ {'slug': 'three-neck-adapter',
+  'category': 'adapters',
+  'name': 'Three-neck adapter',
+  'catalog_name': None,
+  'description': 'An adapter that turns a single neck into three parallel openings. For small '
+                 'flasks it replaces a three-neck flask: reagents are added through the condenser '
+                 'and the temperature is followed in the outer bath.',
+  'aliases': ['Three-way adapter', 'Triple adapter', 'Three-joint head'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/adapter-claisen-three-neck'}],
+  'photos': [{'file': 'three-neck-adapter-1.jpg',
+              'source': 'lw:adapter-claisen-three-neck_0',
+              'page': 'https://www.labware-shop.com/product-page/adapter-claisen-three-neck'},
+             {'file': 'three-neck-adapter-2.jpg',
+              'source': 'lw:adapter-claisen-three-neck_1',
+              'page': 'https://www.labware-shop.com/product-page/adapter-claisen-three-neck'},
+             {'file': 'three-neck-adapter-3.jpg',
+              'source': 'lw:adapter-claisen-three-neck_2',
+              'page': 'https://www.labware-shop.com/product-page/adapter-claisen-three-neck'}]},
+ {'slug': 'stirrer-motor',
+  'category': 'bench',
+  'name': 'Overhead stirrer',
+  'catalog_name': None,
+  'description': 'An electric motor clamped above the flask that turns a stirrer shaft. The speed '
+                 'is set with a knob; the motor must line up exactly with the shaft, which is '
+                 'coupled to it with a flexible joint. Before switching on, turn the stirrer by '
+                 'hand to check that it runs freely. Ordinary motors spark, so near flammable '
+                 'vapours a water or air turbine is used instead.',
+  'aliases': ['Stirrer motor', 'Overhead stirring motor', 'Laboratory stirrer'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:RZR_2051_control.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Mechanical_stirrer_engine.jpg'}],
+  'photos': [{'file': 'stirrer-motor-1.jpg',
+              'source': 'wm:RZR 2051 control.jpg',
+              'credit': 'Evaporation Expert, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'stirrer-motor-2.jpg',
+              'source': 'wm:Mechanical stirrer engine.jpg',
+              'credit': 'Polimerek, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'stirrer-bearing',
+  'category': 'bench',
+  'name': 'Stirrer bearing',
+  'catalog_name': None,
+  'description': 'The seal through which a stirrer shaft enters a flask neck. A precision-ground '
+                 'glass sleeve (a KPG stirrer) runs with a little special grease and should not '
+                 'turn faster than about 600 rpm; a screw-cap bearing with a PTFE seal holds a '
+                 'vacuum even while the shaft turns.',
+  'aliases': ['Stirrer guide', 'Stirrer seal', 'KPG stirrer', 'Stirrer gland'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/adapter-for-stirring-blade'},
+                      {'url': 'https://www.labware-shop.com/product-page/stirring-seals-for-overhead-stirrer-teflon-with-o-ring'}],
+  'photos': [{'file': 'stirrer-bearing-1.jpg',
+              'source': 'lw:adapter-for-stirring-blade_0',
+              'page': 'https://www.labware-shop.com/product-page/adapter-for-stirring-blade'},
+             {'file': 'stirrer-bearing-2.jpg',
+              'source': 'lw:stirring-seals-for-overhead-stirrer-teflon-with-o-ring_0',
+              'page': 'https://www.labware-shop.com/product-page/stirring-seals-for-overhead-stirrer-teflon-with-o-ring'},
+             {'file': 'stirrer-bearing-3.jpg',
+              'source': 'lw:stirring-seals-for-overhead-stirrer-teflon-with-o-ring_1',
+              'page': 'https://www.labware-shop.com/product-page/stirring-seals-for-overhead-stirrer-teflon-with-o-ring'}]},
+ {'slug': 'ultrasonic-bath',
+  'category': 'bench',
+  'name': 'Ultrasonic bath',
+  'catalog_name': None,
+  'description': 'A steel tank of water shaken by ultrasound. A flask stood in it is sonicated: '
+                 'solids break up, dissolve faster and react more readily — it helps, for example, '
+                 'to start a Grignard reaction or a reduction with an alkali metal. It also cleans '
+                 'glassware.',
+  'aliases': ['Sonicator', 'Ultrasonic cleaner', 'Sonication bath'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Bandelin-sonorex_hg.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Ultrasonic_bath_1.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Cuves_ultrasons.jpg'}],
+  'photos': [{'file': 'ultrasonic-bath-1.jpg',
+              'source': 'wm:Bandelin-sonorex hg.jpg',
+              'credit': 'Hannes Grobe, CC BY 3.0, via Wikimedia Commons'},
+             {'file': 'ultrasonic-bath-2.jpg',
+              'source': 'wm:Ultrasonic bath 1.jpg',
+              'credit': 'Karelj, public domain, via Wikimedia Commons'},
+             {'file': 'ultrasonic-bath-3.jpg',
+              'source': 'wm:Cuves ultrasons.jpg',
+              'credit': 'MHC TECHNOLOGY, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'shaker',
+  'category': 'bench',
+  'name': 'Laboratory shaker',
+  'catalog_name': None,
+  'description': 'A machine that shakes flasks or bottles for hours. It keeps heavy solids such as '
+                 'zinc dust or sodium amalgam moving through a liquid and is used for reactions in '
+                 'shaken autoclaves; the vessels must be clamped very firmly.',
+  'aliases': ['Shaker', 'Shaking machine', 'Orbital shaker', 'Flask shaker'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:19112007040.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Velkokapacitni_trepacka_-_shaker.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Laboratory_microbiological_shaker_with_cultures-01.jpg'}],
+  'photos': [{'file': 'shaker-1.jpg',
+              'source': 'wm:19112007040.jpg',
+              'credit': 'Karel Schmiedberger ml., public domain, via Wikimedia Commons'},
+             {'file': 'shaker-2.jpg',
+              'source': 'wm:Velkokapacitni trepacka - shaker.jpg',
+              'credit': 'Karel Schmiedberger ml., CC BY 3.0, via Wikimedia Commons'},
+             {'file': 'shaker-3.jpg',
+              'source': 'wm:Laboratory microbiological shaker with cultures-01.jpg',
+              'credit': 'Matylda Sęk, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'rotameter',
+  'category': 'measuring',
+  'name': 'Rotameter',
+  'catalog_name': None,
+  'description': 'A vertical glass tube that widens towards the top, with a small float inside. '
+                 'Gas flowing up lifts the float until it balances; the height on the scale shows '
+                 'the flow rate.',
+  'aliases': ['Gas flowmeter', 'Variable-area flowmeter', 'Float flowmeter'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Flowmeter_float.JPG'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Rotameter.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Flow-tube-meter_hg.jpg'}],
+  'photos': [{'file': 'rotameter-1.jpg',
+              'source': 'wm:Flowmeter float.JPG',
+              'credit': 'Cjp24, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'rotameter-2.jpg',
+              'source': 'wm:Rotameter.jpg',
+              'credit': 'unknown author, public domain, via Wikimedia Commons'},
+             {'file': 'rotameter-3.jpg',
+              'source': 'wm:Flow-tube-meter hg.jpg',
+              'credit': 'Hannes Grobe, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'woulfe-bottle',
+  'category': 'vacuum',
+  'name': 'Woulfe bottle',
+  'catalog_name': None,
+  'description': 'A thick-walled bottle with two or three necks, used as a safety trap between a '
+                 'water-jet pump and the apparatus. If the water pressure drops, water sucked back '
+                 'from the pump is caught here instead of in the flask or manometer, and a tap on '
+                 'it lets air in before the pump is turned off.',
+  'aliases': ['Woulff bottle', 'Safety bottle', 'Two-neck bottle', 'Three-neck bottle'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Woulfe_bottle_01.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Woulfe_bottle_02.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Woulfesche_Flasche_Glas.jpg'}],
+  'photos': [{'file': 'woulfe-bottle-1.jpg',
+              'source': 'wm:Woulfe bottle 01.jpg',
+              'credit': 'Steffen 962, CC0, via Wikimedia Commons'},
+             {'file': 'woulfe-bottle-2.jpg',
+              'source': 'wm:Woulfe bottle 02.jpg',
+              'credit': 'Steffen 962, CC0, via Wikimedia Commons'},
+             {'file': 'woulfe-bottle-3.jpg',
+              'source': 'wm:Woulfesche Flasche Glas.jpg',
+              'credit': 'Struppi, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'gas-cylinder',
+  'category': 'vacuum',
+  'name': 'Gas cylinder',
+  'catalog_name': None,
+  'description': 'A steel bottle of compressed or liquefied gas. The colour of the body and the '
+                 'thread of the valve show the gas — hydrogen and other flammable gases have '
+                 'left-hand threads. Cylinders are chained upright to a wall, kept away from heat, '
+                 'and the gas is taken off only through a pressure regulator.',
+  'aliases': ['Compressed gas cylinder', 'Gas bottle', 'Steel cylinder'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:2008-07-24_Bundle_of_compressed_gas_bottles.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Gas_cylinder_ammonia.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:P3230006_(7322939).jpg'}],
+  'photos': [{'file': 'gas-cylinder-1.jpg',
+              'source': 'wm:2008-07-24 Bundle of compressed gas bottles.jpg',
+              'credit': 'Ildar Sagdejev (Specious), CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'gas-cylinder-2.jpg',
+              'source': 'wm:Gas cylinder ammonia.jpg',
+              'credit': 'Masur, public domain, via Wikimedia Commons'},
+             {'file': 'gas-cylinder-3.jpg',
+              'source': 'wm:P3230006 (7322939).jpg',
+              'credit': 'Robert Cudmore from Marseille, France, CC BY-SA 2.0, via Wikimedia '
+                        'Commons'}]},
+ {'slug': 'gas-regulator',
+  'category': 'vacuum',
+  'name': 'Pressure regulator',
+  'catalog_name': None,
+  'description': 'The valve screwed onto a gas cylinder that turns its high pressure into a steady '
+                 'low pressure. One gauge shows the cylinder pressure, the other the delivered '
+                 'pressure, and a shut-off valve sets the flow. Regulators for oxygen must be kept '
+                 'free of oil and grease.',
+  'aliases': ['Gas regulator', 'Cylinder regulator', 'Reducing valve', 'Pressure-reducing valve'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Gas_regulator.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:A_nitrogen_gas_cylinder_with_pressure-relief_devices.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Pressure_regulator_by_AGA.jpg'}],
+  'photos': [{'file': 'gas-regulator-1.jpg',
+              'source': 'wm:Gas regulator.jpg',
+              'credit': 'Rifleman 82, public domain, via Wikimedia Commons'},
+             {'file': 'gas-regulator-2.jpg',
+              'source': 'wm:A nitrogen gas cylinder with pressure-relief devices.jpg',
+              'credit': 'Seaborg, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'gas-regulator-3.jpg',
+              'source': 'wm:Pressure regulator by AGA.jpg',
+              'credit': 'Cjp24, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'hot-plate',
+  'category': 'bench',
+  'name': 'Hot plate',
+  'catalog_name': None,
+  'description': 'An electric heating plate with a temperature control, used to heat baths and '
+                 'flat-bottomed vessels. A plate with an exposed heating coil counts as an open '
+                 'flame, and flammable liquids must not be heated directly on it.',
+  'aliases': ['Electric hot plate', 'Hotplate', 'Electric heater'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Hot_plate_2015.JPG'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Laboratory_hot_plate.JPG'}],
+  'photos': [{'file': 'hot-plate-1.jpg',
+              'source': 'wm:Hot plate 2015.JPG',
+              'credit': 'Athikhun.suw, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'hot-plate-2.jpg',
+              'source': 'wm:Laboratory hot plate.JPG',
+              'credit': 'Jeffrey M. Vinocur, CC BY 2.5, via Wikimedia Commons'}]},
+ {'slug': 'wire-gauze',
+  'category': 'bench',
+  'name': 'Wire gauze',
+  'catalog_name': None,
+  'description': 'A square of wire mesh with a heat-resistant centre, laid on a tripod between the '
+                 'flame and the vessel. It spreads the heat so the glass is not heated at one '
+                 'spot, and with it a burner becomes the simplest air bath.',
+  'aliases': ['Gauze mat', 'Ceramic-centred gauze', 'Asbestos gauze', 'Wire mesh'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:12.5cm_by_12.5cm_Wire_Gauze.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:15cm_by_15cm_Wire_Gauze.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Wire_Gauze.jpg'}],
+  'photos': [{'file': 'wire-gauze-1.jpg',
+              'source': 'wm:12.5cm by 12.5cm Wire Gauze.jpg',
+              'credit': 'U5780138, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'wire-gauze-2.jpg',
+              'source': 'wm:15cm by 15cm Wire Gauze.jpg',
+              'credit': 'U5780138, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'wire-gauze-3.jpg',
+              'source': 'wm:Wire Gauze.jpg',
+              'credit': 'U5780138, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'water-bath',
+  'category': 'bench',
+  'name': 'Water bath',
+  'catalog_name': None,
+  'description': 'A tank of water kept warm by an electric heater, for heating up to 100 °C. Water '
+                 'responds quickly, so the temperature can be held very precisely, and a level '
+                 'regulator connected to the tap keeps it topped up. It must never be used with '
+                 'sodium, potassium, metal hydrides or anything else that reacts with water.',
+  'aliases': ['Heating bath', 'Thermostatic water bath', 'Bain-marie'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Bain-marie_laboratoire.JPG'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Circulating_water_bath_2015.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Wasserbad.jpg'}],
+  'photos': [{'file': 'water-bath-1.jpg',
+              'source': 'wm:Bain-marie laboratoire.JPG',
+              'credit': 'unknown author, public domain, via Wikimedia Commons'},
+             {'file': 'water-bath-2.jpg',
+              'source': 'wm:Circulating water bath 2015.jpg',
+              'credit': 'Athikhun.suw, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'water-bath-3.jpg',
+              'source': 'wm:Wasserbad.jpg',
+              'credit': 'Karbohut, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'oil-bath',
+  'category': 'bench',
+  'name': 'Oil bath',
+  'catalog_name': None,
+  'description': 'A dish of silicone oil (or of polyethylene glycol) heated on a hot plate, for '
+                 'temperatures above 100 °C — silicone oil to about 250 °C. A thermometer always '
+                 'stands in it. A drop of water makes hot oil foam and spit, so the condenser is '
+                 'fitted with a paper collar; hot oil is wiped off the flask straight after use.',
+  'aliases': ['Silicone oil bath', 'Heating bath, oil', 'Glycol bath'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Oil_bath.jpg'}],
+  'photos': [{'file': 'oil-bath-1.jpg',
+              'source': 'wm:Oil bath.jpg',
+              'credit': 'Sonal Shinde, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'boiling-chips',
+  'category': 'bench',
+  'name': 'Boiling chips',
+  'catalog_name': None,
+  'description': 'Small pieces of unglazed, fired porcelain dropped into a liquid before it is '
+                 'heated. Their pores release tiny bubbles on which the liquid boils smoothly, '
+                 'preventing superheating and sudden violent boiling. They are never added to a '
+                 'liquid that is already hot, and each chip works only once: once cooled, its '
+                 'pores fill with liquid.',
+  'aliases': ['Boiling stones', 'Anti-bumping granules', 'Porous pot'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Siedesteinchen.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Siedesteinen_auf_Uhrglas.jpg'}],
+  'photos': [{'file': 'boiling-chips-1.jpg',
+              'source': 'wm:Siedesteinchen.jpg',
+              'credit': 'Carsten Niehaus, public domain, via Wikimedia Commons'},
+             {'file': 'boiling-chips-2.jpg',
+              'source': 'wm:Siedesteinen auf Uhrglas.jpg',
+              'credit': 'B.Lachner, CC0, via Wikimedia Commons'}]},
+ {'slug': 'circulator',
+  'category': 'bench',
+  'name': 'Circulating thermostat',
+  'catalog_name': None,
+  'description': 'A bath with a pump, heater and refrigeration unit that sends a liquid at a set '
+                 'temperature through the jacket of a reaction vessel or a condenser. '
+                 'Low-temperature models (cryostats) hold down to about −80 °C.',
+  'aliases': ['Cryostat', 'Refrigerated circulator', 'Chiller', 'Thermostat'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:ThermoFlex_900-Recirculating_Chiller.jpg'}],
+  'photos': [{'file': 'circulator-1.jpg',
+              'source': 'wm:ThermoFlex 900-Recirculating Chiller.jpg',
+              'credit': 'Nadina Wiórkiewicz, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'heat-gun',
+  'category': 'tools',
+  'name': 'Heat gun',
+  'catalog_name': None,
+  'description': 'A hand-held blower of hot air. It dries glassware, melts a solid that has set in '
+                 'a condenser, and chases the last drops of a fore-run out of a microscale '
+                 'distillation head.',
+  'aliases': ['Hot-air gun', 'Hair dryer', 'Heat blower'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Hot_air_gun_(1).jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Hot_air_gun_(2).jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Heat_Gun.JPG'}],
+  'photos': [{'file': 'heat-gun-1.jpg',
+              'source': 'wm:Hot air gun (1).jpg',
+              'credit': 'Suyash Dwivedi, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'heat-gun-2.jpg',
+              'source': 'wm:Hot air gun (2).jpg',
+              'credit': 'Suyash Dwivedi, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'heat-gun-3.jpg',
+              'source': 'wm:Heat Gun.JPG',
+              'credit': 'Jmdestefanis, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'drying-oven',
+  'category': 'vacuum',
+  'name': 'Drying oven',
+  'catalog_name': None,
+  'description': 'A heated cabinet for drying glassware and solids that do not decompose on '
+                 'heating. Even small amounts of flammable liquids must not be evaporated in it.',
+  'aliases': ['Oven', 'Laboratory oven', 'Drying cabinet'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Trockenschrank.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Drying_owen_1.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Drying_owen_2.jpg'}],
+  'photos': [{'file': 'drying-oven-1.jpg',
+              'source': 'wm:Trockenschrank.jpg',
+              'credit': 'unknown author, CC BY 2.5, via Wikimedia Commons'},
+             {'file': 'drying-oven-2.jpg',
+              'source': 'wm:Drying owen 1.jpg',
+              'credit': 'Karelj, public domain, via Wikimedia Commons'},
+             {'file': 'drying-oven-3.jpg',
+              'source': 'wm:Drying owen 2.jpg',
+              'credit': 'Karelj, public domain, via Wikimedia Commons'}]},
+ {'slug': 'fume-hood',
+  'category': 'tools',
+  'name': 'Fume hood',
+  'catalog_name': None,
+  'description': 'A ventilated cabinet with a sliding glass front where work with toxic, smelly or '
+                 'flammable substances is done. Air is drawn in past the operator and away through '
+                 'the duct, so vapours never reach the room; reagents that give off poisonous '
+                 'fumes are stored on a shelf inside it.',
+  'aliases': ['Fume cupboard', 'Hood', 'Extraction hood'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Fume-hood.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Fume_hood.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Fume_hood_MB.jpg'}],
+  'photos': [{'file': 'fume-hood-1.jpg',
+              'source': 'wm:Fume-hood.jpg',
+              'credit': 'Giovanna Canu, Sofia Gambaro, Francesca Cirisano, CNR-ICMATE, CC BY 4.0, '
+                        'via Wikimedia Commons'},
+             {'file': 'fume-hood-2.jpg',
+              'source': 'wm:Fume hood.jpg',
+              'credit': 'unknown author, public domain, via Wikimedia Commons'},
+             {'file': 'fume-hood-3.jpg',
+              'source': 'wm:Fume hood MB.jpg',
+              'credit': 'Miha Bukleski, CC BY 4.0, via Wikimedia Commons'}]},
+ {'slug': 'autoclave',
+  'category': 'vacuum',
+  'name': 'Autoclave',
+  'catalog_name': None,
+  'description': 'A thick steel vessel with a bolted lid, a pressure gauge, a valve and a well for '
+                 'a thermometer, for reactions at high pressure — up to about 350 atm and 350 °C. '
+                 'It is heated in an electric furnace and rocked or stirred, used in special '
+                 'rooms, and never cooled with water while hot.',
+  'aliases': ['Pressure reactor', 'Rocking autoclave', 'Steel autoclave', 'Parr reactor'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Figure-1-High-pressure-reactors-and-control-reactors.jpg'}],
+  'photos': [{'file': 'autoclave-1.jpg',
+              'source': 'wm:Figure-1-High-pressure-reactors-and-control-reactors.jpg',
+              'credit': 'Martina Schedler et al., CC BY 4.0, via Wikimedia Commons'}]},
+ {'slug': 'glass-autoclave',
+  'category': 'vacuum',
+  'name': 'Glass pressure reactor',
+  'catalog_name': None,
+  'description': 'A glass reaction vessel, from about 100 mL, inside a steel safety shield, for '
+                 'moderate pressures — up to about 10 bar at 100 °C. Unlike a steel autoclave it '
+                 'lets the reaction be watched; it is stirred magnetically.',
+  'aliases': ['Glass autoclave', 'Pressure-rated glass reactor'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Glass_Pressure_Reactor.jpg'}],
+  'photos': [{'file': 'glass-autoclave-1.jpg',
+              'source': 'wm:Glass Pressure Reactor.jpg',
+              'credit': 'Rudyher27, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'water-aspirator',
+  'category': 'vacuum',
+  'name': 'Water aspirator',
+  'catalog_name': None,
+  'description': 'A glass or plastic jet on a water tap: water rushing through a narrow nozzle '
+                 'drags air with it and sucks out the apparatus. Its vacuum is limited by the '
+                 'vapour pressure of water, 8–15 mm Hg, and it uses a lot of water. It is always '
+                 'connected through a safety bottle, and air is let in before the tap is turned '
+                 'off.',
+  'aliases': ['Water-jet pump', 'Water pump', 'Filter pump', 'Aspirator'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Aspirator_sample1.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:CIglass_aspirator_3.jpg'}],
+  'photos': [{'file': 'water-aspirator-1.jpg',
+              'source': 'wm:Aspirator sample1.jpg',
+              'credit': 'GOKLuLe 盧樂, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'water-aspirator-2.jpg',
+              'source': 'wm:CIglass aspirator 3.jpg',
+              'credit': 'GOKLuLe 盧樂, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'diaphragm-pump',
+  'category': 'vacuum',
+  'name': 'Diaphragm pump',
+  'catalog_name': None,
+  'description': 'An electric vacuum pump in which a flexing membrane moves the gas, with no oil '
+                 'and no water. It is made of corrosion-resistant materials, reaches about 2–80 '
+                 'mbar, and collects the pumped solvents in a built-in separator — which is why it '
+                 'is replacing the water aspirator.',
+  'aliases': ['Membrane pump', 'Membrane vacuum pump', 'Oil-free vacuum pump'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Diaphragm_pump.JPG'}],
+  'photos': [{'file': 'diaphragm-pump-1.jpg',
+              'source': 'wm:Diaphragm pump.JPG',
+              'credit': 'Agne27, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'rotary-vane-pump',
+  'category': 'vacuum',
+  'name': 'Rotary vane pump',
+  'catalog_name': None,
+  'description': 'An oil-sealed pump in which an off-centre rotor compresses the gas and pushes it '
+                 'out, giving a vacuum of 0.01–1 mm Hg. Corrosive and easily condensed vapours '
+                 'ruin the oil, so a cold trap or a gas-ballast valve is fitted in front of it.',
+  'aliases': ['Oil pump', 'Rotary oil pump', 'Vacuum pump'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Edwards_E2M2_2-Stage_Rotary_Vane_Vacuum_Pump_(15957733526).jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:High-vacuum_pump.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:%C3%96l-Rotations-Vakuumpumpe_der_Firma_Vacuubrand_Wertheim_-_LABW_-_Staatsarchiv_Wertheim_S-N_70_G_3173.jpg'}],
+  'photos': [{'file': 'rotary-vane-pump-1.jpg',
+              'source': 'wm:Edwards E2M2 2-Stage Rotary Vane Vacuum Pump (15957733526).jpg',
+              'credit': 'Kitmondo Marketplace, CC BY 2.0, via Wikimedia Commons'},
+             {'file': 'rotary-vane-pump-2.jpg',
+              'source': 'wm:High-vacuum pump.jpg',
+              'credit': 'University of Dundee Museum Services, CC BY-SA 4.0, via Wikimedia '
+                        'Commons'},
+             {'file': 'rotary-vane-pump-3.jpg',
+              'source': 'wm:Öl-Rotations-Vakuumpumpe der Firma Vacuubrand Wertheim - LABW - '
+                        'Staatsarchiv Wertheim S-N 70 G 3173.jpg',
+              'credit': 'Landesarchiv Baden-Württemberg, CC BY 4.0, via Wikimedia Commons'}]},
+ {'slug': 'diffusion-pump',
+  'category': 'vacuum',
+  'name': 'Diffusion pump',
+  'catalog_name': None,
+  'description': 'A pump for high vacuum, below 10⁻³ mm Hg, in which a jet of boiling oil or '
+                 'mercury vapour sweeps gas molecules towards an oil pump behind it. It needs '
+                 'cooling water, and a flow monitor linked to the heater is a sensible protection.',
+  'aliases': ['Oil diffusion pump', 'Mercury diffusion pump', 'High-vacuum pump'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:A_simplified_oil_diffusion_pump.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:M6_Diffusion_Pump.jpg'}],
+  'photos': [{'file': 'diffusion-pump-1.jpg',
+              'source': 'wm:A simplified oil diffusion pump.jpg',
+              'credit': 'Antigng, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'diffusion-pump-2.jpg',
+              'source': 'wm:M6 Diffusion Pump.jpg',
+              'credit': 'Kkmurray, CC BY 3.0, via Wikimedia Commons'}]},
+ {'slug': 'mcleod-gauge',
+  'category': 'measuring',
+  'name': 'McLeod gauge',
+  'catalog_name': None,
+  'description': 'A mercury gauge for rough-to-medium vacuum, 1–10⁻³ mm Hg. Tilting it traps a '
+                 'known volume of the gas and squeezes it with mercury into a narrow tube, and the '
+                 'compressed volume on the scale gives the original pressure. It reads correctly '
+                 'only when no condensable vapour is present.',
+  'aliases': ['Compression gauge', 'Gaede gauge', 'Vacuum compression gauge'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:McLeod_gauge.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:McLeod_gauge_01.jpg'}],
+  'photos': [{'file': 'mcleod-gauge-1.jpg',
+              'source': 'wm:McLeod gauge.jpg',
+              'credit': 'Ytrottier, CC BY 2.5, via Wikimedia Commons'},
+             {'file': 'mcleod-gauge-2.jpg',
+              'source': 'wm:McLeod gauge 01.jpg',
+              'credit': 'Ytrottier, Amada44, CC BY 2.5, via Wikimedia Commons'}]},
+ {'slug': 'three-way-stopcock',
+  'category': 'closures',
+  'name': 'Three-way stopcock',
+  'catalog_name': None,
+  'description': 'A stopcock with a T-shaped bore and three outlets. Turning it connects any two '
+                 'of them, so one tap can switch an apparatus between a pump and air, or between '
+                 'vacuum and inert gas.',
+  'aliases': ['Three-way tap', 'T-bore stopcock', 'Three-way valve'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/stopcock-glass-t-bore'}],
+  'photos': [{'file': 'three-way-stopcock-1.jpg',
+              'source': 'lw:stopcock-glass-t-bore_0',
+              'page': 'https://www.labware-shop.com/product-page/stopcock-glass-t-bore'}]},
+ {'slug': 'drying-column',
+  'category': 'vacuum',
+  'name': 'Drying column',
+  'catalog_name': None,
+  'description': 'A wide upright tube packed with a solid drying agent through which a gas is '
+                 'passed. Phosphorus pentoxide is mixed with glass wool or pumice so it does not '
+                 'cake; several columns in a row, each with a different drying agent, make a '
+                 'drying train.',
+  'aliases': ['Drying tower', 'Gas drying column', 'Drying train'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/gas-drying-chamber'}],
+  'photos': [{'file': 'drying-column-1.jpg',
+              'source': 'lw:gas-drying-chamber_0',
+              'page': 'https://www.labware-shop.com/product-page/gas-drying-chamber'},
+             {'file': 'drying-column-2.jpg',
+              'source': 'lw:gas-drying-chamber_1',
+              'page': 'https://www.labware-shop.com/product-page/gas-drying-chamber'}]},
+ {'slug': 'hickman-head',
+  'category': 'distillation',
+  'name': 'Hickman still head',
+  'catalog_name': None,
+  'description': 'A small still head for microscale distillation. Vapour condenses on the walls '
+                 'and runs down into a collar round the inside, from which the distillate is drawn '
+                 'off with a pipette or syringe — through a side port in the Hickman–Hinkle '
+                 'version.',
+  'aliases': ['Hickman head', 'Hickman–Hinkle head', 'Microscale still head', 'Collar head'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/adapter-distillation-hickman'},
+                      {'url': 'https://www.labware-shop.com/product-page/adapter-distillation-hickman-hinkle'},
+                      {'url': 'https://www.labware-shop.com/product-page/adapter-distillation-hickman-side-arm'}],
+  'photos': [{'file': 'hickman-head-1.jpg',
+              'source': 'lw:adapter-distillation-hickman_2',
+              'page': 'https://www.labware-shop.com/product-page/adapter-distillation-hickman'},
+             {'file': 'hickman-head-2.jpg',
+              'source': 'lw:adapter-distillation-hickman-hinkle_2',
+              'page': 'https://www.labware-shop.com/product-page/adapter-distillation-hickman-hinkle'},
+             {'file': 'hickman-head-3.jpg',
+              'source': 'lw:adapter-distillation-hickman-side-arm_2',
+              'page': 'https://www.labware-shop.com/product-page/adapter-distillation-hickman-side-arm'}]},
+ {'slug': 'hot-filtration-funnel',
+  'category': 'funnels',
+  'name': 'Hot-filtration funnel',
+  'catalog_name': None,
+  'description': 'A funnel inside a jacket of hot water or steam, or with an electric heater, so a '
+                 'hot solution can be filtered without crystals forming in the funnel. The stem is '
+                 'short and wide so that it does not block.',
+  'aliases': ['Heated funnel', 'Hot-water funnel', 'Jacketed filter funnel'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/funnel-filter-buchner-jacketed'},
+                      {'url': 'https://www.labware-shop.com/product-page/funnel-filter-buchner-jacketed-1'}],
+  'photos': [{'file': 'hot-filtration-funnel-1.jpg',
+              'source': 'lw:funnel-filter-buchner-jacketed_0',
+              'page': 'https://www.labware-shop.com/product-page/funnel-filter-buchner-jacketed'},
+             {'file': 'hot-filtration-funnel-2.jpg',
+              'source': 'lw:funnel-filter-buchner-jacketed-1_0',
+              'page': 'https://www.labware-shop.com/product-page/funnel-filter-buchner-jacketed-1'},
+             {'file': 'hot-filtration-funnel-3.jpg',
+              'source': 'lw:funnel-filter-buchner-jacketed_1',
+              'page': 'https://www.labware-shop.com/product-page/funnel-filter-buchner-jacketed'}]},
+ {'slug': 'filter-paper',
+  'category': 'funnels',
+  'name': 'Filter paper',
+  'catalog_name': None,
+  'description': 'Paper made to let liquids pass and hold solids back. A plain circle lies flat in '
+                 'a Büchner funnel; a pleated (fluted) one sits in a glass funnel and filters '
+                 'faster. Strong acids, alkalis and oxidants destroy it.',
+  'aliases': ['Fluted filter paper', 'Folded filter', 'Filter circle', 'Qualitative filter paper'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Paper_filters-laboratory_1.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Paper_filters-laboratory_3.jpg'}],
+  'photos': [{'file': 'filter-paper-1.jpg',
+              'source': 'wm:Paper filters-laboratory 1.jpg',
+              'credit': 'Nadina Wiórkiewicz, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'filter-paper-2.jpg',
+              'source': 'wm:Paper filters-laboratory 3.jpg',
+              'credit': 'Nadina Wiórkiewicz, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'centrifuge',
+  'category': 'measuring',
+  'name': 'Centrifuge',
+  'catalog_name': None,
+  'description': 'A machine that spins tubes or cups at a few thousand rpm, so a solid settles '
+                 'firmly at the bottom and the liquid can be poured off. It separates small '
+                 'amounts of solid without loss and helps where a precipitate would clog a filter. '
+                 'Opposite cups must be balanced to the same weight.',
+  'aliases': ['Laboratory centrifuge', 'Benchtop centrifuge'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Heraeus_Multifuge_3SR_centrifuge_1.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Heraeus_Multifuge_3SR_centrifuge_3.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Beckman-Coulter_preparative_centrifuge_Avanti_J25-01.jpg'}],
+  'photos': [{'file': 'centrifuge-1.jpg',
+              'source': 'wm:Heraeus Multifuge 3SR centrifuge 1.jpg',
+              'credit': 'Nadina Wiórkiewicz, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'centrifuge-2.jpg',
+              'source': 'wm:Heraeus Multifuge 3SR centrifuge 3.jpg',
+              'credit': 'Nadina Wiórkiewicz, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'centrifuge-3.jpg',
+              'source': 'wm:Beckman-Coulter preparative centrifuge Avanti J25-01.jpg',
+              'credit': 'Matylda Sęk, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'spinning-band-column',
+  'category': 'distillation',
+  'name': 'Spinning band column',
+  'catalog_name': None,
+  'description': 'A narrow column with a PTFE or metal band spinning inside it at a few thousand '
+                 'rpm. The band throws the returning liquid onto the wall and mixes it with the '
+                 'vapour, giving many theoretical plates with a tiny hold-up — for fine '
+                 'separations of small amounts.',
+  'aliases': ['Spinning-band distillation column', 'Rotating band column'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Distillation_bande_tournante_100_6504.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Bande_tournante_100_6499.jpg'}],
+  'photos': [{'file': 'spinning-band-column-1.jpg',
+              'source': 'wm:Distillation bande tournante 100 6504.jpg',
+              'credit': 'Jflm, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'spinning-band-column-2.jpg',
+              'source': 'wm:Bande tournante 100 6499.jpg',
+              'credit': 'Jflm, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'empty-column',
+  'category': 'distillation',
+  'name': 'Empty column',
+  'catalog_name': None,
+  'description': 'A plain empty tube used as a fractionating column. Its hold-up and pressure drop '
+                 'are tiny, so it suits vacuum and semimicro distillations, but it separates only '
+                 'weakly.',
+  'aliases': ['Open tube column', 'Hollow column', 'Unpacked column'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/column-distilling'}],
+  'photos': [{'file': 'empty-column-1.jpg',
+              'source': 'lw:column-distilling_1',
+              'page': 'https://www.labware-shop.com/product-page/column-distilling'}]},
+ {'slug': 'jacketed-column',
+  'category': 'distillation',
+  'name': 'Vacuum-jacketed column',
+  'catalog_name': None,
+  'description': 'A fractionating column inside a silvered, evacuated glass jacket, like a Dewar '
+                 'flask. The jacket stops the column losing heat, so it works close to the ideal '
+                 'adiabatic conditions and separates as well as it can.',
+  'aliases': ['Silvered column', 'Column with vacuum jacket', 'Insulated column'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/column-distilling-full-jacketed'}],
+  'photos': [{'file': 'jacketed-column-1.jpg',
+              'source': 'lw:column-distilling-full-jacketed_1',
+              'page': 'https://www.labware-shop.com/product-page/column-distilling-full-jacketed'},
+             {'file': 'jacketed-column-2.jpg',
+              'source': 'lw:column-distilling-full-jacketed_0',
+              'page': 'https://www.labware-shop.com/product-page/column-distilling-full-jacketed'},
+             {'file': 'jacketed-column-3.jpg',
+              'source': 'lw:column-distilling-full-jacketed_2',
+              'page': 'https://www.labware-shop.com/product-page/column-distilling-full-jacketed'}]},
+ {'slug': 'liquid-extractor',
+  'category': 'distillation',
+  'name': 'Liquid–liquid extractor',
+  'catalog_name': None,
+  'description': 'An apparatus that extracts a compound out of a solution continuously with only a '
+                 'little solvent: condensed solvent drips through the solution, picks up the '
+                 'compound and overflows back into the boiling flask. It can extract compounds '
+                 'with a partition coefficient below 1.5. There are versions for solvents lighter '
+                 'and heavier than the solution.',
+  'aliases': ['Perforator', 'Continuous liquid extractor', 'Kutscher–Steudel extractor'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/liquid-extraction-apparatus-teflon-stopcock'},
+                      {'url': 'https://www.labware-shop.com/product-page/liquid-extraction-apparatus'},
+                      {'url': 'https://www.labware-shop.com/product-page/extractor-liquid-liquid-continuous'}],
+  'photos': [{'file': 'liquid-extractor-1.jpg',
+              'source': 'lw:liquid-extraction-apparatus-teflon-stopcock_0',
+              'page': 'https://www.labware-shop.com/product-page/liquid-extraction-apparatus-teflon-stopcock'},
+             {'file': 'liquid-extractor-2.jpg',
+              'source': 'lw:liquid-extraction-apparatus_0',
+              'page': 'https://www.labware-shop.com/product-page/liquid-extraction-apparatus'},
+             {'file': 'liquid-extractor-3.jpg',
+              'source': 'lw:extractor-liquid-liquid-continuous_0',
+              'page': 'https://www.labware-shop.com/product-page/extractor-liquid-liquid-continuous'}]},
+ {'slug': 'uv-lamp',
+  'category': 'chromatography',
+  'name': 'UV lamp',
+  'catalog_name': None,
+  'description': 'A lamp giving ultraviolet light at 254 and 365 nm, for looking at TLC plates. On '
+                 'a plate with a fluorescent indicator, compounds that absorb UV show as dark '
+                 'spots on a glowing background; others glow themselves. Never look into the lamp.',
+  'aliases': ['TLC lamp', 'UV hand lamp', '254 nm lamp', 'UV viewing cabinet'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:UV_cabinet_for_thin_layer_chromatography.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:UV-handlamp_hg.jpg'}],
+  'photos': [{'file': 'uv-lamp-1.jpg',
+              'source': 'wm:UV cabinet for thin layer chromatography.jpg',
+              'credit': 'Seawind60, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'uv-lamp-2.jpg',
+              'source': 'wm:UV-handlamp hg.jpg',
+              'credit': 'Hannes Grobe, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'fraction-collector',
+  'category': 'chromatography',
+  'name': 'Fraction collector',
+  'catalog_name': None,
+  'description': 'A machine that collects the liquid coming out of a column in a row of tubes, '
+                 'moving on to the next tube after a set number of drops or a set time.',
+  'aliases': ['Automatic fraction collector', 'Fraction collecting rack'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Fraction_collector_-_sampler_LAMBDA_OMNICOLL.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Fraction_Collector_Tube_Rack.jpg'}],
+  'photos': [{'file': 'fraction-collector-1.jpg',
+              'source': 'wm:Fraction collector - sampler LAMBDA OMNICOLL.jpg',
+              'credit': 'LAMBDA CZ s.r.o, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'fraction-collector-2.jpg',
+              'source': 'wm:Fraction Collector Tube Rack.jpg',
+              'credit': 'David J Morgan from Cambridge, UK, CC BY-SA 2.0, via Wikimedia Commons'}]},
+ {'slug': 'hplc',
+  'category': 'instruments',
+  'name': 'HPLC system',
+  'catalog_name': None,
+  'description': 'An instrument that pumps a solvent at 50–500 bar through a short steel column '
+                 'packed with very fine particles. The sample is injected into the flow, the '
+                 'separated compounds are seen by a detector — usually UV — and appear as peaks on '
+                 'the chromatogram.',
+  'aliases': ['HPLC', 'High-performance liquid chromatograph', 'Liquid chromatograph'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:HPLC_to_ICP-MS.JPG'}],
+  'photos': [{'file': 'hplc-1.jpg',
+              'source': 'wm:HPLC to ICP-MS.JPG',
+              'credit': 'Superchilum, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'gas-chromatograph',
+  'category': 'instruments',
+  'name': 'Gas chromatograph',
+  'catalog_name': None,
+  'description': 'An instrument in which a carrier gas sweeps a vaporised sample through a long '
+                 'column in a heated oven. The components leave at different times and are '
+                 'recorded by a detector — a flame-ionisation or thermal-conductivity detector, or '
+                 'a mass spectrometer.',
+  'aliases': ['GC', 'Gas chromatography instrument', 'GC oven'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Gas_chromatographs_with_functional_detectors_in_CAFIA_laboratory,_Czech_Republic.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Gas_chromatograph_for_GCxGC_analyzes_connected_to_a_QTOF_mass_detector_and_GC-IRMS_interface,_in_CAFIA_laboratory,_Czech_Republic.png'}],
+  'photos': [{'file': 'gas-chromatograph-1.jpg',
+              'source': 'wm:Gas chromatographs with functional detectors in CAFIA laboratory, '
+                        'Czech Republic.jpg',
+              'credit': 'Sarka Na kopci, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'gas-chromatograph-2.jpg',
+              'source': 'wm:Gas chromatograph for GCxGC analyzes connected to a QTOF mass detector '
+                        'and GC-IRMS interface, in CAFIA laboratory, Czech Republic.png',
+              'credit': 'Sarka Na kopci, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'thiele-tube',
+  'category': 'instruments',
+  'name': 'Thiele tube',
+  'catalog_name': None,
+  'description': 'A glass tube with a looped side arm, filled with oil, for measuring a melting '
+                 'point. A thermometer with the sample capillary attached hangs in it, and heating '
+                 'the side arm makes the oil circulate by itself, so the sample warms evenly.',
+  'aliases': ['Thiele melting point apparatus', 'Melting point tube, Thiele'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Thiele_Tube.jpg'}],
+  'photos': [{'file': 'thiele-tube-1.jpg',
+              'source': 'wm:Thiele Tube.jpg',
+              'credit': 'Iain George from Calgary, Canada, CC BY-SA 2.0, via Wikimedia Commons'}]},
+ {'slug': 'melting-point-apparatus',
+  'category': 'instruments',
+  'name': 'Melting point apparatus',
+  'catalog_name': None,
+  'description': 'An electrically heated metal block with holes for capillaries and a thermometer '
+                 'and a magnifier to watch through. It measures melting points above 250 °C that '
+                 'an oil bath cannot reach, and several samples at once.',
+  'aliases': ['Melting point instrument', 'Mel-Temp', 'Melting point block'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:MEL-TEMP_melting_point_instrument.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Gallenkamp_Melting_Point_Apparatus.jpg'}],
+  'photos': [{'file': 'melting-point-apparatus-1.jpg',
+              'source': 'wm:MEL-TEMP melting point instrument.jpg',
+              'credit': 'Rifleman 82, public domain, via Wikimedia Commons'},
+             {'file': 'melting-point-apparatus-2.jpg',
+              'source': 'wm:Gallenkamp Melting Point Apparatus.jpg',
+              'credit': 'Iain George from Calgary, Canada, CC BY-SA 2.0, via Wikimedia Commons'}]},
+ {'slug': 'ebulliometer',
+  'category': 'instruments',
+  'name': 'Ebulliometer',
+  'catalog_name': None,
+  'description': 'An apparatus for measuring a boiling point exactly: the liquid is boiled under '
+                 'reflux and the vapour–liquid mixture is pumped over the thermometer bulb, '
+                 'without heat loss or superheating. It needs several millilitres of liquid.',
+  'aliases': ['Boiling point apparatus', 'Cottrell ebulliometer'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Ebulliometro.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Ebulliometer_for_measuring_wine_alcohol.JPG'}],
+  'photos': [{'file': 'ebulliometer-1.jpg',
+              'source': 'wm:Ebulliometro.jpg',
+              'credit': 'Livio Brandellero, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'ebulliometer-2.jpg',
+              'source': 'wm:Ebulliometer for measuring wine alcohol.JPG',
+              'credit': 'Agne27, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'abbe-refractometer',
+  'category': 'instruments',
+  'name': 'Abbe refractometer',
+  'catalog_name': None,
+  'description': 'An instrument that measures the refractive index of a few drops of liquid '
+                 'pressed between two prisms, to four decimal places. It works in daylight but '
+                 'gives the value for the sodium D line; the prisms are held at constant '
+                 'temperature, usually 20 °C.',
+  'aliases': ['Refractometer', 'Abbe', 'Refractive index meter'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Abbe_Refractometer_in_JXTCM.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Refractometre_ABBE_2009_jflm.jpg'}],
+  'photos': [{'file': 'abbe-refractometer-1.jpg',
+              'source': 'wm:Abbe Refractometer in JXTCM.jpg',
+              'credit': '丰泽一号, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'abbe-refractometer-2.jpg',
+              'source': 'wm:Refractometre ABBE 2009 jflm.jpg',
+              'credit': 'Jflm, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'polarimeter',
+  'category': 'instruments',
+  'name': 'Polarimeter',
+  'catalog_name': None,
+  'description': 'An instrument that measures how far an optically active compound turns the plane '
+                 'of polarised light. Light passes a polariser, a tube of the solution and a '
+                 'rotating analyser; the angle read off gives the specific rotation.',
+  'aliases': ['Polarimeter tube', 'Automatic polarimeter'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Automatic_Polarimeter_with_Filling_Funnel.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Modular_circular_polarimeter.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Soviet_portable_polarimeter_in_its_case.jpg'}],
+  'photos': [{'file': 'polarimeter-1.jpg',
+              'source': 'wm:Automatic Polarimeter with Filling Funnel.jpg',
+              'credit': 'Margarete Platzer, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'polarimeter-2.jpg',
+              'source': 'wm:Modular circular polarimeter.jpg',
+              'credit': 'Gingkoaceae, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'polarimeter-3.jpg',
+              'source': 'wm:Soviet portable polarimeter in its case.jpg',
+              'credit': 'Siarhei Besarab, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'saccharimeter',
+  'category': 'instruments',
+  'name': 'Saccharimeter',
+  'catalog_name': None,
+  'description': 'A polarimeter made to measure the sugar content of solutions, with a scale in '
+                 'sugar degrees instead of angles.',
+  'aliases': ['Sugar polarimeter'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Polarimeter_Saccharimeter-UNIL_603.867-IMG_2052-white.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Saccharimeter_Zucker-Museum.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Saccharimeter_c1906_Zucker-Museum.jpg'}],
+  'photos': [{'file': 'saccharimeter-1.jpg',
+              'source': 'wm:Polarimeter Saccharimeter-UNIL 603.867-IMG 2052-white.jpg',
+              'credit': 'Rama, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'saccharimeter-2.jpg',
+              'source': 'wm:Saccharimeter Zucker-Museum.jpg',
+              'credit': 'FA2010, public domain, via Wikimedia Commons'},
+             {'file': 'saccharimeter-3.jpg',
+              'source': 'wm:Saccharimeter c1906 Zucker-Museum.jpg',
+              'credit': 'FA2010, public domain, via Wikimedia Commons'}]},
+ {'slug': 'cuvette',
+  'category': 'instruments',
+  'name': 'Cuvette',
+  'catalog_name': None,
+  'description': 'A small square tube of glass, quartz or plastic with flat, clear sides, usually '
+                 '1 cm across, that holds a solution in the beam of a spectrometer. Quartz is '
+                 'needed for ultraviolet light, which glass absorbs.',
+  'aliases': ['Cell', 'Spectrophotometer cell', 'Quartz cuvette', 'Cuvet'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Cuvette.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:%E5%88%86%E5%85%89%E6%B6%B2%E6%A7%BD.jpg'}],
+  'photos': [{'file': 'cuvette-1.jpg',
+              'source': 'wm:Cuvette.jpg',
+              'credit': 'Jeffrey M. Vinocur, CC BY 2.5, via Wikimedia Commons'},
+             {'file': 'cuvette-2.jpg',
+              'source': 'wm:分光液槽.jpg',
+              'credit': 'GOKLuLe, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'uv-vis-spectrometer',
+  'category': 'instruments',
+  'name': 'UV–Vis spectrophotometer',
+  'catalog_name': None,
+  'description': 'An instrument that shines ultraviolet and visible light through a solution in a '
+                 'cuvette and records how much is absorbed at each wavelength. Double-beam models '
+                 'compare the sample with a reference cell of pure solvent.',
+  'aliases': ['UV spectrometer', 'Spectrophotometer', 'UV-Vis'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:DU640_spectrophotometer.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Spektrofotometri.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Wiki21039722.jpg'}],
+  'photos': [{'file': 'uv-vis-spectrometer-1.jpg',
+              'source': 'wm:DU640 spectrophotometer.jpg',
+              'credit': 'TimVickers, public domain, via Wikimedia Commons'},
+             {'file': 'uv-vis-spectrometer-2.jpg',
+              'source': 'wm:Spektrofotometri.jpg',
+              'credit': 'Skorpion87, public domain, via Wikimedia Commons'},
+             {'file': 'uv-vis-spectrometer-3.jpg',
+              'source': 'wm:Wiki21039722.jpg',
+              'credit': 'Wiki210397, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'ir-spectrometer',
+  'category': 'instruments',
+  'name': 'IR spectrometer',
+  'catalog_name': None,
+  'description': 'An instrument that records which infrared wavelengths a compound absorbs; each '
+                 'functional group has its own bands. Liquids are measured as a thin film between '
+                 'salt plates, solids pressed into a potassium bromide disc.',
+  'aliases': ['FTIR', 'Infrared spectrometer', 'FT-IR spectrometer'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:FTIR_spectrometer.png'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:FTIR_Spectrometer_%2B_ATR.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:FTIR_3000_1.jpg'}],
+  'photos': [{'file': 'ir-spectrometer-1.jpg',
+              'source': 'wm:FTIR spectrometer.png',
+              'credit': 'Wang F. et al., CC BY 4.0, via Wikimedia Commons'},
+             {'file': 'ir-spectrometer-2.jpg',
+              'source': 'wm:FTIR Spectrometer + ATR.jpg',
+              'credit': 'Keshavana, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'ir-spectrometer-3.jpg',
+              'source': 'wm:FTIR 3000 1.jpg',
+              'credit': 'Kkmurray, CC BY-SA 3.0, via Wikimedia Commons'}]},
+ {'slug': 'nmr-spectrometer',
+  'category': 'instruments',
+  'name': 'NMR spectrometer',
+  'catalog_name': None,
+  'description': 'An instrument built around a large superconducting magnet. A sample in an NMR '
+                 'tube is lowered into it and irradiated with radio waves; the nuclei ¹H and ¹³C '
+                 'absorb at frequencies that depend on their surroundings, which reveals the '
+                 'structure of the molecule.',
+  'aliases': ['NMR', 'NMR magnet', 'Nuclear magnetic resonance spectrometer'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Bruker_300_MHz_NMR_Spectrometer.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Bruker_Avance_DPX_250_NMR_Spectrometer.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:NMR_Bruker_Avance_II_700.jpg'}],
+  'photos': [{'file': 'nmr-spectrometer-1.jpg',
+              'source': 'wm:Bruker 300 MHz NMR Spectrometer.jpg',
+              'credit': 'Lihan Yao, CC BY 2.0, via Wikimedia Commons'},
+             {'file': 'nmr-spectrometer-2.jpg',
+              'source': 'wm:Bruker Avance DPX 250 NMR Spectrometer.jpg',
+              'credit': 'Chrumps, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'nmr-spectrometer-3.jpg',
+              'source': 'wm:NMR Bruker Avance II 700.jpg',
+              'credit': 'Chrumps, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'mass-spectrometer',
+  'category': 'instruments',
+  'name': 'Mass spectrometer',
+  'catalog_name': None,
+  'description': 'An instrument that turns molecules into ions — usually by electron impact — '
+                 'separates them by mass-to-charge ratio and counts them. The molecular ion gives '
+                 'the molar mass and the fragments hint at the structure; it is often coupled to a '
+                 'gas chromatograph.',
+  'aliases': ['MS', 'Mass spec', 'GC-MS'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Model_21-103_Mass_Spectrometer_in_use_at_Exxon_analytical_research_laboratory_1974.jpeg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:HR-ICP-MS,_high-resolution_inductively_coupled_plasma_ionization_mass_spectrometer_used_for_multi-element_analysis,_in_CAFIA_laboratory,_Czech_Republic.png'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:EA-IRMS,_isotope_ratio_mass_spectrometer_with_elemental_analyzer_for_the_determination_of_isotope_ratios_of_stable_isotopes_in_wines,_spirits,_honey_and_natural_sweeteners,_in_CAFIA_laboratory.jpg'}],
+  'photos': [{'file': 'mass-spectrometer-1.jpg',
+              'source': 'wm:Model 21-103 Mass Spectrometer in use at Exxon analytical research '
+                        'laboratory 1974.jpeg',
+              'credit': 'Science History Institute, public domain, via Wikimedia Commons'},
+             {'file': 'mass-spectrometer-2.jpg',
+              'source': 'wm:HR-ICP-MS, high-resolution inductively coupled plasma ionization mass '
+                        'spectrometer used for multi-element analysis, in CAFIA laboratory, Czech '
+                        'Republic.png',
+              'credit': 'Sarka Na kopci, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'mass-spectrometer-3.jpg',
+              'source': 'wm:EA-IRMS, isotope ratio mass spectrometer with elemental analyzer for '
+                        'the determination of isotope ratios of stable isotopes in wines, spirits, '
+                        'honey and natural sweeteners, in CAFIA laboratory.jpg',
+              'credit': 'Sarka Na kopci, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'diffractometer',
+  'category': 'instruments',
+  'name': 'X-ray diffractometer',
+  'catalog_name': None,
+  'description': 'An instrument that turns a single crystal in an X-ray beam and measures the '
+                 'reflections. From their positions and intensities a computer calculates where '
+                 'every atom sits — the whole structure of the molecule at once.',
+  'aliases': ['Single-crystal diffractometer', 'Four-circle diffractometer', 'XRD'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Scxrd.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Equi-inclination_3-circle_diffractometer.jpg'}],
+  'photos': [{'file': 'diffractometer-1.jpg',
+              'source': 'wm:Scxrd.jpg',
+              'credit': 'Anjali Merin, CC BY-SA 4.0, via Wikimedia Commons'},
+             {'file': 'diffractometer-2.jpg',
+              'source': 'wm:Equi-inclination 3-circle diffractometer.jpg',
+              'credit': 'unknown author, CC BY-SA 4.0, via Wikimedia Commons'}]},
+ {'slug': 'boss-head',
+  'category': 'bench',
+  'name': 'Boss head',
+  'catalog_name': None,
+  'description': 'A small metal block with two screws at right angles that fixes a clamp or a ring '
+                 'to the rod of a support stand at any height. It is fitted with its open side '
+                 'facing up, so that a loosened clamp cannot slip out and drop the apparatus.',
+  'aliases': ['Bosshead', 'Clamp holder', 'Double clamp', 'Right-angle clamp holder'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/bosshead'},
+                      {'url': 'https://www.labware-shop.com/product-page/bosshead-1'},
+                      {'url': 'https://www.labware-shop.com/product-page/bosshead-2'}],
+  'photos': [{'file': 'boss-head-1.jpg',
+              'source': 'lw:bosshead_0',
+              'page': 'https://www.labware-shop.com/product-page/bosshead'},
+             {'file': 'boss-head-2.jpg',
+              'source': 'lw:bosshead-1_0',
+              'page': 'https://www.labware-shop.com/product-page/bosshead-1'},
+             {'file': 'boss-head-3.jpg',
+              'source': 'lw:bosshead-2_0',
+              'page': 'https://www.labware-shop.com/product-page/bosshead-2'}]},
+ {'slug': 'graduated-receiver',
+  'category': 'distillation',
+  'name': 'Graduated receiver',
+  'catalog_name': None,
+  'description': 'A narrow receiver with a volume scale and a ground joint, put under the '
+                 'condenser in place of a flask. The volume of distillate can be read off at any '
+                 'moment, which is how a boiling curve — temperature against volume distilled — is '
+                 'recorded.',
+  'aliases': ['Graduated distillation receiver',
+              'Graduated collecting tube',
+              'Distilling receiver, graduated'],
+  'source_products': [{'url': 'https://www.labware-shop.com/product-page/distilling-receiver-graduated-with-hooks'}],
+  'photos': [{'file': 'graduated-receiver-1.jpg',
+              'source': 'lw:distilling-receiver-graduated-with-hooks_0',
+              'page': 'https://www.labware-shop.com/product-page/distilling-receiver-graduated-with-hooks'},
+             {'file': 'graduated-receiver-2.jpg',
+              'source': 'lw:distilling-receiver-graduated-with-hooks_1',
+              'page': 'https://www.labware-shop.com/product-page/distilling-receiver-graduated-with-hooks'},
+             {'file': 'graduated-receiver-3.jpg',
+              'source': 'lw:distilling-receiver-graduated-with-hooks_2',
+              'page': 'https://www.labware-shop.com/product-page/distilling-receiver-graduated-with-hooks'}]},
+ {'slug': 'teclu-burner',
+  'category': 'bench',
+  'name': 'Teclu burner',
+  'catalog_name': None,
+  'description': 'A gas burner with a conical tube that widens towards the bottom and a screw disc '
+                 'underneath for setting the air intake. It mixes gas and air better than a Bunsen '
+                 'burner and gives a hotter flame, but it is used in just the same way — and never '
+                 'for heating flammable liquids.',
+  'aliases': ['Teclu', 'Teclu gas burner'],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Teclu_burner.jpg'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Brulilo_Teclu.JPG'},
+                      {'url': 'https://commons.wikimedia.org/wiki/File:Teclu_Burner_in_museum.png'}],
+  'photos': [{'file': 'teclu-burner-1.jpg',
+              'source': 'wm:Teclu burner.jpg',
+              'credit': 'jasonwoodhead23, CC BY 2.0, via Wikimedia Commons'},
+             {'file': 'teclu-burner-2.jpg',
+              'source': 'wm:Brulilo Teclu.JPG',
+              'credit': 'Walber, CC BY-SA 3.0, via Wikimedia Commons'},
+             {'file': 'teclu-burner-3.jpg',
+              'source': 'wm:Teclu Burner in museum.png',
+              'credit': 'Wirtualne Muzeum Gazonictwa, public domain, via Wikimedia Commons'}]}]
 
 # Cards taken out because the catalogue has no clean photograph of them.
 DROPPED = {'distillation-receiver': 'line drawings and posters only',
  'jacketed-vigreux-head': 'only photo(s) were damaged',
  'capillary-tube': 'only photo(s) were damaged',
- 'four-neck-flask': 'only photo(s) were damaged',
  'check-valve': 'only photo(s) were damaged',
  'cannula': 'only photo(s) were damaged'}
