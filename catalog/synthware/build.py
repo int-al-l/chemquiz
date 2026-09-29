@@ -20,7 +20,9 @@ from an existing database).
 
 Photos from Wikimedia Commons (stems starting with "wm:", listed in
 curate.COMMONS with their credit) are read from <folder>/commons/, named as
-curate.commons_filename() says. A photo whose source is not in <folder> but
+curate.commons_filename() says. Photos from the Synthware shop at
+labware-shop.com (stems starting with "lw:", chosen in labware.py) are read
+from <folder>/labware/, as downloaded by tools/fetch_labware_shop.py. A photo whose source is not in <folder> but
 which an earlier build already made is kept as it is, so new cards can be
 added without downloading the whole catalogue again.
 """
@@ -30,7 +32,9 @@ from __future__ import annotations
 import argparse
 import json
 import pprint
+import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -96,6 +100,9 @@ def find(folder: Path, stem: str) -> Path | None:
     if stem.startswith("wm:"):
         p = folder / "commons" / commons_filename(stem[3:])
         return p if p.exists() else None
+    if stem.startswith("lw:"):
+        p = folder / "labware" / "images" / f"{stem[3:]}.jpg"
+        return p if p.exists() else None
     for ext in (".jpg", ".jpeg", ".png", ".webp"):
         p = folder / "images" / f"{stem}{ext}"
         if p.exists():
@@ -104,7 +111,7 @@ def find(folder: Path, stem: str) -> Path | None:
 
 
 def product_id(stem: str) -> int | None:
-    return None if stem.startswith("wm:") else int(stem.split("_")[0])
+    return None if stem.startswith(("wm:", "lw:")) else int(stem.split("_")[0])
 
 
 def main() -> int:
@@ -121,10 +128,27 @@ def main() -> int:
     old_items = {i["slug"]: i for i in seed_data.ITEMS}
     IMAGES.mkdir(parents=True, exist_ok=True)
 
-    # What each existing image file was made from, so it can be kept when its
-    # source is not in the download folder this time.
-    made_from = {p["file"]: p.get("source") for i in seed_data.ITEMS for p in i["photos"]}
+    # Every existing image, keyed by what it was made from, so it can be kept
+    # when its source is not in the download folder this time. They are copied
+    # aside first, because this build may give a file a new name or reuse its
+    # old name for another photo.
+    keep_dir = Path(tempfile.mkdtemp(prefix="chemquiz-images-"))
+    built_before: dict[str, Path] = {}
+    for old_item in seed_data.ITEMS:
+        for p in old_item["photos"]:
+            if p.get("source") and (IMAGES / p["file"]).exists() and p["source"] not in built_before:
+                built_before[p["source"]] = keep_dir / p["file"]
+                shutil.copyfile(IMAGES / p["file"], keep_dir / p["file"])
     old_urls = {sp["id"]: sp["url"] for i in seed_data.ITEMS for sp in i.get("source_products", []) if "id" in sp}
+
+    # labware-shop product page of each "lw:" photo: from the download if it is
+    # here, else from the previous build.
+    shop_urls = {p["source"]: p["page"] for i in seed_data.ITEMS for p in i["photos"] if p.get("page")}
+    shop_file = args.folder / "labware" / "products.json"
+    if shop_file.exists():
+        for product in json.loads(shop_file.read_text("utf-8")):
+            for image in product["images"]:
+                shop_urls["lw:" + image["file"].rsplit(".", 1)[0]] = product["url"]
 
     written: set[str] = set()
     items = []
@@ -142,6 +166,7 @@ def main() -> int:
         first = products.get(ids[0], {}).get("name") if ids else None
         sources = [{"id": i, "url": products[i]["permalink"] if i in products else old_urls[i]} for i in ids]
         sources += [{"url": COMMONS[s[3:]]["url"]} for s in stems if s.startswith("wm:")]
+        sources += [{"url": u} for u in dict.fromkeys(shop_urls[s] for s in stems if s.startswith("lw:"))]
         item = {
             "slug": slug,
             "category": change.get("category", base.get("category")),
@@ -157,12 +182,16 @@ def main() -> int:
             src = find(args.folder, stem)
             if src is not None:
                 process(src, IMAGES / name)
-            elif not ((IMAGES / name).exists() and made_from.get(name) == stem):
+            elif stem in built_before:
+                shutil.copyfile(built_before[stem], IMAGES / name)
+            else:
                 raise SystemExit(f"{slug}: photo {stem} is not in {args.folder} and was not built before")
             written.add(name)
             photo = {"file": name, "source": stem}
             if stem.startswith("wm:"):
                 photo["credit"] = COMMONS[stem[3:]]["credit"]
+            if stem.startswith("lw:"):
+                photo["page"] = shop_urls[stem]
             item["photos"].append(photo)
         items.append(item)
         print(f"  {slug}: {len(stems)} photo(s)")
@@ -193,6 +222,8 @@ def main() -> int:
             if child["slug"] == "funnels":
                 child["name"] = "Funnels & filtration"
                 child["description"] = "Pour, filter, separate and add liquids."
+
+    shutil.rmtree(keep_dir, ignore_errors=True)
 
     removed = 0
     for f in IMAGES.iterdir():

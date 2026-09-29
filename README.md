@@ -131,6 +131,7 @@ backend/
 catalog/synthware/     which Synthware photos show each card, and the build
 catalog/*.py           the earlier Kemtech PDF pipeline (no longer used)
 tools/fetch_synthware.py  downloads the Synthware catalogue (run it locally)
+tools/fetch_labware_shop.py  downloads Synthware's shop, labware-shop.com (run it locally)
 ```
 
 ## Routes
@@ -280,14 +281,20 @@ from the Synthware catalogue:
 
 ```bash
 python tools/fetch_synthware.py              # needs access to chengduglassware.com
+python tools/fetch_labware_shop.py           # optional: labware-shop.com; move its labware/ into synthware/
 python catalog/synthware/build.py synthware  # crop photos, rewrite seed_data.py
 cd backend && python seed.py
 ```
+
+A photo whose download is missing this time is kept as the earlier build made
+it, so the build also runs with only part of the downloads.
 
 `catalog/synthware/curate.py` holds the choices: which product photos show
 each card (clean product shots only -- never the advertising posters with
 dimension arrows and captions, which Synthware uses as many main images),
 the new cards and their text, and the cards dropped for lack of a clean photo.
+`catalog/synthware/labware.py` does the same for the sharper photos from
+labware-shop.com (stems `lw:...`), and `curate.COMMONS` for Wikimedia Commons.
 `build.py --sheets DIR` writes contact sheets for checking the result by eye.
 
 Whichever way a card is added, give it a Russian name and description in
