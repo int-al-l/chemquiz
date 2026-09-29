@@ -1269,7 +1269,16 @@ NO_PHOTO = {'glass-tubing': 'на Commons только заготовки и г�
  'craig-apparatus': 'нет фото',
  'tlc-sprayer': 'нашлась только камера для опрыскивания, самого распылителя нет',
  'mplc': 'нет фото',
- 'hot-stage-microscope': 'нет фото микроскопа Кофлера/Бётиуса'}
+ 'hot-stage-microscope': 'нет фото микроскопа Кофлера/Бётиуса',
+ 'capillary-tube': 'карточка удалена в PR #9 из-за испорченного фото; другого чистого фото капилляра нет ни '
+                   'на Commons, ни в магазине (только медицинские с цветными метками)'}
+
+# Cards the book describes that PR #9 dropped for damaged photos, back with new photos.
+# Their text is still in labware.py.
+RESTORED_PHOTOS = {'four-neck-flask': ['lw:flask-round-bottom-4-neck-angled-2_1',
+                                       'lw:flask-round-bottom-4-neck-angled-2_3',
+                                       'lw:flask-round-bottom-4-neck-small-angled-20_0',
+                                       'lw:flask-round-bottom-4-neck-small-angled-20_3']}
 
 NEW_CATEGORIES = [
     {"slug": "instruments", "image": "polarimeter-1.jpg", "name": "Instruments",
