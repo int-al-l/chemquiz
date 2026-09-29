@@ -7,8 +7,8 @@ Run on your own computer (Python 3.9+, nothing to install):
 
 Every file named in catalog/synthware/curate.COMMONS that is not yet in
 <folder>/commons/ is downloaded there, under the name build.py looks for
-(curate.commons_filename). Photos wider than 2000 px are fetched as a
-2000 px rendition, which is still twice what the site shows. Re-running is
+(curate.commons_filename). Photos wider than 1200 px are fetched as a
+1200 px rendition, still more than the 900 px the site shows. Re-running is
 safe: files already there are skipped.
 
 The shop photos the Organikum cards use (organikum.py, stems "lw:<product>_<n>")
@@ -38,7 +38,7 @@ from curate import COMMONS, commons_filename  # noqa: E402
 from organikum import PHOTOS as ORG_PHOTOS, RESTORED_PHOTOS  # noqa: E402
 
 API = "https://commons.wikimedia.org/w/api.php"
-WIDTH = 2000
+WIDTH = 1200
 HEADERS = {"User-Agent": "ChemQuiz photo fetch (https://github.com/int-al-l/chemquiz)"}
 
 
