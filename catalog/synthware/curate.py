@@ -1108,3 +1108,35 @@ NEW_OR_CHANGED.update({
         "developing tank, the compounds sit at different heights and are seen under a UV lamp or with "
         "a stain."),
 })
+
+# Photos Nik flagged as damaged or wrong (2026-09-29). They are taken out of
+# every card; a card with no photo left is dropped.
+REJECTED = {
+    "wm:Glass capillaries 50 100ul.jpg",                    # capillary tube
+    "lw:adapter-anti-splash-modified-ellipse_0",            # anti-splash adapter
+    "lw:adapter-anti-splash-ellipse_0",
+    "lw:burette-clear-ptfe-stopcock_2",                     # burette
+    "lw:cannula-stainless-steel-3_0",                       # cannula
+    "lw:check-valve_0",                                     # check valve
+    "lw:desiccator-clear_0",                                # desiccator
+    "lw:drying-chamber-abderhalden_0",                      # drying pistol
+    "lw:flask-round-bottom-5-neck-vertical-4_0",            # four-neck flask (all shots)
+    "lw:flask-round-bottom-5-neck-vertical-4_1",
+    "lw:flask-round-bottom-5-neck-vertical-2_0",
+    "lw:flask-round-bottom-5-neck-vertical-2_1",
+    "lw:flask-round-bottom-5-neck-vertical-3_0",
+    "lw:bottle-for-freeze-dryer_0",                         # freeze-drying flask
+    "16849_1",                                              # gas dispersion tube
+    "lw:cap-nylon-screw-thread-no-o-ring_1",                # GL screw cap
+    "1808_0",                                               # graduated cylinder
+    "1808_1",
+    "wm:Electrothermal Heating Mantle.jpg",                 # heating mantle
+    "lw:removable-hose-connection-gl-thread-straight_1",    # hose connector
+    "9734_0",                                               # jacketed Vigreux head
+}
+for _slug, _stems in list(PHOTOS.items()):
+    PHOTOS[_slug] = [s for s in _stems if s not in REJECTED]
+    if not PHOTOS[_slug]:
+        del PHOTOS[_slug]
+        NEW_OR_CHANGED.pop(_slug, None)
+        DROPPED[_slug] = "only photo(s) were damaged"
