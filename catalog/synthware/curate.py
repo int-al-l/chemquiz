@@ -1190,3 +1190,56 @@ DROPPED["ptfe-stopper"] = "folded into ptfe-stopcock: the plug alone reads as a 
 # The glass T-bore stopcock (16172) is a three-way stopcock, which has its own card now.
 PHOTOS["glass-stopcock"] = [s for s in PHOTOS["glass-stopcock"] if s != "16172_0"]
 PHOTOS["three-way-stopcock"] = PHOTOS["three-way-stopcock"] + ["16172_0"]
+
+# Denis's review, second round (2026-10-03).
+#
+# The shop's "large cooling capacity" reflux condensers are Dimroth coils in a single
+# jacket -- the second jacket that makes an intensive condenser is not there, and they
+# look just like the Dimroth card's shots. Only the Commons photo of a real one stays.
+PHOTOS["intensive-condenser"] = [s for s in PHOTOS["intensive-condenser"] if not s.startswith("lw:")]
+
+# The two digital baths read as thermostats (and there is a circulating thermostat card
+# beside them). A water bath is the tank with a lid of concentric rings.
+PHOTOS["water-bath"] = [
+    "wm:Water bath at Vigyan Ashram.jpg",
+    "wm:Herzfeldsche Blechflaschen Wasserbad c1950 Zucker-Museum.jpg",
+]
+NEW_OR_CHANGED.setdefault("water-bath", {})["description"] = (
+    "A tank of water kept warm by an electric heater, for heating up to 100 °C. Its lid is a set "
+    "of concentric rings: lift out as many as it takes for the flask to sit in the water. Water "
+    "responds quickly, so the temperature can be held very precisely, and a level regulator "
+    "connected to the tap keeps it topped up. It must never be used with sodium, potassium, metal "
+    "hydrides or anything else that reacts with water."
+)
+
+# Both gas chromatograph photos showed GC-MS rigs, a right answer to "Find the mass
+# spectrometer" too. These are a GC on its own, two of them with the oven open -- the
+# part that tells a GC apart.
+PHOTOS["gas-chromatograph"] = [
+    "wm:Gaschromatograph offen.jpg",
+    "wm:GC with open door.jpg",
+    "wm:SHIMADZU GC-2010 Plus High-end Gas Chromatograph.jpg",
+]
+
+COMMONS.update({
+    "Water bath at Vigyan Ashram.jpg": {
+        "credit": "Adak shital, CC BY-SA 4.0, via Wikimedia Commons",
+        "url": "https://commons.wikimedia.org/wiki/File:Water_bath_at_Vigyan_Ashram.jpg",
+    },
+    "Herzfeldsche Blechflaschen Wasserbad c1950 Zucker-Museum.jpg": {
+        "credit": "FA2010, public domain, via Wikimedia Commons",
+        "url": "https://commons.wikimedia.org/wiki/File:Herzfeldsche_Blechflaschen_Wasserbad_c1950_Zucker-Museum.jpg",
+    },
+    "Gaschromatograph offen.jpg": {
+        "credit": "W.Nitsch, CC BY-SA 4.0, via Wikimedia Commons",
+        "url": "https://commons.wikimedia.org/wiki/File:Gaschromatograph_offen.jpg",
+    },
+    "GC with open door.jpg": {
+        "credit": "Polimerek, CC BY-SA 3.0, via Wikimedia Commons",
+        "url": "https://commons.wikimedia.org/wiki/File:GC_with_open_door.jpg",
+    },
+    "SHIMADZU GC-2010 Plus High-end Gas Chromatograph.jpg": {
+        "credit": "Dqwyy, CC0, via Wikimedia Commons",
+        "url": "https://commons.wikimedia.org/wiki/File:SHIMADZU_GC-2010_Plus_High-end_Gas_Chromatograph.jpg",
+    },
+})
