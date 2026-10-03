@@ -1160,3 +1160,33 @@ for _slug, _stems in list(PHOTOS.items()):
         del PHOTOS[_slug]
         NEW_OR_CHANGED.pop(_slug, None)
         DROPPED[_slug] = "only photo(s) were damaged"
+
+# Denis's review (2026-10-03): two cards whose photos a chemist reads as another card,
+# so a question had two right answers.
+#
+# A loose PTFE plug with its handles is what the lab calls a PTFE stopcock: "Find the
+# PTFE stopcock" offered the plug as a wrong option. The plug's photos join the stopcock
+# card and the plug card goes -- all but the T-bore plug, which belongs to a three-way
+# stopcock, and a second shot of the same double-oblique plug.
+PHOTOS["ptfe-stopcock"] = PHOTOS["ptfe-stopcock"] + [
+    "lw:stopcock-replacement-plug-1-5-teflon-double-oblique-bore_0",
+    "lw:stopcock-replacement-plug-1-5-teflon-metering-valve_0",
+    "lw:stopcock-replacement-plug-1-5-teflon-straight-bore_0",
+]
+NEW_OR_CHANGED.setdefault("ptfe-stopcock", {}).update({
+    "aliases": ["Teflon stopcock", "PTFE tap", "Teflon tap", "PTFE stopcock plug", "PTFE plug",
+                "Teflon plug", "Stopcock key"],
+    "description": (
+        "A tap whose plug is PTFE, sealed with O-rings. It needs no grease, so nothing "
+        "leaches into what flows past, and it is the usual stopcock on modern separatory "
+        "funnels and columns. The plug — the white part with the handles and a hole bored "
+        "through it — pulls out whole, and a worn one is simply swapped for a new one."
+    ),
+})
+del PHOTOS["ptfe-stopper"]
+NEW_OR_CHANGED.pop("ptfe-stopper", None)
+DROPPED["ptfe-stopper"] = "folded into ptfe-stopcock: the plug alone reads as a PTFE stopcock"
+
+# The glass T-bore stopcock (16172) is a three-way stopcock, which has its own card now.
+PHOTOS["glass-stopcock"] = [s for s in PHOTOS["glass-stopcock"] if s != "16172_0"]
+PHOTOS["three-way-stopcock"] = PHOTOS["three-way-stopcock"] + ["16172_0"]
