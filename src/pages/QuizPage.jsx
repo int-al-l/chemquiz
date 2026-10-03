@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import BottomSheet from "../components/BottomSheet";
+import ImageZoom, { ZoomButton } from "../components/ImageZoom";
 import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { fetchQuiz, imageSrc, submitAnswer } from "../api/client";
 import { useApi } from "../hooks/useApi";
@@ -18,6 +19,9 @@ import { useSaved } from "../saved/context";
  * Two modes:
  *   choice    a photograph and four names
  *   inverted  a name and four photographs
+ *
+ * Any photograph opens full screen to look closer: a tap on the question's
+ * photo or the one in "Why?", the magnifier on each of the four photos.
  *
  * The session lives on the server, so a refresh resumes at the first
  * unanswered question. Answers are graded by the backend.
@@ -40,6 +44,7 @@ function QuizPage() {
   const [xp, setXp] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [zoomed, setZoomed] = useState(null);
 
   const firstUnanswered = session?.questions.find((q) => !q.answered)?.position ?? null;
   const position = cursor ?? firstUnanswered;
@@ -170,30 +175,38 @@ function QuizPage() {
           </div>
           <div className="photo-options">
             {question.choices.map((choice, i) => (
-              <button
-                key={choice.id}
-                className={`photo-option ${stateOf(choice.id)}`}
-                onClick={() => send(choice.id)}
-                disabled={answered || submitting}
-                aria-label={t("quiz.photoN", { n: i + 1 })}
-                type="button"
-              >
-                <img src={imageSrc(choice.image_url)} alt="" draggable="false" />
-                <span className="option-key" aria-hidden="true">{i + 1}</span>
-                {answered && choice.id === correctId && (
-                  <span className="photo-option-mark material-symbols-outlined" aria-hidden="true">check_circle</span>
-                )}
-                {answered && choice.id === pickedId && choice.id !== correctId && (
-                  <span className="photo-option-mark is-wrong material-symbols-outlined" aria-hidden="true">cancel</span>
-                )}
-              </button>
+              <div key={choice.id} className="photo-cell">
+                <button
+                  className={`photo-option ${stateOf(choice.id)}`}
+                  onClick={() => send(choice.id)}
+                  disabled={answered || submitting}
+                  aria-label={t("quiz.photoN", { n: i + 1 })}
+                  type="button"
+                >
+                  <img src={imageSrc(choice.image_url)} alt="" draggable="false" />
+                  <span className="option-key" aria-hidden="true">{i + 1}</span>
+                  {answered && choice.id === correctId && (
+                    <span className="photo-option-mark material-symbols-outlined" aria-hidden="true">check_circle</span>
+                  )}
+                  {answered && choice.id === pickedId && choice.id !== correctId && (
+                    <span className="photo-option-mark is-wrong material-symbols-outlined" aria-hidden="true">cancel</span>
+                  )}
+                </button>
+                <ZoomButton onClick={() => setZoomed(choice.image_url)} />
+              </div>
             ))}
           </div>
         </section>
       ) : (
         <section className="quiz-stage is-named" key={position}>
           <div className="quiz-photo">
-            <img src={imageSrc(question.image_url)} alt={t("quiz.namePhoto")} draggable="false" />
+            <img
+              src={imageSrc(question.image_url)}
+              alt={t("quiz.namePhoto")}
+              draggable="false"
+              onClick={() => setZoomed(question.image_url)}
+            />
+            <ZoomButton onClick={() => setZoomed(question.image_url)} />
           </div>
           <div className="quiz-answers">
             <span className="quiz-q-pill">{t("quiz.progress", { n: position, total: session.question_count })}</span>
@@ -261,7 +274,17 @@ function QuizPage() {
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title={item?.name ?? ""}>
         {item && (
           <div className="why-body">
-            {item.image_url && <img className="why-photo" src={imageSrc(item.image_url)} alt="" />}
+            {item.image_url && (
+              <button
+                className="why-photo"
+                onClick={() => setZoomed(item.image_url)}
+                aria-label={t("zoom.open")}
+                type="button"
+              >
+                <img src={imageSrc(item.image_url)} alt="" />
+                <span className="zoom-badge material-symbols-outlined" aria-hidden="true">zoom_in</span>
+              </button>
+            )}
             <p>{item.description ?? t("common.noDescription")}</p>
             <button
               className={`secondary-button ${has(item.slug) ? "is-on" : ""}`}
@@ -276,6 +299,8 @@ function QuizPage() {
           </div>
         )}
       </BottomSheet>
+
+      {zoomed && <ImageZoom src={imageSrc(zoomed)} onClose={() => setZoomed(null)} />}
     </main>
   );
 }

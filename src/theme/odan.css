@@ -1071,9 +1071,9 @@ textarea {
   transition: transform 0.25s var(--spring), border-color 0.15s, box-shadow 0.2s, opacity 0.2s;
 }
 
-.photo-option:nth-child(2) { animation-delay: 0.06s; }
-.photo-option:nth-child(3) { animation-delay: 0.12s; }
-.photo-option:nth-child(4) { animation-delay: 0.18s; }
+.photo-cell:nth-child(2) .photo-option { animation-delay: 0.06s; }
+.photo-cell:nth-child(3) .photo-option { animation-delay: 0.12s; }
+.photo-cell:nth-child(4) .photo-option { animation-delay: 0.18s; }
 .photo-option:hover:not(:disabled) { transform: translateY(-3px) rotate(-0.5deg); box-shadow: var(--oq-shadow-hover); border-color: rgba(13, 123, 210, 0.45); }
 .photo-option.is-correct { border: 2px solid var(--oq-ok); background: var(--oq-ok-soft); animation: oq-boing 0.55s var(--spring); }
 .photo-option.is-wrong { border: 2px solid var(--oq-error); animation: oq-shake 0.45s ease; }

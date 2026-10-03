@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { imageSrc } from "../api/client";
 import { useT } from "../i18n";
+import ImageZoom, { ZoomButton } from "./ImageZoom";
 
 /**
  * A study card: the photograph fills the front, the name sits in a strip at
@@ -10,13 +11,14 @@ import { useT } from "../i18n";
  * the deck (see useSwipe), which passes `flipped`.
  *
  * Several photographs of the same piece page through with the dots, without
- * leaving the card.
+ * leaving the card; the magnifier opens the one shown full screen.
  */
 function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, onFlip }) {
   const t = useT();
   const photos = item.photo_urls?.length ? item.photo_urls : [item.image_url].filter(Boolean);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [failed, setFailed] = useState({});
+  const [zoomed, setZoomed] = useState(false);
   const shown = Math.min(photoIndex, photos.length - 1);
   const current = photos[shown];
   const credit = item.photo_urls?.length ? item.photo_credits?.[shown] : null;
@@ -53,12 +55,15 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
 
           <div className="flip-photo">
             {current && !failed[current] ? (
-              <img
-                src={imageSrc(current)}
-                alt={hideName ? t("card.whichPiece") : item.name}
-                draggable="false"
-                onError={() => setFailed((f) => ({ ...f, [current]: true }))}
-              />
+              <>
+                <img
+                  src={imageSrc(current)}
+                  alt={hideName ? t("card.whichPiece") : item.name}
+                  draggable="false"
+                  onError={() => setFailed((f) => ({ ...f, [current]: true }))}
+                />
+                {!flipped && <ZoomButton onClick={() => setZoomed(true)} />}
+              </>
             ) : (
               <span className="flip-photo-empty material-symbols-outlined" aria-hidden="true">
                 science
@@ -119,6 +124,13 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
           </button>
         </section>
       </div>
+      {zoomed && current && (
+        <ImageZoom
+          src={imageSrc(current)}
+          alt={hideName ? "" : item.name}
+          onClose={() => setZoomed(false)}
+        />
+      )}
     </div>
   );
 }
