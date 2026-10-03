@@ -96,6 +96,10 @@ const en = {
   "card.tapToReveal": "Tap to reveal",
   "card.photoCredit": "Photo: {credit}",
   "card.turnBack": "Turn back",
+  "zoom.title": "Photo",
+  "zoom.open": "Zoom in on the photo",
+  "zoom.in": "Zoom in",
+  "zoom.out": "Zoom out",
 
   // CodeInput, DemoInbox
   "code.label": "Code from the email",

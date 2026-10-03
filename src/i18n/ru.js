@@ -92,6 +92,10 @@ const ru = {
   "card.tapToReveal": "Нажмите, чтобы узнать",
   "card.photoCredit": "Фото: {credit}",
   "card.turnBack": "Перевернуть",
+  "zoom.title": "Фото",
+  "zoom.open": "Увеличить фото",
+  "zoom.in": "Приблизить",
+  "zoom.out": "Отдалить",
 
   // CodeInput, DemoInbox
   "code.label": "Код из письма",
