@@ -6,6 +6,7 @@ import ImageZoom, { ZoomButton } from "../components/ImageZoom";
 import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { fetchQuiz, imageSrc, submitAnswer } from "../api/client";
 import { useApi } from "../hooks/useApi";
+import { closeOverlaysThen, useBackClose } from "../hooks/useBackClose";
 import { useT } from "../i18n";
 import { useProgress } from "../progress/context";
 import { useSaved } from "../saved/context";
@@ -21,7 +22,8 @@ import { useSaved } from "../saved/context";
  *   inverted  a name and four photographs
  *
  * Any photograph opens full screen to look closer: a tap on the question's
- * photo or the one in "Why?", the magnifier on each of the four photos.
+ * photo or the one in "Why?", the magnifier on each of the four photos. The
+ * phone's Back button closes the photo or the sheet rather than the quiz.
  *
  * The session lives on the server, so a refresh resumes at the first
  * unanswered question. Answers are graded by the backend.
@@ -43,8 +45,8 @@ function QuizPage() {
   const [combo, setCombo] = useState(0);
   const [xp, setXp] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [zoomed, setZoomed] = useState(null);
+  const [sheetOpen, openSheet, closeSheet] = useBackClose("why");
+  const [zoomed, openZoom, closeZoom] = useBackClose("photo");
 
   const firstUnanswered = session?.questions.find((q) => !q.answered)?.position ?? null;
   const position = cursor ?? firstUnanswered;
@@ -76,17 +78,20 @@ function QuizPage() {
     }
   }
 
+  // Next can be pressed (Enter) with "Why?" still open: its history entry goes
+  // first, or the results page would replace it and Back land on the quiz.
   function handleNext() {
     if (!feedback) return;
     const wasLast = feedback.is_complete;
-    setFeedback(null);
-    setSheetOpen(false);
-    setAnswerError(null);
-    if (wasLast) {
-      navigate(`/quiz/${token}/results`, { replace: true, state: { xp, bestCombo } });
-    } else {
+    closeOverlaysThen(() => {
+      if (wasLast) {
+        navigate(`/quiz/${token}/results`, { replace: true, state: { xp, bestCombo } });
+        return;
+      }
+      setFeedback(null);
+      setAnswerError(null);
       setCursor(position + 1);
-    }
+    });
   }
 
   // 1-4 pick an option, Enter or → moves on.
@@ -192,7 +197,7 @@ function QuizPage() {
                     <span className="photo-option-mark is-wrong material-symbols-outlined" aria-hidden="true">cancel</span>
                   )}
                 </button>
-                <ZoomButton onClick={() => setZoomed(choice.image_url)} />
+                <ZoomButton onClick={() => openZoom(choice.image_url)} />
               </div>
             ))}
           </div>
@@ -204,9 +209,9 @@ function QuizPage() {
               src={imageSrc(question.image_url)}
               alt={t("quiz.namePhoto")}
               draggable="false"
-              onClick={() => setZoomed(question.image_url)}
+              onClick={() => openZoom(question.image_url)}
             />
-            <ZoomButton onClick={() => setZoomed(question.image_url)} />
+            <ZoomButton onClick={() => openZoom(question.image_url)} />
           </div>
           <div className="quiz-answers">
             <span className="quiz-q-pill">{t("quiz.progress", { n: position, total: session.question_count })}</span>
@@ -254,7 +259,7 @@ function QuizPage() {
                 </strong>
                 <span className="verdict-answer">{item.name}</span>
               </span>
-              <button className="why-button" onClick={() => setSheetOpen(true)} type="button">
+              <button className="why-button" onClick={() => openSheet()} type="button">
                 <span className="material-symbols-outlined" aria-hidden="true">info</span>
                 {t("quiz.why")}
               </button>
@@ -271,13 +276,13 @@ function QuizPage() {
         </button>
       </footer>
 
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title={item?.name ?? ""}>
+      <BottomSheet open={Boolean(sheetOpen)} onClose={closeSheet} title={item?.name ?? ""}>
         {item && (
           <div className="why-body">
             {item.image_url && (
               <button
                 className="why-photo"
-                onClick={() => setZoomed(item.image_url)}
+                onClick={() => openZoom(item.image_url)}
                 aria-label={t("zoom.open")}
                 type="button"
               >
@@ -300,7 +305,7 @@ function QuizPage() {
         )}
       </BottomSheet>
 
-      {zoomed && <ImageZoom src={imageSrc(zoomed)} onClose={() => setZoomed(null)} />}
+      {zoomed && <ImageZoom src={imageSrc(zoomed)} onClose={closeZoom} />}
     </main>
   );
 }
