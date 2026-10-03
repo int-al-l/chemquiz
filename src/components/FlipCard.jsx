@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { imageSrc } from "../api/client";
+import { useBackClose } from "../hooks/useBackClose";
 import { useT } from "../i18n";
 import ImageZoom, { ZoomButton } from "./ImageZoom";
 
@@ -18,7 +19,7 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
   const photos = item.photo_urls?.length ? item.photo_urls : [item.image_url].filter(Boolean);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [failed, setFailed] = useState({});
-  const [zoomed, setZoomed] = useState(false);
+  const [zoomed, openZoom, closeZoom] = useBackClose("photo");
   const shown = Math.min(photoIndex, photos.length - 1);
   const current = photos[shown];
   const credit = item.photo_urls?.length ? item.photo_credits?.[shown] : null;
@@ -62,7 +63,7 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
                   draggable="false"
                   onError={() => setFailed((f) => ({ ...f, [current]: true }))}
                 />
-                {!flipped && <ZoomButton onClick={() => setZoomed(true)} />}
+                {!flipped && <ZoomButton onClick={() => openZoom()} />}
               </>
             ) : (
               <span className="flip-photo-empty material-symbols-outlined" aria-hidden="true">
@@ -128,7 +129,7 @@ function FlipCard({ item, flipped, hideName, masteryKey, saved, onToggleSave, on
         <ImageZoom
           src={imageSrc(current)}
           alt={hideName ? "" : item.name}
-          onClose={() => setZoomed(false)}
+          onClose={closeZoom}
         />
       )}
     </div>
