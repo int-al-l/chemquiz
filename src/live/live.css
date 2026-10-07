@@ -134,7 +134,7 @@
 
 .live-deck-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 10px;
 }
 
@@ -142,7 +142,7 @@
   min-height: 64px;
   padding: 8px 12px 8px 8px;
   display: grid;
-  grid-template-columns: 48px 1fr auto;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
   text-align: left;
@@ -186,6 +186,8 @@
 .live-deck-name {
   font-weight: 500;
   line-height: 1.25;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .live-join-layout {
