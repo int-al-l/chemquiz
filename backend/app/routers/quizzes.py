@@ -7,12 +7,12 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, UploadFile
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .. import models, quizzes
+from .. import models, quiz_import, quizzes
 from ..database import get_db
 from ..i18n import AppError, request_lang
 from .account import current_user
@@ -71,6 +71,14 @@ class FromCardsIn(BaseModel):
 def from_cards(payload: FromCardsIn, user: models.User = Depends(current_user),
                db: Session = Depends(get_db)):
     return {"questions": quizzes.from_cards(db, payload.item_slugs, payload.mode, payload.lang)}
+
+
+@router.post("/import")
+def import_file(file: UploadFile, lang: str = Depends(request_lang),
+                user: models.User = Depends(current_user)):
+    """Questions from a filled-in template, for the editor to show; nothing is saved."""
+    questions, errors = quiz_import.parse(file.file.read(quiz_import.MAX_FILE + 1), lang)
+    return {"questions": questions, "errors": errors}
 
 
 @router.get("/{quiz_id}")
