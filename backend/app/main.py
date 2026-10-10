@@ -9,13 +9,14 @@ Interactive API docs are then at http://localhost:8000/docs
 
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from . import crud, migrate, models, schemas, seeding
+from . import config, crud, migrate, models, schemas, seeding
 from .live import purge as purge_live_games
 from .config import CORS_ORIGINS, IMAGES_DIR, STATIC_DIR, UPLOADS_DIR
 from .database import Base, SessionLocal, engine, get_db
@@ -105,3 +106,18 @@ def health(db: Session = Depends(get_db)):
         "categories": db.execute(select(func.count(models.Category.id))).scalar_one(),
         "items": db.execute(select(func.count(models.Item.id))).scalar_one(),
     }
+
+
+# Registered last, so every API route and /static come first.
+@app.get("/{path:path}", include_in_schema=False)
+def site(path: str):
+    """The built site (see config.FRONTEND_DIR): a file if there is one, else
+    index.html, because every other path is a page of the single-page app."""
+    root = config.FRONTEND_DIR
+    if root is None or path.startswith("api/"):
+        raise HTTPException(status_code=404)
+    root = root.resolve()
+    wanted = (root / path).resolve()
+    if path and wanted.is_file() and root in wanted.parents:
+        return FileResponse(wanted)
+    return FileResponse(root / "index.html")
