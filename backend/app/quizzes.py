@@ -11,10 +11,12 @@ show and grade (`grading.py`).
 from __future__ import annotations
 
 import math
+import random
 import re
 from typing import Any, Optional
 
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 
 from . import messages
 from .i18n import AppError
@@ -180,3 +182,37 @@ def freeze(questions: list[dict], lang: str) -> list[dict]:
             f.update({k: q[k] for k in ("min", "max", "step", "answer", "tolerance", "unit")})
         frozen.append(f)
     return frozen
+
+
+def from_cards(db: Session, slugs: list[str], mode: str, lang: str,
+               rng: Optional[random.Random] = None) -> list[dict]:
+    """Draft questions from library cards, the way a deck game asks them.
+
+    Nothing is saved: the editor appends these and the teacher can change them
+    like any other question. Unknown slugs are skipped.
+    """
+    from . import crud, live  # live imports grading, which must not import us back
+
+    rng = rng or random.SystemRandom()
+    library = crud.list_items(db)
+    by_slug = {item.slug: item for item in library}
+    asked = [by_slug[s] for s in dict.fromkeys(slugs) if s in by_slug]
+    if not asked:
+        raise AppError("no_items")
+    drafts = []
+    for q in live._draw(db, asked, library, mode, rng, lang):
+        if mode == "inverted":
+            text = messages.text("from_cards_inverted", lang, name=q["prompt"])
+        else:
+            text = messages.text("from_cards_choice", lang)
+        drafts.append({
+            "type": "quiz",
+            "text": text,
+            "image": q["image_url"],
+            "time_limit": DEFAULT_TIME_LIMIT,
+            "options": [
+                {"text": c.get("name") or "", "image": c.get("image_url"), "correct": c["id"] == q["correct_id"]}
+                for c in q["choices"]
+            ],
+        })
+    return drafts

@@ -20,7 +20,7 @@ from .live import purge as purge_live_games
 from .config import CORS_ORIGINS, IMAGES_DIR, STATIC_DIR
 from .database import Base, SessionLocal, engine, get_db
 from .i18n import AppError, request_lang
-from .routers import account, content, live, live_history, quiz
+from .routers import account, content, live, live_history, quiz, quizzes
 
 
 @asynccontextmanager
@@ -93,6 +93,7 @@ app.include_router(quiz.router)
 app.include_router(account.router)
 app.include_router(live.router)
 app.include_router(live_history.router)
+app.include_router(quizzes.router)
 
 
 @app.get("/api/health", response_model=schemas.HealthOut, tags=["meta"])

@@ -119,3 +119,92 @@ def test_freeze():
     assert (q4["min"], q4["max"], q4["answer"], q4["tolerance"], q4["unit"]) == (0, 200, 100, 2, "°C")
     assert [q["position"] for q in (q1, q2, q3, q4)] == [1, 2, 3, 4]
     assert quizzes.TIME_LIMITS == (5, 10, 20, 30, 60, 90, 120, 240)
+
+
+from test_api import auth, client, sign_in  # noqa: F401,E402 -- the seeded test app
+
+
+def teacher(client, email="anton@example.com"):
+    return auth(sign_in(client, email=email).json()["token"])
+
+
+BODY = {"title": "Mixed", "lang": "en", "questions": GOOD[:4]}
+
+
+def test_quiz_crud(client):
+    t = teacher(client)
+    assert client.get("/api/quizzes", headers=t).json() == []
+    made = client.post("/api/quizzes", json=BODY, headers=t)
+    assert made.status_code == 201, made.text
+    quiz = made.json()
+    assert quiz["title"] == "Mixed" and len(quiz["questions"]) == 4
+
+    listed = client.get("/api/quizzes", headers=t).json()
+    assert [(q["id"], q["title"], q["question_count"]) for q in listed] == [(quiz["id"], "Mixed", 4)]
+
+    changed = client.put(f"/api/quizzes/{quiz['id']}", json={**BODY, "title": "Renamed"}, headers=t).json()
+    assert changed["title"] == "Renamed"
+    assert client.get(f"/api/quizzes/{quiz['id']}", headers=t).json()["title"] == "Renamed"
+
+    assert client.delete(f"/api/quizzes/{quiz['id']}", headers=t).status_code == 204
+    assert client.get(f"/api/quizzes/{quiz['id']}", headers=t).status_code == 404
+
+
+def test_quizzes_are_private(client):
+    mine = teacher(client)
+    theirs = teacher(client, email="bea@example.com")
+    quiz_id = client.post("/api/quizzes", json=BODY, headers=theirs).json()["id"]
+    assert client.get("/api/quizzes").status_code == 401
+    assert client.get("/api/quizzes", headers=mine).json() == []
+    for res in (
+        client.get(f"/api/quizzes/{quiz_id}", headers=mine),
+        client.put(f"/api/quizzes/{quiz_id}", json=BODY, headers=mine),
+        client.delete(f"/api/quizzes/{quiz_id}", headers=mine),
+        client.get(f"/api/quizzes/{quiz_id}/play", headers=mine),
+    ):
+        assert res.status_code == 404
+
+
+def test_a_bad_question_is_named_in_the_request_language(client):
+    t = {**teacher(client), "Accept-Language": "ru"}
+    body = {**BODY, "questions": [GOOD[0], quiz_q(options=[{"text": "A"}, {"text": "B"}])]}
+    res = client.post("/api/quizzes", json=body, headers=t)
+    assert res.status_code == 422
+    assert res.json() == {"detail": "Отметьте хотя бы один правильный вариант", "code": "q_correct", "question": 2}
+
+
+def test_play_gives_the_frozen_questions_with_answers(client):
+    t = teacher(client)
+    quiz_id = client.post("/api/quizzes", json=BODY, headers=t).json()["id"]
+    played = client.get(f"/api/quizzes/{quiz_id}/play", headers={**t, "Accept-Language": "ru"}).json()
+    assert played["title"] == "Mixed"
+    assert played["questions"][0]["correct_ids"] == [1]
+    assert played["questions"][1]["choices"][0]["name"] == "Верно"
+
+
+@pytest.mark.parametrize("mode", ["choice", "inverted"])
+def test_questions_from_cards(client, mode):
+    t = teacher(client)
+    res = client.post("/api/quizzes/from-cards",
+                      json={"item_slugs": ["condenser-1", "bubbler-0", "nope"], "mode": mode, "lang": "en"},
+                      headers=t)
+    assert res.status_code == 200, res.text
+    made = res.json()["questions"]
+    assert len(made) == 2
+    for q in made:
+        clean_question(q)  # every drafted question is saveable as it is
+        assert q["type"] == "quiz" and len(q["options"]) == 4
+        assert sum(o["correct"] for o in q["options"]) == 1
+    first = made[0]
+    right = next(o for o in first["options"] if o["correct"])
+    if mode == "choice":
+        assert first["text"] == "What is this?" and first["image"].startswith("/static/images/condenser-1")
+        assert right["text"] == "Condenser 1"
+    else:
+        assert first["text"] == "Find the Condenser 1" and first["image"] is None
+        assert right["image"].startswith("/static/images/condenser-1")
+
+
+def test_from_cards_needs_known_cards(client):
+    res = client.post("/api/quizzes/from-cards", json={"item_slugs": ["nope"]}, headers=teacher(client))
+    assert res.status_code == 409

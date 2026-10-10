@@ -9,6 +9,8 @@ Accounts live in User (email + password, verified by a code sent by email),
 EmailCode (the one-time codes and links) and UserProgress (the learning
 progress document: XP, per-card mastery, streak days, badges).
 
+A teacher's own quizzes are CustomQuiz rows (app/quizzes.py).
+
 Live classroom games live in LiveGame, LivePlayer and LiveAnswer (the rules
 are in app/live.py). A game hosted while signed in stays after it ends, as the
 host's history.
@@ -278,6 +280,25 @@ class UserProgress(Base):
         ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
     data: Mapped[str] = mapped_column(Text, default="{}")
+    updated_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class CustomQuiz(Base):
+    """A teacher's own quiz (the rules are in `app/quizzes.py`).
+
+    The questions are one JSON document, saved whole by the editor. Only the
+    author sees the quiz. Games played from it keep their own frozen copy, so
+    editing or deleting the quiz leaves past games as they were.
+    """
+
+    __tablename__ = "custom_quizzes"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    title: Mapped[str] = mapped_column(String(120))
+    lang: Mapped[str] = mapped_column(String(2), default="en")
+    questions: Mapped[list] = mapped_column(JSON)
+    created_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
