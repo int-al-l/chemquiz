@@ -590,6 +590,17 @@ const ru = {
   "quizzes.play.done": "Верно {right} из {total}",
   "quizzes.play.again": "Ещё раз",
   "quizzes.play.backToList": "Мои квизы",
+  "live.setup.source": "Вопросы",
+  "live.setup.fromDeck": "Колода",
+  "live.setup.fromQuiz": "Мой квиз",
+  "live.setup.noQuizzes": "У вас пока нет квизов. {make}",
+  "live.setup.makeOne": "Создать",
+  "live.setup.quizNote": { one: "{n} вопрос, время задано в каждом", few: "{n} вопроса, время задано в каждом", many: "{n} вопросов, время задано в каждом", other: "{n} вопроса, время задано в каждом" },
+  "live.host.answerNow": "Отвечайте на телефонах",
+  "live.host.typeOnPhones": "Напишите ответ на телефоне",
+  "live.host.sliderRange": "Выберите значение от {min} до {max} {unit}",
+  "live.play.itWasAnswer": "Ответ: {answer}",
+  "mode.custom": "Свой квиз",
 };
 
 export default ru;

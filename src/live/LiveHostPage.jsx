@@ -17,6 +17,7 @@ import { rich, useT } from "../i18n";
 import { LanguageScope } from "../i18n/LanguageProvider";
 import { Countdown, DemoNotice, QrCode, Shape } from "./components";
 import { hostToken, OPTION_STYLES, questionClock, saveHostToken, useLivePoll, useServerNow } from "./game";
+import { formatNumber } from "../quizzes/grade";
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
 
@@ -303,6 +304,10 @@ function QuestionBoard({ t, state, now, busy, onNext }) {
   const reveal = state.reveal;
   const clock = questionClock(state, now);
   const inverted = state.mode === "inverted";
+  const custom = state.mode === "custom";
+  const kind = q?.type ?? "quiz";
+  const rightIds = reveal ? (reveal.correct_ids?.length ? reveal.correct_ids : [reveal.correct_id]) : [];
+  const photos = inverted || (custom && q?.choices?.some((c) => c.image_url));
   const counts = Object.fromEntries((reveal?.counts ?? []).map((c) => [c.id, c.count]));
   const most = Math.max(1, ...Object.values(counts));
   const total = state.players.length;
@@ -321,7 +326,13 @@ function QuestionBoard({ t, state, now, busy, onNext }) {
           </span>
         ) : (
           <span className="live-q-status">
-            {clock.reading ? t("live.host.getReady") : inverted ? t("live.host.findPhoto") : t("live.host.whatIsThis")}
+            {clock.reading
+              ? t("live.host.getReady")
+              : custom
+                ? t("live.host.answerNow")
+                : inverted
+                  ? t("live.host.findPhoto")
+                  : t("live.host.whatIsThis")}
           </span>
         )}
         <span className="live-q-answers">
@@ -332,7 +343,22 @@ function QuestionBoard({ t, state, now, busy, onNext }) {
 
       <section className="live-q-stage">
         {!reveal && <Countdown {...clock} />}
-        {inverted ? (
+        {custom ? (
+          <div className="live-q-prompt">
+            {q.prompt && <strong>{q.prompt}</strong>}
+            {q.image_url && (
+              <div className="live-q-photo">
+                <img src={imageSrc(q.image_url)} alt="" draggable="false" />
+              </div>
+            )}
+            {!reveal && kind === "type" && <span>{t("live.host.typeOnPhones")}</span>}
+            {!reveal && kind === "slider" && (
+              <span>
+                {t("live.host.sliderRange", { min: formatNumber(q.min), max: formatNumber(q.max), unit: q.unit })}
+              </span>
+            )}
+          </div>
+        ) : inverted ? (
           <div className="live-q-prompt">
             <span>{t("live.host.findThe")}</span>
             <strong>{q.prompt}</strong>
@@ -342,19 +368,26 @@ function QuestionBoard({ t, state, now, busy, onNext }) {
             <img src={imageSrc(q.image_url)} alt="" draggable="false" />
           </div>
         )}
-        {reveal && (
+        {reveal?.item && (
           <aside className="live-q-explain">
             <span className="live-q-explain-label">{t("live.host.answer")}</span>
             <strong>{reveal.item.name}</strong>
             {reveal.item.description && <p>{reveal.item.description}</p>}
           </aside>
         )}
+        {reveal && !reveal.item && reveal.answer_text && (
+          <aside className="live-q-explain">
+            <span className="live-q-explain-label">{t("live.host.answer")}</span>
+            <strong>{reveal.answer_text}</strong>
+          </aside>
+        )}
       </section>
 
-      <ul className={`live-options ${inverted ? "is-photos" : ""}`}>
+      {q.choices && (
+      <ul className={`live-options ${photos ? "is-photos" : ""}`}>
         {q.choices.map((choice, i) => {
           const style = OPTION_STYLES[i];
-          const isRight = reveal && choice.id === reveal.correct_id;
+          const isRight = reveal && rightIds.includes(choice.id);
           const n = counts[choice.id] ?? 0;
           return (
             <li
@@ -365,7 +398,16 @@ function QuestionBoard({ t, state, now, busy, onNext }) {
               {inverted ? (
                 <img src={imageSrc(choice.image_url)} alt={t(`live.shape.${style.key}`)} draggable="false" />
               ) : (
-                <span className="live-option-text">{choice.name}</span>
+                <>
+                  {choice.image_url && (
+                    <img
+                      src={imageSrc(choice.image_url)}
+                      alt={choice.name ?? t(`live.shape.${style.key}`)}
+                      draggable="false"
+                    />
+                  )}
+                  {choice.name && <span className="live-option-text">{choice.name}</span>}
+                </>
               )}
               {reveal && (
                 <span className="live-option-count">
@@ -382,6 +424,7 @@ function QuestionBoard({ t, state, now, busy, onNext }) {
           );
         })}
       </ul>
+      )}
 
       <button type="button" className="live-next-button" onClick={onNext} disabled={busy}>
         {reveal ? t("live.host.standings") : t("live.host.skip")}

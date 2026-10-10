@@ -19,6 +19,12 @@ describe("describeGame", () => {
     ).toBe("Everything · Find it · 4 of 10 questions · 3 players");
   });
 
+  it("calls a teacher's own quiz by its title and Own quiz", () => {
+    expect(
+      describeGame({ category_name: "Kahoot night", mode: "custom", question_count: 4, asked_count: 4, player_count: 2 }, tEn),
+    ).toBe("Kahoot night · Own quiz · 4 questions · 2 players");
+  });
+
   it("speaks Russian", () => {
     expect(
       describeGame({ category_name: "Холодильники", mode: "choice", question_count: 5, asked_count: 5, player_count: 22 }, tRu),

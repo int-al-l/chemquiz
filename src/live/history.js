@@ -12,7 +12,7 @@ export function describeGame(game, t) {
     game.asked_count < game.question_count
       ? t("history.questions-of", { asked: game.asked_count, n: game.question_count })
       : t("history.questions", { n: game.question_count });
-  const mode = game.mode === "choice" || game.mode === "inverted" ? t(`mode.${game.mode}`) : game.mode;
+  const mode = ["choice", "inverted", "custom"].includes(game.mode) ? t(`mode.${game.mode}`) : game.mode;
   return [
     game.category_name ?? t("history.everything"),
     mode,

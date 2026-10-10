@@ -558,6 +558,17 @@ const en = {
   "quizzes.play.done": "{right} of {total} right",
   "quizzes.play.again": "Play again",
   "quizzes.play.backToList": "My quizzes",
+  "live.setup.source": "Questions",
+  "live.setup.fromDeck": "A deck",
+  "live.setup.fromQuiz": "My quiz",
+  "live.setup.noQuizzes": "You have no quizzes yet. {make}",
+  "live.setup.makeOne": "Make one",
+  "live.setup.quizNote": { one: "{n} question, times set per question", other: "{n} questions, times set per question" },
+  "live.host.answerNow": "Answer on your phones",
+  "live.host.typeOnPhones": "Type the answer on your phone",
+  "live.host.sliderRange": "Pick a value from {min} to {max} {unit}",
+  "live.play.itWasAnswer": "Answer: {answer}",
+  "mode.custom": "Own quiz",
 };
 
 export default en;
