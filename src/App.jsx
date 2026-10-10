@@ -20,6 +20,7 @@ import LiveHistoryPage from "./live/LiveHistoryPage";
 import LiveGamePage from "./live/LiveGamePage";
 import MyQuizzesPage from "./quizzes/MyQuizzesPage";
 import QuizEditorPage from "./quizzes/QuizEditorPage";
+import SoloPlayPage from "./quizzes/SoloPlayPage";
 import Toaster from "./components/Toaster";
 import AppShell from "./components/AppShell";
 
@@ -103,6 +104,7 @@ function App() {
             <Route path="/quiz/:token" element={<QuizPage />} />
             <Route path="/live/host/:pin" element={<LiveHostPage />} />
             <Route path="/play/:pin" element={<LivePlayPage />} />
+            <Route path="/quizzes/:id/play" element={<SoloPlayPage />} />
           </Routes>
           <Toaster />
         </ProgressProvider>

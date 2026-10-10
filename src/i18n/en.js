@@ -549,6 +549,15 @@ const en = {
   "profile.myQuizzes": "My quizzes",
   "live.tf.true": "True",
   "live.tf.false": "False",
+  "quizzes.play.question": "Question {n} of {total}",
+  "quizzes.play.right": "Right!",
+  "quizzes.play.wrong": "Not quite",
+  "quizzes.play.timeUp": "Time's up",
+  "quizzes.play.itWas": "Answer: {answer}",
+  "quizzes.play.next": "Next",
+  "quizzes.play.done": "{right} of {total} right",
+  "quizzes.play.again": "Play again",
+  "quizzes.play.backToList": "My quizzes",
 };
 
 export default en;

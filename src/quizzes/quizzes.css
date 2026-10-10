@@ -54,3 +54,6 @@
 .quiz-list .secondary-button { width: auto; max-width: none; margin-top: 0; padding-left: 16px; padding-right: 16px; }
 .quiz-actions { margin: 12px 0; }
 .quiz-editor { margin-top: 12px; }
+
+/* Solo play borrows the phone's layout; on a wide screen keep it phone-sized. */
+.solo-play { max-width: 560px; margin: 0 auto; }

@@ -581,6 +581,15 @@ const ru = {
   "profile.myQuizzes": "Мои квизы",
   "live.tf.true": "Верно",
   "live.tf.false": "Неверно",
+  "quizzes.play.question": "Вопрос {n} из {total}",
+  "quizzes.play.right": "Верно!",
+  "quizzes.play.wrong": "Неверно",
+  "quizzes.play.timeUp": "Время вышло",
+  "quizzes.play.itWas": "Ответ: {answer}",
+  "quizzes.play.next": "Дальше",
+  "quizzes.play.done": "Верно {right} из {total}",
+  "quizzes.play.again": "Ещё раз",
+  "quizzes.play.backToList": "Мои квизы",
 };
 
 export default ru;
