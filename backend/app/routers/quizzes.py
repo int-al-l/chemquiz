@@ -46,7 +46,7 @@ def list_quizzes(user: models.User = Depends(current_user), db: Session = Depend
         .order_by(models.CustomQuiz.updated_at.desc(), models.CustomQuiz.id.desc())
     ).all()
     return [
-        {"id": q.id, "title": q.title, "question_count": len(q.questions), "updated_at": q.updated_at}
+        {"id": q.id, "title": q.title, "lang": q.lang, "question_count": len(q.questions), "updated_at": q.updated_at}
         for q in rows
     ]
 

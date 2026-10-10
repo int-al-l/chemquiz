@@ -121,3 +121,33 @@ def test_import_endpoint(client):
     assert res.status_code == 200, res.text
     assert len(res.json()["questions"]) == 5 and res.json()["errors"] == []
     assert client.post("/api/quizzes/import", files={"file": ("q.xlsx", data)}).status_code == 401
+
+
+def test_cells_past_the_eighth_column_are_ignored():
+    # A cell far to the right must not make every row that wide (a far-off
+    # column like ZZZZZZZZ1 would otherwise exhaust memory).
+    data = xlsx_bytes([HEADER, EXAMPLES[3] + ["", "far away"]], [])
+    rows = quiz_import.read_rows(data)
+    assert all(len(cells) <= 8 for _, cells in rows)
+
+
+def test_numeric_cells_written_with_float_noise():
+    # Some Excel versions store a typed "2,3" (Russian locale) as 2.2999999999999998.
+    data = xlsx_bytes([HEADER, ["квиз", "Q", "A", "B", "C", "", "", "X"]], [])
+    data = _patch_sheet(data, '<c r="H2" t="inlineStr"><is><t xml:space="preserve">X</t></is></c>',
+                        '<c r="H2"><v>2.2999999999999998</v></c>')
+    [q], errors = quiz_import.parse(data, "en")
+    assert errors == [] and [o["correct"] for o in q["options"]] == [False, True, True]
+
+
+def _patch_sheet(data: bytes, old: str, new: str) -> bytes:
+    src = zipfile.ZipFile(io.BytesIO(data))
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w") as z:
+        for name in src.namelist():
+            body = src.read(name)
+            if name == "xl/worksheets/sheet1.xml":
+                assert old.encode() in body
+                body = body.replace(old.encode(), new.encode())
+            z.writestr(name, body)
+    return out.getvalue()

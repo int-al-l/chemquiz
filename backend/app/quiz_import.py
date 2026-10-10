@@ -97,7 +97,12 @@ def _xlsx_rows(archive: zipfile.ZipFile) -> list[tuple[int, list[str]]]:
                     value = shared[int(value)]
                 elif kind == "b":
                     value = "true" if value == "1" else "false"
-            cells[_column(c.get("r", ""), position)] = value.strip()
+                elif kind in (None, "n") and value:
+                    # Some Excel versions write 2.3 as 2.2999999999999998.
+                    value = format(float(value), ".15g")
+            column = _column(c.get("r", ""), position)
+            if column < COLUMNS:  # anything further right is not ours, and could be very far
+                cells[column] = value.strip()
         width = max(cells, default=-1) + 1
         rows.append((int(row.get("r") or index), [cells.get(i, "") for i in range(width)]))
     return rows

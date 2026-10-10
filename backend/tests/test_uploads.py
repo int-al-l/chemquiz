@@ -61,3 +61,20 @@ def test_too_big(client, uploads, monkeypatch):
 
 def test_sign_in_required(client, uploads):
     assert send(client, png(), {}).status_code == 401
+
+
+def test_only_web_picture_formats_are_opened(client, uploads):
+    # Pillow can open PostScript (through Ghostscript) and many rare formats; we only take web pictures.
+    out = io.BytesIO()
+    Image.new("RGB", (10, 10), (1, 2, 3)).save(out, "BMP")
+    res = send(client, out.getvalue(), teacher(client), name="x.bmp")
+    assert res.status_code == 422 and res.json()["code"] == "upload_bad"
+
+
+@pytest.mark.parametrize("mode, color", [("RGB", (0, 0, 0)), ("L", 0)])
+def test_a_png_with_one_transparent_colour_gets_a_white_background(client, uploads, mode, color):
+    out = io.BytesIO()
+    Image.new(mode, (10, 10), color).save(out, "PNG", transparency=color)
+    url = send(client, out.getvalue(), teacher(client)).json()["url"]
+    with Image.open(uploads / url.rsplit("/", 1)[1]) as img:
+        assert min(img.convert("L").getdata()) > 240

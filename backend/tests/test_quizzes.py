@@ -140,7 +140,7 @@ def test_quiz_crud(client):
     assert quiz["title"] == "Mixed" and len(quiz["questions"]) == 4
 
     listed = client.get("/api/quizzes", headers=t).json()
-    assert [(q["id"], q["title"], q["question_count"]) for q in listed] == [(quiz["id"], "Mixed", 4)]
+    assert [(q["id"], q["title"], q["question_count"], q["lang"]) for q in listed] == [(quiz["id"], "Mixed", 4, "en")]
 
     changed = client.put(f"/api/quizzes/{quiz['id']}", json={**BODY, "title": "Renamed"}, headers=t).json()
     assert changed["title"] == "Renamed"
