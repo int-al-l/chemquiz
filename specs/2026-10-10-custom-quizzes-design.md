@@ -165,11 +165,12 @@ parse these same files.
 - `_question_public` sends `type`, `text`, `image_url`, the options without
   `correct`, and for slider `min, max, step, unit`. Nothing that gives the
   answer away (no accepted strings, no slider answer).
-- `_reveal` adds what each type needs:
-  - quiz / tf: the correct option(s) and vote counts, as now.
-  - type: the accepted answers and the right count.
-  - slider: answer ± tolerance, unit, and the right count.
-  For deck questions the card (`item`) is still shown with its description.
+- `_reveal` adds `type`, `correct_ids` (quiz / tf: the options to light up,
+  with vote counts as now) and `answer_text`, the right answer in words:
+  the right option names, the accepted answers joined by " / ", or
+  "answer ± tolerance unit" for a slider. The phones get it too (they have no
+  question on screen during the reveal). For deck questions the card (`item`)
+  is still shown with its description.
 - Phones: four coloured buttons (quiz, with option images when present), two
   buttons (tf), a text box with Send (type), a slider with the value shown and
   Send (slider). The board shows the question text, image, and options.
@@ -201,8 +202,8 @@ All strings in `src/i18n/en.js` and `ru.js`.
 - **Solo player** `/quizzes/:id/play`: one question at a time with the same
   question view as the phone, the timer, right/wrong after each answer, a score
   screen at the end with "Play again".
-- The question view (prompt + answer input for each type) is one component,
-  `src/quizzes/QuestionView.jsx`, used by the phone and the solo player.
+- The answer input for each type (option buttons, text box, slider) is one
+  component, `src/quizzes/AnswerInput.jsx`, used by the phone and the solo player.
 
 ## 6. Tests
 
@@ -221,7 +222,7 @@ Backend (`backend/tests/`):
   "same" and "mistakes" replays for a custom game; an old-format deck game still
   plays.
 
-Frontend: `QuestionView` renders and submits each type; the solo grader matches
+Frontend: `AnswerInput` renders and submits each type; the solo grader matches
 the backend on the same cases.
 
 Checks before pushing: `npm run lint && npm test`, `cd backend && python -m pytest -q`.
