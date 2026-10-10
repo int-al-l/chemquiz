@@ -31,10 +31,11 @@ export function setRequestLanguage(lang) {
 
 /** Thrown for any non-2xx response, carrying the server's message. */
 export class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, body = null) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.body = body;
   }
 }
 
@@ -88,7 +89,7 @@ async function request(path, options = {}) {
   const body = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new ApiError(describeFailure(response.status, body), response.status);
+    throw new ApiError(describeFailure(response.status, body), response.status, body);
   }
 
   return body;
@@ -186,11 +187,12 @@ function live(path, token, options = {}) {
   });
 }
 
-export function createLiveGame({ categorySlug, mode, questionCount, timeLimit, lang }) {
+export function createLiveGame({ categorySlug, customQuizId, mode, questionCount, timeLimit, lang }) {
   return live("", null, {
     method: "POST",
     body: JSON.stringify({
       category_slug: categorySlug ?? null,
+      custom_quiz_id: customQuizId ?? null,
       mode,
       question_count: questionCount,
       time_limit: timeLimit,
@@ -213,10 +215,10 @@ export const liveRemovePlayer = (pin, token, playerId) =>
 export const joinLiveGame = (pin, name) =>
   live(`/${pin}/join`, null, { method: "POST", body: JSON.stringify({ name }) });
 export const fetchLivePlayer = (pin, token) => live(`/${pin}/me`, token);
-export const liveAnswer = (pin, token, { position, choiceId }) =>
+export const liveAnswer = (pin, token, { position, choiceId, text, value }) =>
   live(`/${pin}/answer`, token, {
     method: "POST",
-    body: JSON.stringify({ position, choice_id: choiceId }),
+    body: JSON.stringify({ position, choice_id: choiceId ?? null, text: text ?? null, value: value ?? null }),
   });
 
 // --- past class games (signed in) -------------------------------------------------
@@ -251,6 +253,46 @@ export async function fetchLiveGameCsv(id) {
   const match = /filename="([^"]+)"/.exec(response.headers.get("Content-Disposition") ?? "");
   return { blob: await response.blob(), filename: match ? match[1] : `class-game-${id}.csv` };
 }
+
+// --- custom quizzes (signed in) -------------------------------------------------
+
+export const fetchQuizzes = () => request("/api/quizzes");
+export const fetchMyQuiz = (id) => request(`/api/quizzes/${id}`);
+export const createQuiz = (body) => request("/api/quizzes", { method: "POST", body: JSON.stringify(body) });
+export const updateQuiz = (id, body) =>
+  request(`/api/quizzes/${id}`, { method: "PUT", body: JSON.stringify(body) });
+export const deleteQuiz = (id) => request(`/api/quizzes/${id}`, { method: "DELETE" });
+export const playQuiz = (id) => request(`/api/quizzes/${id}/play`);
+export const questionsFromCards = ({ slugs, mode, lang }) =>
+  request("/api/quizzes/from-cards", {
+    method: "POST",
+    body: JSON.stringify({ item_slugs: slugs, mode, lang }),
+  });
+
+/** Send a file as multipart form data: request() always sends JSON. */
+async function sendFile(path, file) {
+  const form = new FormData();
+  form.append("file", file);
+  let response;
+  try {
+    response = await fetch(`${BASE_URL}${path}`, {
+      method: "POST",
+      body: form,
+      headers: {
+        "Accept-Language": requestLanguage,
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      },
+    });
+  } catch {
+    throw new ApiError(translate(requestLanguage, "api.unreachable"), 0);
+  }
+  const body = await response.json().catch(() => null);
+  if (!response.ok) throw new ApiError(describeFailure(response.status, body), response.status, body);
+  return body;
+}
+
+export const importQuiz = (file) => sendFile("/api/quizzes/import", file);
+export const uploadImage = (file) => sendFile("/api/uploads", file);
 
 // --- account ---------------------------------------------------------------
 

@@ -29,6 +29,7 @@ import { SavedProvider } from "./saved/SavedProvider";
 import "./App.css";
 import "./learn.css";
 import "./live/live.css";
+import "./quizzes/quizzes.css";
 import "./theme/odan.css";
 import "./pages/MainPage.css";
 

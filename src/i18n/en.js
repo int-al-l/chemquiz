@@ -483,6 +483,9 @@ const en = {
   "api.notFound": "That is not on the server. It may have been renamed or removed.",
   "api.serverError": "The server hit an error. Check the terminal running uvicorn for the traceback.",
   "api.failed": "Request failed ({status}).",
+  "quizzes.play.typeHere": "Type your answer",
+  "quizzes.play.send": "Send",
+  "quizzes.play.pickValue": "Pick a value",
 };
 
 export default en;

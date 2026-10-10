@@ -515,6 +515,9 @@ const ru = {
   "api.notFound": "На сервере этого нет. Возможно, его переименовали или удалили.",
   "api.serverError": "На сервере произошла ошибка. Трейсбек — в терминале, где запущен uvicorn.",
   "api.failed": "Запрос не выполнен ({status}).",
+  "quizzes.play.typeHere": "Введите ответ",
+  "quizzes.play.send": "Отправить",
+  "quizzes.play.pickValue": "Выберите значение",
 };
 
 export default ru;
