@@ -321,3 +321,129 @@ def test_an_archived_games_pin_can_be_reused(client, clock):
         )
         db.commit()
         assert again.game.pin == pin
+
+
+# --- custom quizzes -------------------------------------------------------------
+
+CUSTOM = {
+    "title": "Mixed",
+    "lang": "en",
+    "questions": [
+        {"type": "quiz", "text": "Pick B", "time_limit": 10,
+         "options": [{"text": "A"}, {"text": "B", "correct": True}]},
+        {"type": "tf", "text": "Water is wet", "time_limit": 5, "answer": True},
+        {"type": "type", "text": "Symbol of gold?", "time_limit": 30, "accepted": ["Au"]},
+        {"type": "slider", "text": "Boiling point", "time_limit": 20, "min": 0, "max": 200, "step": 1,
+         "answer": 100, "tolerance": 2, "unit": "°C"},
+    ],
+}
+RIGHT = [{"choice_id": 1}, {"choice_id": 0}, {"text": " au "}, {"value": 101}]
+
+
+def custom_room(client, headers, quiz=CUSTOM, lang="en"):
+    quiz_id = client.post("/api/quizzes", json=quiz, headers=headers).json()["id"]
+    res = client.post("/api/live", json={"custom_quiz_id": quiz_id, "lang": lang}, headers=headers)
+    assert res.status_code == 201, res.text
+    return res.json()
+
+
+def test_a_custom_quiz_plays_every_question_type(client, clock):
+    t = teacher(client)
+    room = custom_room(client, t)
+    pin, token = room["pin"], room["host_token"]
+    assert (room["mode"], room["question_count"], room["category_name"]) == ("custom", 4, "Mixed")
+    ann = join(client, pin, "Ann")["token"]
+    for position, (given, limit) in enumerate(zip(RIGHT, [10, 5, 30, 20]), start=1):
+        board = client.post(f"/api/live/{pin}/next", headers=host(token)).json()
+        assert board["time_limit"] == limit and board["deadline"] - board["starts_at"] == limit
+        assert board["question"]["type"] == CUSTOM["questions"][position - 1]["type"]
+        clock.advance(live.READ_SECONDS)
+        me = client.post(f"/api/live/{pin}/answer", json={"position": position, **given}, headers=host(ann))
+        assert me.status_code == 200, me.text
+        assert me.json()["you"]["result"]["correct"] is True  # the only player answered: revealed
+        assert me.json()["reveal"]["answer_text"]
+        client.post(f"/api/live/{pin}/next", headers=host(token))  # standings
+    # Instant right answers: 1000 each, plus 100, 200 and 300 for the streak.
+    assert client.get(f"/api/live/{pin}/me", headers=host(ann)).json()["you"]["score"] == 4600
+
+
+def test_points_shrink_over_the_questions_own_time(client, clock):
+    t = teacher(client)
+    room = custom_room(client, t)
+    pin, token = room["pin"], room["host_token"]
+    ann = join(client, pin, "Ann")["token"]
+    client.post(f"/api/live/{pin}/next", headers=host(token))
+    clock.advance(live.READ_SECONDS + 5)  # half of question 1's 10 seconds
+    me = client.post(f"/api/live/{pin}/answer", json={"position": 1, "choice_id": 1}, headers=host(ann)).json()
+    assert me["you"]["result"]["points"] == 750
+
+
+def test_a_custom_question_does_not_give_its_answer_away(client, clock):
+    t = teacher(client)
+    room = custom_room(client, t)
+    pin, token = room["pin"], room["host_token"]
+    ann = join(client, pin, "Ann")["token"]
+    secret = {"correct_ids", "correct_id", "accepted", "answer", "tolerance", "item"}
+    for _ in CUSTOM["questions"]:
+        board = client.post(f"/api/live/{pin}/next", headers=host(token)).json()
+        phone = client.get(f"/api/live/{pin}/me", headers=host(ann)).json()
+        for view in (board["question"], phone["question"]):
+            assert not secret & set(view), view
+        assert board["reveal"] is None and phone["reveal"] is None
+        client.post(f"/api/live/{pin}/next", headers=host(token))  # close
+        client.post(f"/api/live/{pin}/next", headers=host(token))  # standings
+
+
+@pytest.mark.parametrize("position, given", [
+    (1, {"choice_id": 7}), (1, {"text": "B"}), (3, {"text": "   "}), (3, {"choice_id": 0}),
+    (4, {"value": 201}), (4, {}),
+])
+def test_answers_that_do_not_fit_the_question(client, clock, position, given):
+    t = teacher(client)
+    room = custom_room(client, t)
+    pin, token = room["pin"], room["host_token"]
+    ann = join(client, pin, "Ann")["token"]
+    for _ in range(position - 1):
+        for _ in range(3):
+            client.post(f"/api/live/{pin}/next", headers=host(token))  # open, close, standings
+    client.post(f"/api/live/{pin}/next", headers=host(token))
+    clock.advance(live.READ_SECONDS)
+    res = client.post(f"/api/live/{pin}/answer", json={"position": position, **given}, headers=host(ann))
+    assert res.status_code == 422 and res.json()["code"] == "not_an_option"
+
+
+def test_true_false_speaks_the_games_language(client, clock):
+    t = teacher(client)
+    room = custom_room(client, t, lang="ru")
+    pin, token = room["pin"], room["host_token"]
+    join(client, pin, "Ann")
+    for _ in range(3):
+        client.post(f"/api/live/{pin}/next", headers=host(token))
+    board = client.post(f"/api/live/{pin}/next", headers=host(token)).json()
+    assert [c["name"] for c in board["question"]["choices"]] == ["Верно", "Неверно"]
+
+
+def test_a_custom_game_needs_your_own_quiz(client, clock):
+    mine = teacher(client)
+    quiz_id = client.post("/api/quizzes", json=CUSTOM, headers=mine).json()["id"]
+    theirs = auth(sign_in(client, name="Bea", email="bea@example.com").json()["token"])
+    assert client.post("/api/live", json={"custom_quiz_id": quiz_id}).status_code == 401
+    assert client.post("/api/live", json={"custom_quiz_id": quiz_id}, headers=theirs).status_code == 404
+
+
+def test_a_game_frozen_before_question_types_still_plays(client, clock):
+    room = make_room(client, question_count=1)
+    pin, token = room["pin"], room["host_token"]
+    with client.session_factory() as db:
+        game = db.scalars(select(models.LiveGame).where(models.LiveGame.pin == pin)).one()
+        game.questions = [{k: v for k, v in q.items() if k not in ("type", "correct_ids", "time_limit")}
+                          for q in game.questions]
+        db.commit()
+    ann = join(client, pin, "Ann")["token"]
+    board = client.post(f"/api/live/{pin}/next", headers=host(token)).json()
+    assert board["time_limit"] == 20 and board["question"]["type"] == "quiz"
+    clock.advance(live.READ_SECONDS)
+    right = correct_id(client, pin, 1)
+    me = client.post(f"/api/live/{pin}/answer", json={"position": 1, "choice_id": right}, headers=host(ann)).json()
+    assert me["you"]["result"]["correct"] is True
+    assert me["reveal"]["correct_ids"] == [right] and me["reveal"]["item"]["id"] == right
