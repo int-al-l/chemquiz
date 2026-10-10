@@ -18,6 +18,8 @@ import JoinPage from "./live/JoinPage";
 import LivePlayPage from "./live/LivePlayPage";
 import LiveHistoryPage from "./live/LiveHistoryPage";
 import LiveGamePage from "./live/LiveGamePage";
+import MyQuizzesPage from "./quizzes/MyQuizzesPage";
+import QuizEditorPage from "./quizzes/QuizEditorPage";
 import Toaster from "./components/Toaster";
 import AppShell from "./components/AppShell";
 
@@ -56,6 +58,9 @@ import "./pages/MainPage.css";
  *   /live/history/:id        one past game: standings, CSV, play again
  *   /join[/:pin]             a student joins with the PIN (the QR code fills it in)
  *   /play/:pin               a student's phone during the game
+ *   /quizzes                 a teacher's own quizzes
+ *   /quizzes/new, /:id       the quiz editor
+ *   /quizzes/:id/play        play your own quiz alone
  */
 function App() {
   return (
@@ -79,6 +84,9 @@ function App() {
               <Route path="/live" element={<LiveSetupPage />} />
               <Route path="/live/history" element={<LiveHistoryPage />} />
               <Route path="/live/history/:id" element={<LiveGamePage />} />
+              <Route path="/quizzes" element={<MyQuizzesPage />} />
+              <Route path="/quizzes/new" element={<QuizEditorPage />} />
+              <Route path="/quizzes/:id" element={<QuizEditorPage />} />
               <Route path="/join" element={<JoinPage />} />
               <Route path="/join/:pin" element={<JoinPage />} />
 

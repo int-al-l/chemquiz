@@ -48,3 +48,9 @@
 .quiz-errors { margin: 0; padding-left: 18px; color: #b42318; }
 .quiz-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .solo-feedback { display: grid; gap: 8px; justify-items: center; text-align: center; }
+
+/* The shared buttons are full-width blocks; in a row of actions they size to their text. */
+.quiz-actions .primary-button, .quiz-actions .secondary-button,
+.quiz-list .secondary-button { width: auto; max-width: none; margin-top: 0; padding-left: 16px; padding-right: 16px; }
+.quiz-actions { margin: 12px 0; }
+.quiz-editor { margin-top: 12px; }
