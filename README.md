@@ -38,6 +38,17 @@ npm run dev
 http://localhost:5173. Vite proxies `/api` and `/static` through to port 8000,
 so the browser only ever sees one origin and CORS never comes up.
 
+**On one port, without Vite** (a classroom laptop, or behind a tunnel such as
+Tailscale Funnel): build the site and point the backend at it.
+
+```bash
+npm run build
+cd backend && CHEMQUIZ_FRONTEND_DIR=../dist uvicorn app.main:app --port 8000
+```
+
+The backend then serves the pages too, and any path that is not a file or
+`/api/...` gets `index.html`, so links like `/join/123456` work.
+
 ## Class game (live, like Kahoot)
 
 The teacher's screen is the board; students answer on their phones.

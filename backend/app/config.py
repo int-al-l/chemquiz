@@ -27,6 +27,13 @@ IMAGES_URL_PREFIX = "/static/images"
 UPLOADS_DIR = STATIC_DIR / "uploads"
 UPLOADS_URL_PREFIX = "/static/uploads"
 
+# --- the built site --------------------------------------------------------
+
+# Where `npm run build` put the site (dist/). When set, the backend serves it
+# too, so the whole thing runs on one port without Vite -- on a laptop in the
+# classroom, or behind a tunnel. Unset in development, where Vite serves it.
+FRONTEND_DIR = Path(os.environ["CHEMQUIZ_FRONTEND_DIR"]) if os.getenv("CHEMQUIZ_FRONTEND_DIR") else None
+
 # --- cors -----------------------------------------------------------------
 
 # Vite dev server origins.
