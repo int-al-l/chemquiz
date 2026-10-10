@@ -17,10 +17,10 @@ from sqlalchemy.orm import Session
 
 from . import crud, migrate, models, schemas, seeding
 from .live import purge as purge_live_games
-from .config import CORS_ORIGINS, IMAGES_DIR, STATIC_DIR
+from .config import CORS_ORIGINS, IMAGES_DIR, STATIC_DIR, UPLOADS_DIR
 from .database import Base, SessionLocal, engine, get_db
 from .i18n import AppError, request_lang
-from .routers import account, content, live, live_history, quiz, quizzes
+from .routers import account, content, live, live_history, quiz, quizzes, uploads
 
 
 @asynccontextmanager
@@ -28,6 +28,7 @@ async def lifespan(app: FastAPI):
     # Fine while the schema is still moving. Introduce Alembic before there is
     # data worth keeping through a schema change.
     IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+    UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
     Base.metadata.create_all(bind=engine)
     added = migrate.add_missing_columns(engine)
     if added:
@@ -94,6 +95,7 @@ app.include_router(account.router)
 app.include_router(live.router)
 app.include_router(live_history.router)
 app.include_router(quizzes.router)
+app.include_router(uploads.router)
 
 
 @app.get("/api/health", response_model=schemas.HealthOut, tags=["meta"])
