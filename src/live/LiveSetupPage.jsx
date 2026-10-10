@@ -94,7 +94,11 @@ function LiveSetupPage() {
               </p>
               <p className="section-note">
                 {user ? (
-                  <Link to="/live/history">{t("live.setup.pastGames")}</Link>
+                  <>
+                    <Link to="/live/history">{t("live.setup.pastGames")}</Link>
+                    {" · "}
+                    <Link to="/quizzes">{t("quizzes.myQuizzes")}</Link>
+                  </>
                 ) : (
                   rich(t("live.setup.signIn"), { signIn: <Link to="/sign-in">{t("common.signInLink")}</Link> })
                 )}

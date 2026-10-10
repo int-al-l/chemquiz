@@ -39,6 +39,7 @@ function AppShell() {
           <SideLink to="/live" icon="cast_for_education" end>{t("main.hostShort")}</SideLink>
           <SideLink to="/join" icon="qr_code_scanner">{t("main.joinShort")}</SideLink>
           <SideLink to="/live/history" icon="history">{t("main.pastGames")}</SideLink>
+          <SideLink to="/quizzes" icon="quiz">{t("quizzes.myQuizzes")}</SideLink>
         </nav>
 
         <div className="oq-sidebar-bottom">
