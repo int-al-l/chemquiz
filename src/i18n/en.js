@@ -569,6 +569,8 @@ const en = {
   "live.host.sliderRange": "Pick a value from {min} to {max} {unit}",
   "live.play.itWasAnswer": "Answer: {answer}",
   "mode.custom": "Own quiz",
+  "quizzes.form.addAnswer": "+ Answer",
+  "quizzes.library.max": "Up to {n} cards at a time",
 };
 
 export default en;

@@ -39,16 +39,20 @@ function LiveSetupPage() {
   const [source, setSource] = useState(params.get("quiz") ? "quiz" : "deck");
   const [quizId, setQuizId] = useState(params.get("quiz") ? Number(params.get("quiz")) : null);
   const [quizzes, setQuizzes] = useState(null);
+  const wanted = Number(params.get("quiz")) || null;
 
   useEffect(() => {
     if (!user || IS_DEMO) return;
     fetchQuizzes()
       .then((list) => {
         setQuizzes(list);
-        setQuizId((id) => id ?? list[0]?.id ?? null);
+        const first = list.find((q) => q.id === wanted) ?? list[0];
+        setQuizId((id) => id ?? first?.id ?? null);
+        // A quiz is played in the language it was written in, unless the teacher changes it.
+        if (wanted && first?.id === wanted) setGameLang(first.lang);
       })
       .catch(() => setQuizzes([]));
-  }, [user]);
+  }, [user, wanted]);
   const quiz = quizzes?.find((q) => q.id === quizId);
   const fromQuiz = source === "quiz";
 
@@ -140,7 +144,10 @@ function LiveSetupPage() {
                           type="button"
                           className={`live-deck ${quizId === q.id ? "is-selected" : ""}`}
                           aria-pressed={quizId === q.id}
-                          onClick={() => setQuizId(q.id)}
+                          onClick={() => {
+                            setQuizId(q.id);
+                            setGameLang(q.lang);
+                          }}
                         >
                           <span className="live-deck-icon material-symbols-outlined" aria-hidden="true">
                             quiz

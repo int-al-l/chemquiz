@@ -5,6 +5,9 @@ import { ErrorMessage, Loading } from "../components/StatusMessage";
 import { useT } from "../i18n";
 import { useProgress } from "../progress/context";
 
+// The server drafts at most this many questions per request.
+const MAX_CARDS = 100;
+
 /** Pick cards from our library; each becomes a "photo → names" or "name → photos" question. */
 function LibraryPicker({ lang, onAdd }) {
   const t = useT();
@@ -23,7 +26,7 @@ function LibraryPicker({ lang, onAdd }) {
   function toggle(slug) {
     const next = new Set(picked);
     if (next.has(slug)) next.delete(slug);
-    else next.add(slug);
+    else if (next.size < MAX_CARDS) next.add(slug);
     setPicked(next);
   }
 
@@ -66,7 +69,7 @@ function LibraryPicker({ lang, onAdd }) {
             {t(`mode.${m}`)}
           </button>
         ))}
-        <button type="button" className="text-button" onClick={() => setPicked(new Set(cards.map((c) => c.slug)))}>
+        <button type="button" className="text-button" onClick={() => setPicked(new Set(cards.slice(0, MAX_CARDS).map((c) => c.slug)))}>
           {t("quizzes.library.selectAll")}
         </button>
       </div>
@@ -84,6 +87,7 @@ function LibraryPicker({ lang, onAdd }) {
           </button>
         ))}
       </div>
+      {picked.size >= MAX_CARDS && <p className="section-note">{t("quizzes.library.max", { n: MAX_CARDS })}</p>}
       {error && <ErrorMessage error={error} />}
       <button type="button" className="primary-button" disabled={busy || picked.size === 0} onClick={add}>
         {t("quizzes.library.add", { n: picked.size })}

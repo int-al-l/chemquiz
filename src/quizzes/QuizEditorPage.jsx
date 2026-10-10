@@ -8,7 +8,7 @@ import { useAuth } from "../auth/context";
 import { rich, useLang, useT } from "../i18n";
 import ImportPanel from "./ImportPanel";
 import LibraryPicker from "./LibraryPicker";
-import { blankQuestion, move, tidy, TYPE_ICONS, TYPES } from "./model";
+import { blankQuestion, isBlank, move, tidy, TYPE_ICONS, TYPES } from "./model";
 import QuestionForm from "./QuestionForm";
 
 /**
@@ -80,25 +80,31 @@ function Editor({ id }) {
   const questions = quiz.questions;
   const current = questions[Math.min(selected, questions.length - 1)];
 
-  function change(patch) {
-    setQuiz((q) => ({ ...q, ...patch }));
+  // Every change works on the quiz as it is when it lands, not as it was when
+  // it started: uploads and imports finish while the teacher keeps typing.
+  function change(update) {
+    setQuiz((q) => ({ ...q, ...(typeof update === "function" ? update(q) : update) }));
     setDirty(true);
     setSaved(false);
   }
-  const setQuestions = (list) => change({ questions: list });
+  const setQuestions = (update) => change((q) => ({ questions: update(q.questions) }));
 
   // The import panel stays open afterwards: it lists the rows it could not read.
   function append(list, { close = true } = {}) {
     if (!list.length) return;
-    setQuestions([...questions, ...list]);
-    setSelected(questions.length);
+    // A new quiz's untouched blank question gives way to what was added.
+    const replacesBlank = questions.length === 1 && isBlank(questions[0]);
+    setQuestions((qs) => (qs.length === 1 && isBlank(qs[0]) ? list : [...qs, ...list]));
+    setSelected(replacesBlank ? 0 : questions.length);
     if (close) setPanel(null);
   }
 
   function remove(index) {
-    const next = questions.filter((_, i) => i !== index);
-    setQuestions(next.length ? next : [blankQuestion("quiz")]);
-    setSelected(Math.max(0, Math.min(selected, next.length - 1)));
+    setQuestions((qs) => {
+      const next = qs.filter((_, i) => i !== index);
+      return next.length ? next : [blankQuestion("quiz")];
+    });
+    setSelected(Math.max(0, Math.min(selected, questions.length - 2)));
   }
 
   async function save() {
@@ -182,12 +188,12 @@ function Editor({ id }) {
                   {i + 1}. {q.text || t("quizzes.editor.untitled")}
                 </button>
                 <button type="button" className="quiz-icon-button" disabled={i === 0} aria-label={t("quizzes.editor.up")}
-                  onClick={() => { setQuestions(move(questions, i, -1)); setSelected(i - 1); }}>
+                  onClick={() => { setQuestions((qs) => move(qs, i, -1)); setSelected(i - 1); }}>
                   ↑
                 </button>
                 <button type="button" className="quiz-icon-button" disabled={i === questions.length - 1}
                   aria-label={t("quizzes.editor.down")}
-                  onClick={() => { setQuestions(move(questions, i, 1)); setSelected(i + 1); }}>
+                  onClick={() => { setQuestions((qs) => move(qs, i, 1)); setSelected(i + 1); }}>
                   ↓
                 </button>
                 <button type="button" className="quiz-icon-button" aria-label={t("quizzes.editor.remove")} onClick={() => remove(i)}>
@@ -200,7 +206,10 @@ function Editor({ id }) {
           <QuestionForm
             question={current}
             error={errorHere}
-            onChange={(q) => setQuestions(questions.map((old, i) => (i === selected ? q : old)))}
+            onChange={(update) => {
+              const index = selected; // the question the update was made for
+              setQuestions((qs) => qs.map((old, i) => (i === index ? update(old) : old)));
+            }}
           />
         </div>
 

@@ -6,15 +6,22 @@ import { useT } from "../i18n";
 import { OPTION_STYLES } from "../live/game";
 import { blankQuestion, TIME_LIMITS, TYPES } from "./model";
 
-/** The selected question's fields; they change with its type. `onChange` gets the whole new question. */
+/**
+ * The selected question's fields; they change with its type.
+ *
+ * `onChange` gets an update -- a function from the question as it is now to
+ * the new one -- rather than a new question: a picture upload finishes
+ * seconds later, and must not undo what was typed in the meantime.
+ */
 function QuestionForm({ question: q, onChange, error }) {
   const t = useT();
-  const set = (patch) => onChange({ ...q, ...patch });
+  // `patch` is fields, or a function of the current question giving fields.
+  const set = (patch) => onChange((cur) => ({ ...cur, ...(typeof patch === "function" ? patch(cur) : patch) }));
 
   function changeType(type) {
     if (type === q.type) return;
     // Keep what carries over: the text, the picture and the time.
-    onChange({ ...blankQuestion(type), text: q.text, image: q.image, time_limit: q.time_limit });
+    onChange((cur) => ({ ...blankQuestion(type), text: cur.text, image: cur.image, time_limit: cur.time_limit }));
   }
 
   return (
@@ -78,8 +85,10 @@ function QuestionForm({ question: q, onChange, error }) {
 }
 
 function QuizOptions({ q, set, t }) {
-  const setOption = (i, patch) => set({ options: q.options.map((o, j) => (j === i ? { ...o, ...patch } : o)) });
+  const setOption = (i, patch) =>
+    set((cur) => ({ options: cur.options.map((o, j) => (j === i ? { ...o, ...patch } : o)) }));
   return (
+    <>
     <div className="question-options">
       {q.options.map((o, i) => (
         <div key={i} className={`question-option is-${OPTION_STYLES[i].key}`}>
@@ -101,6 +110,16 @@ function QuizOptions({ q, set, t }) {
         </div>
       ))}
     </div>
+    {q.options.length < 4 && (
+      <button
+        type="button"
+        className="text-button"
+        onClick={() => set((cur) => ({ options: [...cur.options, { text: "", image: null, correct: false }] }))}
+      >
+        {t("quizzes.form.addAnswer")}
+      </button>
+    )}
+    </>
   );
 }
 
@@ -115,11 +134,14 @@ function AcceptedAnswers({ q, set, t }) {
           value={a}
           maxLength={20}
           aria-label={t("quizzes.form.answer", { n: i + 1 })}
-          onChange={(e) => set({ accepted: q.accepted.map((b, j) => (j === i ? e.target.value : b)) })}
+          onChange={(e) => {
+            const value = e.target.value;
+            set((cur) => ({ accepted: cur.accepted.map((b, j) => (j === i ? value : b)) }));
+          }}
         />
       ))}
       {q.accepted.length < 4 && (
-        <button type="button" className="text-button" onClick={() => set({ accepted: [...q.accepted, ""] })}>
+        <button type="button" className="text-button" onClick={() => set((cur) => ({ accepted: [...cur.accepted, ""] }))}>
           {t("quizzes.form.addAccepted")}
         </button>
       )}

@@ -601,6 +601,8 @@ const ru = {
   "live.host.sliderRange": "Выберите значение от {min} до {max} {unit}",
   "live.play.itWasAnswer": "Ответ: {answer}",
   "mode.custom": "Свой квиз",
+  "quizzes.form.addAnswer": "+ Вариант",
+  "quizzes.library.max": "Не больше {n} карточек за раз",
 };
 
 export default ru;

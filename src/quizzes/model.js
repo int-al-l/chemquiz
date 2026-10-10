@@ -28,3 +28,8 @@ export function move(list, index, by) {
   [next[index], next[to]] = [next[to], next[index]];
   return next;
 }
+
+/** A question nobody has touched yet: the blank a new quiz starts with. */
+export function isBlank(q) {
+  return JSON.stringify(q) === JSON.stringify(blankQuestion(q.type));
+}

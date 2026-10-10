@@ -104,7 +104,8 @@ async function request(path, options = {}) {
  * running. Saying so beats printing a number.
  */
 function describeFailure(status, body) {
-  if (body?.detail) {
+  // A string from our own errors; FastAPI's validation errors are a list, not for people.
+  if (typeof body?.detail === "string") {
     return body.detail;
   }
 
