@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import PageHeader from "../components/PageHeader";
 import { ErrorMessage, Loading } from "../components/StatusMessage";
-import { createLiveGame, imageSrc, IS_DEMO } from "../api/client";
+import { createLiveGame, fetchQuizzes, imageSrc, IS_DEMO } from "../api/client";
 import { useAuth } from "../auth/context";
 import { rich, useLang, useT } from "../i18n";
 import { useProgress } from "../progress/context";
@@ -15,7 +15,8 @@ const TIMES = [10, 20, 30, 60];
 
 /**
  * The teacher sets up a class game: which deck, which way round, how many
- * questions and how long each one runs. Creating it opens the board with the
+ * questions and how long each one runs -- or one of their own quizzes, which
+ * brings its own questions and times. Creating it opens the board with the
  * PIN for the class to join.
  */
 function LiveSetupPage() {
@@ -33,6 +34,28 @@ function LiveSetupPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState(null);
 
+  // ?quiz=ID (from "Host in class" on My quizzes) starts on that quiz.
+  const [params] = useSearchParams();
+  const [source, setSource] = useState(params.get("quiz") ? "quiz" : "deck");
+  const [quizId, setQuizId] = useState(params.get("quiz") ? Number(params.get("quiz")) : null);
+  const [quizzes, setQuizzes] = useState(null);
+  const wanted = Number(params.get("quiz")) || null;
+
+  useEffect(() => {
+    if (!user || IS_DEMO) return;
+    fetchQuizzes()
+      .then((list) => {
+        setQuizzes(list);
+        const first = list.find((q) => q.id === wanted) ?? list[0];
+        setQuizId((id) => id ?? first?.id ?? null);
+        // A quiz is played in the language it was written in, unless the teacher changes it.
+        if (wanted && first?.id === wanted) setGameLang(first.lang);
+      })
+      .catch(() => setQuizzes([]));
+  }, [user, wanted]);
+  const quiz = quizzes?.find((q) => q.id === quizId);
+  const fromQuiz = source === "quiz";
+
   const decks = catalog?.decks ?? [];
   const available = deck
     ? (decks.find((d) => d.slug === deck)?.cards.length ?? 0)
@@ -43,13 +66,11 @@ function LiveSetupPage() {
     setCreating(true);
     setError(null);
     try {
-      const game = await createLiveGame({
-        categorySlug: deck,
-        mode,
-        questionCount: length,
-        timeLimit,
-        lang: gameLang,
-      });
+      const game = await createLiveGame(
+        fromQuiz
+          ? { customQuizId: quizId, lang: gameLang }
+          : { categorySlug: deck, mode, questionCount: length, timeLimit, lang: gameLang },
+      );
       saveHostToken(game.pin, game.host_token);
       navigate(`/live/host/${game.pin}`, { replace: true });
     } catch (err) {
@@ -73,7 +94,11 @@ function LiveSetupPage() {
               </p>
               <p className="section-note">
                 {user ? (
-                  <Link to="/live/history">{t("live.setup.pastGames")}</Link>
+                  <>
+                    <Link to="/live/history">{t("live.setup.pastGames")}</Link>
+                    {" · "}
+                    <Link to="/quizzes">{t("quizzes.myQuizzes")}</Link>
+                  </>
                 ) : (
                   rich(t("live.setup.signIn"), { signIn: <Link to="/sign-in">{t("common.signInLink")}</Link> })
                 )}
@@ -82,8 +107,68 @@ function LiveSetupPage() {
               {!catalog && <Loading />}
               {catalog?.failed && <ErrorMessage error={{ message: t("explore.loadFailed") }} />}
 
+              {user && (
+                <fieldset className="option-group">
+                  <legend className="option-legend">{t("live.setup.source")}</legend>
+                  <div className="option-row option-row-tight">
+                    {[
+                      ["deck", t("live.setup.fromDeck")],
+                      ["quiz", t("live.setup.fromQuiz")],
+                    ].map(([id, label]) => (
+                      <button
+                        key={id}
+                        type="button"
+                        className={`option-button option-button-small ${source === id ? "is-selected" : ""}`}
+                        aria-pressed={source === id}
+                        onClick={() => setSource(id)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+              )}
+
+              {fromQuiz && (
+                <fieldset className="option-group">
+                  <legend className="option-legend">{t("live.setup.fromQuiz")}</legend>
+                  {!quizzes && <Loading />}
+                  {quizzes?.length === 0 && (
+                    <p className="section-note">
+                      {rich(t("live.setup.noQuizzes"), {
+                        make: <Link to="/quizzes/new">{t("live.setup.makeOne")}</Link>,
+                      })}
+                    </p>
+                  )}
+                  {quizzes?.length > 0 && (
+                    <div className="live-deck-grid">
+                      {quizzes.map((q) => (
+                        <button
+                          key={q.id}
+                          type="button"
+                          className={`live-deck ${quizId === q.id ? "is-selected" : ""}`}
+                          aria-pressed={quizId === q.id}
+                          onClick={() => {
+                            setQuizId(q.id);
+                            setGameLang(q.lang);
+                          }}
+                        >
+                          <span className="live-deck-icon material-symbols-outlined" aria-hidden="true">
+                            quiz
+                          </span>
+                          <span className="live-deck-name">{q.title}</span>
+                          <span className="option-note">{t("quizzes.questions", { n: q.question_count })}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </fieldset>
+              )}
+
               {catalog && !catalog.failed && (
                 <>
+                  {!fromQuiz && (
+                  <>
                   <fieldset className="option-group">
                     <legend className="option-legend">{t("live.setup.deck")}</legend>
                     <div className="live-deck-grid">
@@ -188,6 +273,9 @@ function LiveSetupPage() {
                     </div>
                   </fieldset>
 
+                  </>
+                  )}
+
                   <fieldset className="option-group">
                     <legend className="option-legend">{t("live.setup.lang")}</legend>
                     <div className="option-row option-row-tight">
@@ -207,11 +295,18 @@ function LiveSetupPage() {
 
                   {error && <ErrorMessage error={error} />}
 
-                  <button className="primary-button" onClick={create} disabled={creating || !available} type="button">
+                  <button
+                    className="primary-button"
+                    onClick={create}
+                    disabled={creating || (fromQuiz ? !quiz : !available)}
+                    type="button"
+                  >
                     {creating ? t("live.opening") : t("live.setup.open")}
-                    {!creating && (
+                    {!creating && (fromQuiz ? quiz : true) && (
                       <span className="primary-button-note">
-                        {t("live.setup.note", { n: length, s: timeLimit })}
+                        {fromQuiz
+                          ? t("live.setup.quizNote", { n: quiz.question_count })
+                          : t("live.setup.note", { n: length, s: timeLimit })}
                       </span>
                     )}
                   </button>

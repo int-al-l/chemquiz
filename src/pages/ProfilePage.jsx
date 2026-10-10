@@ -149,6 +149,11 @@ function ProfilePage() {
               {t("profile.pastGames")}
             </Link>
           )}
+          {user && !IS_DEMO && (
+            <Link className="secondary-button" to="/quizzes">
+              {t("profile.myQuizzes")}
+            </Link>
+          )}
 
           {user && (
             <button

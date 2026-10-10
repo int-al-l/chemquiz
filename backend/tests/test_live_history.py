@@ -229,3 +229,56 @@ def test_replay_checks_the_kind_and_the_owner(client, clock):
     assert replay(client, t, game_id, "everything").status_code == 422
     other = auth(sign_in(client, name="Bea", email="bea@example.com").json()["token"])
     assert replay(client, other, game_id, "same").status_code == 404
+
+
+from test_live import CUSTOM, RIGHT, custom_room  # noqa: E402
+
+
+def play_custom(client, clock, headers, right_positions):
+    """Ann plays CUSTOM, answering right at the given positions and wrong elsewhere."""
+    room = custom_room(client, headers)
+    pin, token = room["pin"], room["host_token"]
+    ann = join(client, pin, "Ann")["token"]
+    wrong = [{"choice_id": 0}, {"choice_id": 1}, {"text": "Ag"}, {"value": 0}]
+    for position in range(1, len(CUSTOM["questions"]) + 1):
+        client.post(f"/api/live/{pin}/next", headers=host(token))
+        clock.advance(live.READ_SECONDS)
+        given = RIGHT[position - 1] if position in right_positions else wrong[position - 1]
+        client.post(f"/api/live/{pin}/answer", json={"position": position, **given}, headers=host(ann))
+        client.post(f"/api/live/{pin}/next", headers=host(token))  # standings
+    client.post(f"/api/live/{pin}/next", headers=host(token))  # finish
+    return only_game(client, headers)
+
+
+def test_a_custom_game_in_history(client, clock):
+    t = teacher(client)
+    game = play_custom(client, clock, t, right_positions={1, 2})
+    assert game["mode"] == "custom" and game["category_name"] == "Mixed" and game["has_mistakes"]
+    csv_text = client.get(f"/api/me/live-games/{game['id']}/results.csv", headers=t).text
+    header = csv_text.lstrip("﻿").splitlines()[0]
+    assert header == "Place;Name;Score;Correct;Q1 Pick B;Q2 Water is wet;Q3 Symbol of gold?;Q4 Boiling point"
+
+
+def test_custom_mistakes_ask_only_what_was_missed(client, clock):
+    t = teacher(client)
+    game = play_custom(client, clock, t, right_positions={1, 2})
+    new = replay(client, t, game["id"], "mistakes")
+    assert new.status_code == 201, new.text
+    assert new.json()["mode"] == "custom" and new.json()["question_count"] == 2
+    with client.session_factory() as db:
+        fresh = db.scalars(select(models.LiveGame).where(models.LiveGame.pin == new.json()["pin"])).one()
+        assert [(q["position"], q["prompt"]) for q in fresh.questions] == [(1, "Symbol of gold?"), (2, "Boiling point")]
+
+
+def test_custom_same_settings_needs_the_quiz(client, clock):
+    t = teacher(client)
+    game = play_custom(client, clock, t, right_positions={1})
+    again = replay(client, t, game["id"], "same")
+    assert again.status_code == 201 and again.json()["question_count"] == 4
+    client.delete(f"/api/live/{again.json()['pin']}", headers=host(again.json()["host_token"]))
+
+    [quiz] = client.get("/api/quizzes", headers=t).json()
+    client.delete(f"/api/quizzes/{quiz['id']}", headers=t)
+    gone = replay(client, t, game["id"], "same")
+    assert gone.status_code == 409 and gone.json()["code"] == "quiz_gone"
+    assert replay(client, t, game["id"], "mistakes").status_code == 201  # from the frozen copy

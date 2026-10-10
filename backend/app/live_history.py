@@ -15,7 +15,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from . import live, models
+from . import live, models, quizzes
 
 # An item goes into "Work on mistakes" when fewer than this share of the class
 # got it right. Not answering counts as getting it wrong.
@@ -58,20 +58,19 @@ class Results:
     def correct_count(self, player: models.LivePlayer) -> int:
         return sum(1 for a in self.answers[player.id].values() if a.correct)
 
-    def mistake_item_ids(self) -> list[int]:
-        """The items fewer than MISTAKE_THRESHOLD of the class got right."""
+    def mistakes(self) -> list[dict]:
+        """The questions fewer than MISTAKE_THRESHOLD of the class got right."""
         if not self.players:
             return []
-        ids = []
+        missed = []
         for q in asked(self.game):
             right = sum(
                 1 for p in self.players
                 if (a := self.answers[p.id].get(q["position"])) is not None and a.correct
             )
             if right < MISTAKE_THRESHOLD * len(self.players):
-                ids.append(q["correct_id"])
-        return ids
-
+                missed.append(q)
+        return missed
 
 def _summary(game: models.LiveGame, results: Results) -> dict:
     return {
@@ -84,7 +83,7 @@ def _summary(game: models.LiveGame, results: Results) -> dict:
         "player_count": len(results.players),
         "winner": results.players[0].name if results.players else None,
         "status": status(game),
-        "has_mistakes": bool(results.mistake_item_ids()),
+        "has_mistakes": bool(results.mistakes()),
     }
 
 
@@ -119,6 +118,13 @@ def _cell(text: str) -> str:
     return "'" + text if text.startswith(_FORMULA_START) else text
 
 
+def _label(q: dict) -> str:
+    """A question as a column heading: the card for deck games, else its text."""
+    if q.get("item"):
+        return q["item"]["name"]
+    return q.get("prompt") or ""
+
+
 def results_csv(db: Session, game: models.LiveGame) -> str:
     """One row per player: place, name, score, right answers, then + / − /
     blank for each question asked.
@@ -132,7 +138,7 @@ def results_csv(db: Session, game: models.LiveGame) -> str:
     writer = csv.writer(out, delimiter=";", lineterminator="\r\n")
     writer.writerow(
         ["Place", "Name", "Score", "Correct",
-         *(_cell(f"Q{q['position']} {q['item']['name']}") for q in questions)]
+         *(_cell(f"Q{q['position']} {_label(q)}".strip()) for q in questions)]
     )
     for place, p in enumerate(results.players, start=1):
         mine = results.answers[p.id]
@@ -162,6 +168,20 @@ def _deck(db: Session, game: models.LiveGame) -> Optional[models.Category]:
 def replay(db: Session, game: models.LiveGame, kind: str, user: models.User) -> live.Room:
     """A new room from a past game: "same" draws afresh with the same
     settings; "mistakes" asks only what the class got wrong."""
+    if game.mode == "custom":
+        if kind == "same":
+            quiz = db.get(models.CustomQuiz, game.custom_quiz_id) if game.custom_quiz_id else None
+            if quiz is None or quiz.user_id != user.id:
+                raise live.LiveError("quiz_gone")
+            questions = quizzes.freeze(quiz.questions, game.lang)
+            title, quiz_id = quiz.title, quiz.id
+        else:
+            questions = Results(db, game).mistakes()
+            title, quiz_id = game.category_name, game.custom_quiz_id
+        if not questions:
+            raise live.LiveError("no_mistakes")
+        return live.create_custom_room(db, questions=questions, title=title, quiz_id=quiz_id,
+                                       host_user=user, lang=game.lang)
     category = _deck(db, game)
     if kind == "same":
         return live.create_room(
@@ -173,7 +193,7 @@ def replay(db: Session, game: models.LiveGame, kind: str, user: models.User) -> 
             host_user=user,
             lang=game.lang,
         )
-    ids = Results(db, game).mistake_item_ids()
+    ids = [q["correct_id"] for q in Results(db, game).mistakes()]
     if not ids:
         raise live.LiveError("no_mistakes")
     items = db.scalars(

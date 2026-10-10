@@ -9,6 +9,8 @@ Accounts live in User (email + password, verified by a code sent by email),
 EmailCode (the one-time codes and links) and UserProgress (the learning
 progress document: XP, per-card mastery, streak days, badges).
 
+A teacher's own quizzes are CustomQuiz rows (app/quizzes.py).
+
 Live classroom games live in LiveGame, LivePlayer and LiveAnswer (the rules
 are in app/live.py). A game hosted while signed in stays after it ends, as the
 host's history.
@@ -281,6 +283,25 @@ class UserProgress(Base):
     updated_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class CustomQuiz(Base):
+    """A teacher's own quiz (the rules are in `app/quizzes.py`).
+
+    The questions are one JSON document, saved whole by the editor. Only the
+    author sees the quiz. Games played from it keep their own frozen copy, so
+    editing or deleting the quiz leaves past games as they were.
+    """
+
+    __tablename__ = "custom_quizzes"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    title: Mapped[str] = mapped_column(String(120))
+    lang: Mapped[str] = mapped_column(String(2), default="en")
+    questions: Mapped[list] = mapped_column(JSON)
+    created_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class SavedItem(Base):
     """One entry in a user's list."""
 
@@ -437,7 +458,7 @@ class LiveGame(Base):
         ForeignKey("users.id", ondelete="CASCADE"), default=None, index=True
     )
 
-    # "choice" or "inverted", as in QuizSession.
+    # "choice" or "inverted" (a deck game, as in QuizSession) or "custom" (a teacher's own quiz).
     mode: Mapped[str] = mapped_column(String(16))
     # "en" or "ru", chosen by the teacher; the questions are frozen in it.
     lang: Mapped[str] = mapped_column(String(2), default="en")
@@ -449,6 +470,9 @@ class LiveGame(Base):
     )
     category_slug: Mapped[Optional[str]] = mapped_column(String(80), default=None)
     category_name: Mapped[Optional[str]] = mapped_column(String(160), default=None)
+    # The teacher's own quiz this game was made from (custom games), for
+    # "Same settings". No foreign key: the quiz may be deleted, the game stays.
+    custom_quiz_id: Mapped[Optional[int]] = mapped_column(Integer, default=None)
     questions: Mapped[list] = mapped_column(JSON)
 
     phase: Mapped[str] = mapped_column(String(16), default="lobby")
@@ -500,7 +524,11 @@ class LiveAnswer(Base):
     game_id: Mapped[int] = mapped_column(ForeignKey("live_games.id", ondelete="CASCADE"))
     player_id: Mapped[int] = mapped_column(ForeignKey("live_players.id", ondelete="CASCADE"))
     position: Mapped[int] = mapped_column(Integer)
+    # The option picked; -1 for a typed or slider answer (the column is NOT
+    # NULL in databases made before those existed).
     choice_id: Mapped[int] = mapped_column(Integer)
+    # What was typed, or the slider's value.
+    answer: Mapped[Optional[str]] = mapped_column(String(100), default=None)
     elapsed: Mapped[float] = mapped_column(Float)
     correct: Mapped[bool] = mapped_column(Boolean)
     points: Mapped[int] = mapped_column(Integer)

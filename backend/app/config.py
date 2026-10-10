@@ -23,6 +23,9 @@ DATABASE_URL = os.getenv(
 STATIC_DIR = Path(os.getenv("CHEMQUIZ_STATIC_DIR", BASE_DIR / "static"))
 IMAGES_DIR = STATIC_DIR / "images"
 IMAGES_URL_PREFIX = "/static/images"
+# Pictures teachers upload for their own quizzes (served from STATIC_DIR too).
+UPLOADS_DIR = STATIC_DIR / "uploads"
+UPLOADS_URL_PREFIX = "/static/uploads"
 
 # --- cors -----------------------------------------------------------------
 

@@ -111,7 +111,7 @@ def test_two_taps_at_once_store_one_answer(client, clock):
         with client.session_factory() as db:
             try:
                 r = live.open_room(db, pin, lock=True)
-                r.answer(r.player_by_token(players["Ann"]["token"]), 1, right, clock())
+                r.answer(r.player_by_token(players["Ann"]["token"]), 1, {"choice_id": right}, clock())
                 db.commit()
                 outcomes.append("ok")
             except live.LiveError:
@@ -138,7 +138,7 @@ def test_next_racing_an_answer_leaves_scores_consistent(client, clock):
         with client.session_factory() as db:
             try:
                 r = live.open_room(db, pin, lock=True)
-                r.answer(r.player_by_token(players["Bob"]["token"]), 1, right, clock())
+                r.answer(r.player_by_token(players["Bob"]["token"]), 1, {"choice_id": right}, clock())
                 db.commit()
             except live.LiveError:
                 db.rollback()  # too late: the host closed it first

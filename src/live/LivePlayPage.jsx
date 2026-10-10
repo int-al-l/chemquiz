@@ -6,6 +6,7 @@ import { fetchLivePlayer, imageSrc, IS_DEMO, liveAnswer } from "../api/client";
 import { rich, useLang, useT } from "../i18n";
 import { LanguageScope } from "../i18n/LanguageProvider";
 import { useProgress } from "../progress/context";
+import AnswerInput from "../quizzes/AnswerInput";
 import { DemoNotice, Shape } from "./components";
 import { OPTION_STYLES, ordinal, playerToken, questionClock, savePlayerToken, useLivePoll, useServerNow } from "./game";
 
@@ -36,6 +37,7 @@ function LivePlayPage() {
   const correctSoFar = useRef(0);
   useEffect(() => {
     if (!state?.reveal || !state.you.result) return;
+    if (!state.reveal.item) return; // a custom question: not a card, nothing to learn into
     const key = state.position;
     if (credited.current.has(key)) return;
     credited.current.add(key);
@@ -55,13 +57,21 @@ function LivePlayPage() {
     if (status === 404 || status === 410) savePlayerToken(pin, null);
   }, [status, pin]);
 
-  async function send(choiceId) {
-    if (!state || picked?.position === state.position || state.you.answered_id) return;
-    setPicked({ position: state.position, id: choiceId });
+  // `given` is {choice_id}, {text} or {value}, whichever the question asks for.
+  async function send(given) {
+    if (!state || picked?.position === state.position || state.you.answered) return;
+    setPicked({ position: state.position, id: given.choice_id ?? -1 });
     setAnswerError(null);
     if (navigator.vibrate) navigator.vibrate(30);
     try {
-      apply(await liveAnswer(pin, token, { position: state.position, choiceId }));
+      apply(
+        await liveAnswer(pin, token, {
+          position: state.position,
+          choiceId: given.choice_id,
+          text: given.text,
+          value: given.value,
+        }),
+      );
     } catch (err) {
       setPicked(null);
       setAnswerError(err);
@@ -158,7 +168,7 @@ function PlayScreen({ pin, token, state, error, status, now, picked, answerError
           t={t}
           state={state}
           now={now}
-          picked={picked?.position === state.position ? picked.id : you.answered_id}
+          picked={picked?.position === state.position ? picked.id : you.answered ? you.answered_id : null}
           onPick={send}
           error={answerError}
         />
@@ -213,8 +223,17 @@ function PhoneQuestion({ t, state, now, picked, onPick, error }) {
   }
 
   if (picked != null) {
-    const index = q.choices.findIndex((c) => c.id === picked);
-    const style = OPTION_STYLES[index] ?? OPTION_STYLES[0];
+    const index = q.choices ? q.choices.findIndex((c) => c.id === picked) : -1;
+    if (index < 0) {
+      // A typed or slider answer: no colour to echo back.
+      return (
+        <section className="live-phone-card live-phone-sent">
+          <h1>{t("live.play.sent")}</h1>
+          <p>{t("live.play.waiting")}</p>
+        </section>
+      );
+    }
+    const style = OPTION_STYLES[index];
     return (
       <section className={`live-phone-card live-phone-sent is-${style.key}`}>
         <Shape index={Math.max(index, 0)} size={72} />
@@ -228,6 +247,20 @@ function PhoneQuestion({ t, state, now, picked, onPick, error }) {
     return (
       <section className="live-phone-card">
         <h1>{t("live.play.timeUp")}</h1>
+      </section>
+    );
+  }
+
+  if (state.mode === "custom") {
+    return (
+      <section className="live-phone-question is-custom">
+        <div className="live-phone-timer" aria-hidden="true">
+          <span style={{ width: `${clock.fraction * 100}%` }} />
+        </div>
+        {q.prompt && <p className="live-phone-prompt">{q.prompt}</p>}
+        {q.image_url && <img className="live-phone-photo" src={imageSrc(q.image_url)} alt="" draggable="false" />}
+        {error && <ErrorMessage error={error} />}
+        <AnswerInput question={q} onAnswer={onPick} />
       </section>
     );
   }
@@ -253,7 +286,7 @@ function PhoneQuestion({ t, state, now, picked, onPick, error }) {
               key={choice.id}
               type="button"
               className={`live-phone-option is-${style.key}`}
-              onClick={() => onPick(choice.id)}
+              onClick={() => onPick({ choice_id: choice.id })}
               aria-label={inverted ? t(`live.shape.${style.key}`) : choice.name}
             >
               <Shape index={i} size={inverted ? 22 : 28} />
@@ -289,7 +322,10 @@ function PhoneResult({ state, t, lang }) {
           {t("live.play.inARow", { n: you.streak })}
         </p>
       )}
-      {!result.correct && reveal && <p>{t("live.play.itWas", { name: reveal.item.name })}</p>}
+      {!result.correct && reveal?.item && <p>{t("live.play.itWas", { name: reveal.item.name })}</p>}
+      {!result.correct && !reveal?.item && reveal?.answer_text && (
+        <p>{t("live.play.itWasAnswer", { answer: reveal.answer_text })}</p>
+      )}
       <p className="live-phone-place">{t("live.play.youAre", { place: ordinal(you.rank, lang) })}</p>
     </section>
   );

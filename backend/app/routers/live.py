@@ -17,17 +17,19 @@ from pydantic import BaseModel, Field
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from .. import crud, live, models
+from .. import crud, live, models, quizzes
 from ..config import MAX_QUESTION_COUNT, QUIZ_MODES
 from ..database import get_db
 from ..i18n import AppError
 from .account import optional_user
+from .quizzes import own_quiz
 
 router = APIRouter(prefix="/api/live", tags=["live"])
 
 
 class CreateIn(BaseModel):
     category_slug: Optional[str] = None
+    custom_quiz_id: Optional[int] = None
     mode: str = "choice"
     question_count: int = Field(10, ge=1, le=MAX_QUESTION_COUNT)
     time_limit: int = live.DEFAULT_TIME_LIMIT
@@ -40,7 +42,9 @@ class JoinIn(BaseModel):
 
 class AnswerIn(BaseModel):
     position: int
-    choice_id: int
+    choice_id: Optional[int] = None
+    text: Optional[str] = Field(None, max_length=100)
+    value: Optional[float] = None
 
 
 class LockIn(BaseModel):
@@ -89,6 +93,24 @@ def create(
     db: Session = Depends(get_db),
     user: Optional[models.User] = Depends(optional_user),
 ):
+    if payload.custom_quiz_id is not None:
+        if user is None:
+            raise AppError("sign_in_required", status=401)
+        quiz = own_quiz(db, user, payload.custom_quiz_id)
+        try:
+            room = live.create_custom_room(
+                db,
+                questions=quizzes.freeze(quiz.questions, payload.lang),
+                title=quiz.title,
+                quiz_id=quiz.id,
+                host_user=user,
+                lang=payload.lang,
+            )
+        except live.LiveError as exc:
+            raise _fail(db, exc) from exc
+        view = {"host_token": room.game.host_token, **live.host_view(room, live._now())}
+        db.commit()
+        return view
     if payload.mode not in QUIZ_MODES:
         raise AppError("unknown_mode", status=422, mode=payload.mode)
     if payload.time_limit not in live.TIME_LIMITS:
@@ -263,7 +285,7 @@ def answer(
         room = live.open_room(db, pin, lock=True)
         player = _player(room, x_live_token)
         player.last_seen = now
-        room.answer(player, payload.position, payload.choice_id, now)
+        room.answer(player, payload.position, payload.model_dump(exclude_none=True, exclude={"position"}), now)
         room.game.touched_at = now
         db.flush()
     except live.LiveError as exc:

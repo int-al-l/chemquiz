@@ -38,7 +38,7 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from . import crud, models
+from . import crud, grading, models
 from .database import begin_write
 from .i18n import AppError, localized
 
@@ -116,6 +116,11 @@ class Room:
                 self.answers[answer.player_id] = answer
 
     # -- lookups --
+
+    def time_limit(self) -> int:
+        """Seconds for the question on screen: its own (custom quizzes) or the game's."""
+        q = self.question
+        return (q or {}).get("time_limit") or self.game.time_limit
 
     @property
     def active_players(self) -> list[models.LivePlayer]:
@@ -211,7 +216,7 @@ class Room:
         game.position = position
         game.phase = "question"
         game.starts_at = now + READ_SECONDS
-        game.deadline = game.starts_at + game.time_limit
+        game.deadline = game.starts_at + self.time_limit()
         game.closed_at = None
         if game.started_at is None:
             game.started_at = now
@@ -255,8 +260,9 @@ class Room:
         return player
 
     def answer(
-        self, player: models.LivePlayer, position: int, choice_id: int, now: float
+        self, player: models.LivePlayer, position: int, given: dict, now: float
     ) -> models.LiveAnswer:
+        """`given` is {"choice_id"}, {"text"} or {"value"}, whichever the question asks for."""
         self.tick(now)
         game = self.game
         question = self.question
@@ -266,26 +272,31 @@ class Room:
             raise LiveError("not_open_yet")
         if player.id in self.answers:
             raise LiveError("already_answered")
-        if choice_id not in {c["id"] for c in question["choices"]}:
-            raise LiveError("not_an_option", status=422)
+        try:
+            correct = grading.grade(question, given)
+        except ValueError:
+            raise LiveError("not_an_option", status=422) from None
 
-        elapsed = max(0.0, min(now - game.starts_at, float(game.time_limit)))
-        correct = choice_id == question["correct_id"]
+        limit = self.time_limit()
+        elapsed = max(0.0, min(now - game.starts_at, float(limit)))
         points = 0
         if correct:
             player.streak += 1
-            fraction = elapsed / game.time_limit
+            fraction = elapsed / limit
             points = round(MAX_POINTS - (MAX_POINTS - MIN_POINTS) * fraction)
             points += min((player.streak - 1) * STREAK_BONUS, STREAK_BONUS_CAP)
         else:
             player.streak = 0
         player.score += points
 
+        choice = grading.kind(question) in grading.CHOICE_TYPES
+        typed = given.get("text") if "text" in given else given.get("value")
         answer = models.LiveAnswer(
             game_id=game.id,
             player_id=player.id,
             position=position,
-            choice_id=choice_id,
+            choice_id=given["choice_id"] if choice else -1,
+            answer=None if choice else str(typed).strip()[:100],
             elapsed=elapsed,
             correct=correct,
             points=points,
@@ -430,6 +441,11 @@ def create_room(
         lang=lang,
         questions=questions,
     )
+    return _open(db, settings, rng)
+
+
+def _open(db: Session, settings: dict, rng: random.Random) -> Room:
+    """A new room with these settings and a free PIN."""
     now = _now()
     purge(db, now)
 
@@ -461,6 +477,36 @@ def create_room(
     raise LiveError("no_free_pins", status=503)
 
 
+def create_custom_room(
+    db: Session,
+    *,
+    questions: list[dict],
+    title: str,
+    quiz_id: Optional[int],
+    host_user: Optional[models.User] = None,
+    lang: str = "en",
+    rng: Optional[random.Random] = None,
+) -> Room:
+    """Open a room for frozen questions from a teacher's own quiz (see
+    quizzes.freeze), in order. Also used by "Work on mistakes" with a subset."""
+    if not questions:
+        raise LiveError("no_items")
+    questions = [{**q, "position": n} for n, q in enumerate(questions, start=1)]
+    settings = dict(
+        host_user_id=host_user.id if host_user else None,
+        mode="custom",
+        time_limit=max(q.get("time_limit") or DEFAULT_TIME_LIMIT for q in questions),
+        question_count=len(questions),
+        category_id=None,
+        category_slug=None,
+        category_name=title,
+        custom_quiz_id=quiz_id,
+        lang=lang,
+        questions=questions,
+    )
+    return _open(db, settings, rng or random.SystemRandom())
+
+
 def _draw(db: Session, asked, pool, mode: str, rng: random.Random, lang: str = "en") -> list[dict]:
     """The frozen questions: what is shown, the options, and the answer."""
     questions = []
@@ -480,8 +526,10 @@ def _draw(db: Session, asked, pool, mode: str, rng: random.Random, lang: str = "
         answer["image_url"] = photo_url
         questions.append(
             {
+                "type": "quiz",
                 "position": position,
                 "correct_id": item.id,
+                "correct_ids": [item.id],
                 "image_url": photo_url if mode == "choice" else None,
                 "prompt": localized(item, "name", lang) if mode == "inverted" else None,
                 "choices": choices,
@@ -537,12 +585,19 @@ def purge(db: Session, now: Optional[float] = None) -> None:
 
 def _question_public(q: dict) -> dict:
     """The question without its answer."""
-    return {
+    kind = grading.kind(q)
+    out = {
         "position": q["position"],
+        "type": kind,
         "image_url": q["image_url"],
         "prompt": q["prompt"],
-        "choices": q["choices"],
+        "time_limit": q.get("time_limit"),
     }
+    if kind in grading.CHOICE_TYPES:
+        out["choices"] = q["choices"]
+    if kind == "slider":
+        out.update({k: q[k] for k in ("min", "max", "step", "unit")})
+    return out
 
 
 def _reveal(room: Room) -> Optional[dict]:
@@ -550,7 +605,7 @@ def _reveal(room: Room) -> Optional[dict]:
     q = room.question
     if q is None or game.phase not in ("reveal", "scoreboard", "finished") or game.closed_at is None:
         return None
-    counts = {c["id"]: 0 for c in q["choices"]}
+    counts = {c["id"]: 0 for c in q.get("choices", [])}
     right = 0
     for p in room.active_players:
         a = room.answers.get(p.id)
@@ -561,8 +616,11 @@ def _reveal(room: Room) -> Optional[dict]:
         if a.correct:
             right += 1
     return {
-        "correct_id": q["correct_id"],
-        "item": q["item"],
+        "type": grading.kind(q),
+        "correct_id": q.get("correct_id"),
+        "correct_ids": grading.correct_ids(q) if q.get("choices") else [],
+        "item": q.get("item"),
+        "answer_text": grading.answer_text(q),
         "counts": [{"id": cid, "count": n} for cid, n in counts.items()],
         "right_count": right,
     }
@@ -574,7 +632,7 @@ def _clock(room: Room, now: float) -> dict:
         "now": now,
         "starts_at": game.starts_at if game.phase == "question" else None,
         "deadline": game.deadline if game.phase == "question" else None,
-        "time_limit": game.time_limit,
+        "time_limit": room.time_limit(),
     }
 
 
@@ -625,6 +683,8 @@ def player_view(room: Room, player: models.LivePlayer, now: float) -> dict:
         "streak": player.streak,
         "rank": room.rank_of(player),
         "answered_id": answer.choice_id if answer else None,
+        "answered": answer is not None,
+        "answer": answer.answer if answer else None,
     }
     if reveal is not None:
         you["result"] = {

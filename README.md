@@ -77,6 +77,30 @@ are not kept.
 room; the board and every phone follow it, whatever language the phones are
 set to.
 
+## Your own quizzes
+
+A signed-in teacher can make their own quizzes, Kahoot-style: **My quizzes**
+(`/quizzes`, also in the profile and on the class game screen).
+
+* Four kinds of question: **quiz** (2-4 answers, one or more of them right),
+  **true / false**, **type the answer** (up to four accepted spellings; case,
+  accents and punctuation do not matter) and **slider** (a number between a
+  min and a max, right within a tolerance). Each question has its own time
+  (5-240 s) and can have a picture, and quiz answers can be pictures too.
+* **From the library**: tick cards from our decks and each becomes a
+  "photo → names" or "name → photos" question, which can then be edited like
+  any other.
+* **Import**: fill in the Excel or Word template (`public/templates/`, linked
+  from the editor) and upload it; rows that cannot be read are listed by row
+  number. Rebuild the templates with `python3 tools/make_quiz_templates.py`.
+* Play it in class (**Host in class**, or **My quiz** on the class game
+  screen) or alone (**Play**). Solo runs do not count towards XP or cards.
+
+Pictures are saved under `backend/static/uploads/` (not committed). A quiz is
+one JSON document (`CustomQuiz.questions`); the rules are in
+`backend/app/quizzes.py`, grading in `backend/app/grading.py`, the import in
+`backend/app/quiz_import.py`. The demo build cannot keep quizzes.
+
 ## Demo build (no backend)
 
 `npm run build:demo` builds a version that runs entirely in the browser: the
@@ -156,6 +180,9 @@ tools/fetch_labware_shop.py  downloads Synthware's shop, labware-shop.com (run i
 | `/live/history` | past class games (signed in) |
 | `/live/history/:id` | one past game: standings, CSV, play again |
 | `/join[/:pin]`, `/play/:pin` | a student joins, and plays on their phone |
+| `/quizzes` | a teacher's own quizzes (signed in) |
+| `/quizzes/new`, `/quizzes/:id` | the quiz editor |
+| `/quizzes/:id/play` | play your own quiz alone |
 
 ## Languages
 
