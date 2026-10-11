@@ -128,6 +128,16 @@ https://int-al-l.github.io/chemquiz/ . A GitHub Action
 `python tools/make_demo_data.py`, after every merge to `main` and commits the
 result, so there is no need to do it by hand.
 
+## The public site
+
+The full site (with accounts and class games) runs on a laptop and is reachable
+at https://desktop-0l2k3po.taila60572.ts.net . It updates itself: every two
+minutes `tools/deploy-honor.sh --watch` checks `main`, and once CI on a new
+commit is green it backs up the database, pulls, rebuilds and restarts the
+backend and frontend. So a merged pull request is live a few minutes after its
+CI passes. The restart takes a few seconds; running class games are kept in the
+database. Log: tmux window `chemquiz:deploy` on the laptop.
+
 ## Working together
 
 Two people work on this repo. Every change goes on its own branch and into
