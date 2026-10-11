@@ -185,7 +185,9 @@ function Editor({ id }) {
                   <span className="material-symbols-outlined" aria-hidden="true">
                     {TYPE_ICONS[q.type]}
                   </span>
-                  {i + 1}. {q.text || t("quizzes.editor.untitled")}
+                  <span className="quiz-editor-item-text">
+                    {i + 1}. {q.text || t("quizzes.editor.untitled")}
+                  </span>
                 </button>
                 <button type="button" className="quiz-icon-button" disabled={i === 0} aria-label={t("quizzes.editor.up")}
                   onClick={() => { setQuestions((qs) => move(qs, i, -1)); setSelected(i - 1); }}>

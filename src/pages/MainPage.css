@@ -123,6 +123,8 @@
 }
 
 .oq-stat-icon { font-size: 32px; }
+/* "0 days in a row" is short: keep it on one line while the level bar gives way */
+.oq-stat > div > .oq-subheader { white-space: nowrap; }
 .oq-stat-icon.is-hot { animation: oq-flicker 1.4s ease-in-out infinite; }
 
 .oq-goal {
@@ -452,6 +454,14 @@
   .oq-deck-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .oq-deck:nth-child(n + 5) { display: none; }
   .oq-class { width: 300px; }
+}
+
+/* Too narrow for level, streak and goal side by side (the level title ended up
+   one word per line): the level takes the first row, streak and goal the second. */
+@media (max-width: 1240px) {
+  .oq-progress { flex-wrap: wrap; row-gap: 16px; }
+  .oq-level { flex: 1 1 100%; }
+  .oq-progress > .oq-divider:first-of-type { display: none; }
 }
 
 @media (max-width: 1100px) {

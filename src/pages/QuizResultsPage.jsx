@@ -80,7 +80,7 @@ function QuizResultsPage() {
       <div className="page-layout">
         <PageHeader title={t("results.title")} backTo="/" />
 
-        <section className="categories-content">
+        <section className="categories-content results-content">
           <SavedError />
 
           {loading && <Loading />}

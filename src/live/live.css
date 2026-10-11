@@ -730,6 +730,17 @@
   font-size: clamp(26px, 2.4vw, 38px);
 }
 
+/* The bar gives way, never the count or the tick (which the tile would clip);
+   the counts line up in one column whatever the bar's length. */
+.live-option-n,
+.live-option-count .material-symbols-outlined { flex: none; }
+.live-option-n { margin-left: auto; }
+.live-option:not(.is-right) .live-option-count::after {
+  content: "";
+  flex: none;
+  width: clamp(26px, 2.4vw, 38px); /* the tick's room, so every count sits in the same place */
+}
+
 .live-question .live-next-button {
   justify-self: end;
 }

@@ -536,6 +536,10 @@ textarea {
 
 .text-button:hover { text-decoration: underline; }
 
+/* a link inside a sentence ("Tap the star ... in Explore"), not the browser's own blue */
+:where(a:not([class])) { color: var(--oq-brand-text); font-weight: 500; text-decoration: none; }
+:where(a:not([class])):hover { text-decoration: underline; }
+
 .icon-button {
   width: 36px;
   height: 36px;
@@ -629,6 +633,11 @@ textarea {
   animation: oq-boing 0.5s var(--spring);
 }
 
+/* small choices (5 / 10 / 20, English / Русский) line up with the rest of the
+   left-aligned page and keep their label on one line ("My quiz", "True / false") */
+.option-row-tight { justify-content: flex-start; }
+.option-button-small { flex: 0 0 auto; min-width: 90px; white-space: nowrap; }
+
 .option-note { font-size: 12px; font-weight: 400; }
 .option-icon { color: var(--oq-brand-text); }
 .option-hint { font-size: 13px; }
@@ -715,6 +724,9 @@ textarea {
 .stat-pill { background: var(--oq-generic); color: var(--oq-text-2); font-weight: 500; }
 .stat-pill.is-hot { background: var(--oq-streak-soft); color: var(--oq-streak-text); }
 .goal-ring .ring-fill { stroke: var(--oq-ok); }
+/* the small daily-goal ring shows its track, so 0/50 is an empty ring, not a mint blob */
+.level-card .goal-ring { background: none; }
+.level-card .goal-ring .ring-track { stroke: var(--oq-track); }
 
 /* Explore: quick tiles and deck tiles as in the Figma "Колоды" card */
 .quick-decks { gap: 16px; }
@@ -827,8 +839,15 @@ textarea {
 .badge-title { font-size: 13px; font-weight: 500; }
 .badge-blurb { font-size: 11px; line-height: 16px; }
 
-/* Results */
+/* Results: one column -- the score, the level, the buttons and the cards share an edge */
 .score-card { padding: 28px 20px; }
+.results-content { max-width: 640px; }
+.results-content .score-card,
+.results-content .results-actions { max-width: none; }
+.results-content .score-card { margin-top: 0; }
+.results-content .level-card.is-compact { margin: 12px 0 0; }
+.results-content .results-actions { margin-top: 16px; }
+.results-content .results-actions > * { margin-top: 0; }
 
 .score-value {
   font-size: clamp(48px, 8vw, 72px);
@@ -1409,7 +1428,8 @@ textarea {
   .quick-decks { grid-template-columns: 1fr; gap: 10px; }
   .quick-deck { flex-direction: row; align-items: center; }
 
-  .deck-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  /* two across on a phone, three or four on a tablet rather than two giant tiles */
+  .deck-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 
   /* quiz: the Figma phone layout */
   .quiz-top { min-height: 52px; padding: 0 16px; gap: 12px; }
