@@ -40,6 +40,11 @@ deploy() {
     # only the site's deps; the catalog pipeline ones below that comment are heavy
     backend/.venv/bin/pip install -q -r <(sed '/^# the content pipelines/,$d' backend/requirements.txt)
   fi
+  if changed backend/seed_data.py backend/content_ru.py backend/app/seeding.py; then
+    # card texts live in the database; the backend only seeds an empty one.
+    # Upsert by slug: accounts and custom quizzes stay, dropped cards go.
+    (cd backend && .venv/bin/python seed.py) || log "seed.py: see the warnings above"  # exits 1 on a missing photo
+  fi
   if changed package-lock.json; then npm ci --no-audit --no-fund; fi
   npm run build
 
