@@ -115,12 +115,7 @@ PHOTOS = {'ground-glass-joint': ['wm:Ground glass joint open.jpg', 'wm:Ground gl
  'nmr-spectrometer': ['wm:Bruker 300 MHz NMR Spectrometer.jpg',
                       'wm:Bruker Avance DPX 250 NMR Spectrometer.jpg',
                       'wm:NMR Bruker Avance II 700.jpg'],
- 'mass-spectrometer': ['wm:Model 21-103 Mass Spectrometer in use at Exxon analytical research laboratory '
-                       '1974.jpeg',
-                       'wm:HR-ICP-MS, high-resolution inductively coupled plasma ionization mass '
-                       'spectrometer used for multi-element analysis, in CAFIA laboratory, Czech '
-                       'Republic.png',
-                       'wm:EA-IRMS, isotope ratio mass spectrometer with elemental analyzer for the '
+ 'mass-spectrometer': ['wm:EA-IRMS, isotope ratio mass spectrometer with elemental analyzer for the '
                        'determination of isotope ratios of stable isotopes in wines, spirits, honey and '
                        'natural sweeteners, in CAFIA laboratory.jpg'],
  'diffractometer': ['wm:Scxrd.jpg', 'wm:Equi-inclination 3-circle diffractometer.jpg'],

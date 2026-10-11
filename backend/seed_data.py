@@ -4566,19 +4566,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
                  'the molar mass and the fragments hint at the structure; it is often coupled to a '
                  'gas chromatograph.',
   'aliases': ['MS', 'Mass spec', 'GC-MS'],
-  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Model_21-103_Mass_Spectrometer_in_use_at_Exxon_analytical_research_laboratory_1974.jpeg'},
-                      {'url': 'https://commons.wikimedia.org/wiki/File:HR-ICP-MS,_high-resolution_inductively_coupled_plasma_ionization_mass_spectrometer_used_for_multi-element_analysis,_in_CAFIA_laboratory,_Czech_Republic.png'},
-                      {'url': 'https://commons.wikimedia.org/wiki/File:EA-IRMS,_isotope_ratio_mass_spectrometer_with_elemental_analyzer_for_the_determination_of_isotope_ratios_of_stable_isotopes_in_wines,_spirits,_honey_and_natural_sweeteners,_in_CAFIA_laboratory.jpg'}],
+  'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:EA-IRMS,_isotope_ratio_mass_spectrometer_with_elemental_analyzer_for_the_determination_of_isotope_ratios_of_stable_isotopes_in_wines,_spirits,_honey_and_natural_sweeteners,_in_CAFIA_laboratory.jpg'}],
   'photos': [{'file': 'mass-spectrometer-1.jpg',
-              'source': 'wm:Model 21-103 Mass Spectrometer in use at Exxon analytical research '
-                        'laboratory 1974.jpeg',
-              'credit': 'Science History Institute, public domain, via Wikimedia Commons'},
-             {'file': 'mass-spectrometer-2.jpg',
-              'source': 'wm:HR-ICP-MS, high-resolution inductively coupled plasma ionization mass '
-                        'spectrometer used for multi-element analysis, in CAFIA laboratory, Czech '
-                        'Republic.png',
-              'credit': 'Sarka Na kopci, CC BY-SA 4.0, via Wikimedia Commons'},
-             {'file': 'mass-spectrometer-3.jpg',
               'source': 'wm:EA-IRMS, isotope ratio mass spectrometer with elemental analyzer for '
                         'the determination of isotope ratios of stable isotopes in wines, spirits, '
                         'honey and natural sweeteners, in CAFIA laboratory.jpg',
