@@ -36,6 +36,10 @@ Then open a pull request into `main`. CI (lint, frontend tests, backend tests)
 runs on it automatically; merge only when it is green. Prefer "Squash and
 merge". Delete the branch after merging.
 
+Right after opening the PR, turn on Auto-fix for it (Claude desktop app), so
+CI failures, merge conflicts and review comments come back to the session
+and get fixed there, instead of polling CI by hand.
+
 If a rebase hits a conflict in a file the other person owns or just changed,
 keep both intentions — don't silently drop their lines. When unsure, stop and
 ask the user.
