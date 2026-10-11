@@ -16,9 +16,10 @@ REPO=int-al-l/chemquiz
 log() { echo "$(date '+%F %T') $*"; }
 
 ci_green() {  # CI jobs (ci.yml: frontend, backend) succeeded on commit $1
-  [[ $(git log -1 --format=%B "$1") == *'[skip ci]'* ]] && return 0  # Pages rebuilds
-  local runs
-  runs=$(curl -fsS -m 30 "https://api.github.com/repos/$REPO/commits/$1/check-runs?per_page=100") || return 1
+  local sha=$1 runs
+  # Pages rebuilds ([skip ci]) carry the code of the commit below them: check that one
+  while [[ $(git log -1 --format=%B "$sha") == *'[skip ci]'* ]]; do sha=$(git rev-parse "$sha^"); done
+  runs=$(curl -fsS -m 30 "https://api.github.com/repos/$REPO/commits/$sha/check-runs?per_page=100") || return 1
   python3 -c 'import json, sys
 runs = {r["name"]: r["conclusion"] for r in json.load(sys.stdin)["check_runs"]}
 sys.exit(0 if runs.get("frontend") == runs.get("backend") == "success" else 1)' <<<"$runs"
@@ -38,6 +39,11 @@ deploy() {
   if changed backend/requirements.txt; then
     # only the site's deps; the catalog pipeline ones below that comment are heavy
     backend/.venv/bin/pip install -q -r <(sed '/^# the content pipelines/,$d' backend/requirements.txt)
+  fi
+  if changed backend/seed_data.py backend/content_ru.py backend/app/seeding.py; then
+    # card texts live in the database; the backend only seeds an empty one.
+    # Upsert by slug: accounts and custom quizzes stay, dropped cards go.
+    (cd backend && .venv/bin/python seed.py) || log "seed.py: see the warnings above"  # exits 1 on a missing photo
   fi
   if changed package-lock.json; then npm ci --no-audit --no-fund; fi
   npm run build
