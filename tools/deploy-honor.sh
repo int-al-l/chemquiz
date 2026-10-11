@@ -16,9 +16,10 @@ REPO=int-al-l/chemquiz
 log() { echo "$(date '+%F %T') $*"; }
 
 ci_green() {  # CI jobs (ci.yml: frontend, backend) succeeded on commit $1
-  [[ $(git log -1 --format=%B "$1") == *'[skip ci]'* ]] && return 0  # Pages rebuilds
-  local runs
-  runs=$(curl -fsS -m 30 "https://api.github.com/repos/$REPO/commits/$1/check-runs?per_page=100") || return 1
+  local sha=$1 runs
+  # Pages rebuilds ([skip ci]) carry the code of the commit below them: check that one
+  while [[ $(git log -1 --format=%B "$sha") == *'[skip ci]'* ]]; do sha=$(git rev-parse "$sha^"); done
+  runs=$(curl -fsS -m 30 "https://api.github.com/repos/$REPO/commits/$sha/check-runs?per_page=100") || return 1
   python3 -c 'import json, sys
 runs = {r["name"]: r["conclusion"] for r in json.load(sys.stdin)["check_runs"]}
 sys.exit(0 if runs.get("frontend") == runs.get("backend") == "success" else 1)' <<<"$runs"
