@@ -599,7 +599,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'CONDENSER, FRIEDRICHS',
   'description': 'A cold finger spiralled inside the jacket, so the cooled surface sits in the '
                  'middle of the vapour stream rather than around the outside. A very efficient '
-                 'reflux condenser for solvents that are hard to hold.',
+                 'reflux condenser for low-boiling solvents that escape through an ordinary one, '
+                 'such as diethyl ether, dichloromethane or pentane.',
   'aliases': ['Friedrich condenser', 'Cold finger reflux condenser', 'Friedrichs'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/condenser-friedrichs-removable-hose-connections'},
                       {'url': 'https://www.labware-shop.com/product-page/condenser-friedrichs'},
@@ -903,8 +904,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'FILTER FUNNEL',
   'description': 'A funnel with a disc of fused glass instead of paper. The frit comes in graded '
                  'porosities, does not tear or react, and can be washed and used again — which '
-                 'matters when the liquid would attack paper or must not pick up fibres. '
-                 'Porosities No. 2 and 3 are the usual ones. A frit is required when strong acids, '
+                 'matters when the liquid would attack paper or must not pick up fibres. Pores of '
+                 '16–160 µm are the usual ones: porosity No. 1–3, or P40 to P160 where the grade '
+                 'gives the largest pore in micrometres. A frit is required when strong acids, '
                  'alkalis or oxidants would destroy paper, and for samples meant for analysis.',
   'aliases': ['Sintered filter funnel',
               'Sintered glass funnel',
@@ -956,7 +958,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
                  'layers settle and the lower one is run off through the tap. This extraction is '
                  'one of the most-used operations in organic chemistry. Fill it no more than '
                  'two-thirds, turn it tap-up and open the tap to let the vapour out before shaking '
-                 'hard. The lower layer leaves through the tap, the upper one through the top.',
+                 'hard. The lower layer leaves through the tap and the upper one is poured out of '
+                 'the top: drops of the lower layer stay in the tap and stem, and the upper layer '
+                 'would pick them up again on the way through.',
   'aliases': ['Sep funnel', 'Separating funnel', 'Squibb funnel', 'Sepfunnel'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/funnel-separatory-squibb-glass-stopcock-4'},
                       {'url': 'https://www.labware-shop.com/product-page/funnel-separatory-squibb-glass-stopcock-2'},
@@ -1046,8 +1050,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'name': 'Reducing adapter',
   'catalog_name': 'ADAPTER, REDUCING',
   'description': 'A short adapter with a large joint at one end and a small one at the other, so '
-                 'pieces with different joint sizes can be connected. Read from the other end it '
-                 'is an enlarging adapter — the same piece, the opposite direction.',
+                 'pieces with different joint sizes can be connected. One with a large cone and a '
+                 'small socket is a reducing adapter; one with a small cone and a large socket is '
+                 'an enlarging adapter.',
   'aliases': ['Enlarging adapter',
               'Expansion adapter',
               'Reduction adapter',
@@ -1236,7 +1241,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'ADAPTER, DISTILLATION, BENT, 105°',
   'description': 'The bend that carries the distillate from the condenser down into the receiving '
                  'flask, with a side port for the vacuum line. Its bore should be at least 5–6 mm '
-                 'wide, or a vacuum distillation is held back.',
+                 'wide, or a vacuum distillation is held back. In a distillation without vacuum, a '
+                 'calcium chloride tube on the side port keeps moist air out.',
   'aliases': ['Vacuum adapter',
               'Distillation adapter',
               'Bend adapter',
@@ -1298,7 +1304,8 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': 'ADAPTER, ANTI-SPLASH',
   'description': 'A bulb with a baffle inside, placed between the flask and the condenser. Liquid '
                  'that bumps upwards hits the baffle and falls back instead of contaminating the '
-                 'distillate. It is standard on a rotary evaporator.',
+                 'distillate. It is standard on a rotary evaporator, hence its usual name, the '
+                 'rotovap bump trap.',
   'aliases': ['Bump trap',
               'Rotovap bump trap',
               'Splash head',
@@ -2393,7 +2400,12 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'A hand-held piston pipette with a dial for the volume and a plastic tip on the '
                  'end. Press the plunger, draw up, press again to dispense: microlitre volumes, '
-                 'quickly and repeatably, with a fresh tip for every sample.',
+                 'quickly and repeatably, with a fresh tip for every sample. A good one is out by '
+                 'about 1 % at the top of its range and by much more at the bottom, so pick one '
+                 'whose maximum is close to the volume needed. It measures aqueous solutions well '
+                 'but not volatile or viscous organic liquids: volatile ones drip from the tip, '
+                 'viscous ones stay on the wall. For those, use reverse pipetting or a '
+                 'positive-displacement pipette.',
   'aliases': ['Automatic pipette',
               'Pipettor',
               'Air displacement pipette',
@@ -2465,9 +2477,10 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'category': 'measuring',
   'name': 'Electronic balance',
   'catalog_name': None,
-  'description': 'An electronic scale for weighing chemicals. Analytical balances read to 0.1 mg '
-                 'and sit inside a glass draught shield, because even air moving across the pan '
-                 'would change the reading.',
+  'description': 'An electronic scale for weighing chemicals. A top-loading balance reads to 0.01 '
+                 'g, an analytical balance to 0.1 mg, a semi-micro balance to 0.01 mg and a '
+                 'microbalance to 1 µg. The precise ones sit inside a glass draught shield, '
+                 'because even air moving across the pan would change the reading.',
   'aliases': ['Balance', 'Analytical balance', 'Scales', 'Laboratory balance', 'Top-pan balance'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Balance_Mettler_AJ100.jpg'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Analytical_balance_mettler_ae-260.jpg'},
@@ -2745,7 +2758,6 @@ ITEMS = [{'slug': 'round-bottom-flask',
                  'past the coil.',
   'aliases': ['Dimroth', 'Dimroth coil condenser'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Dimrothk%C3%BChler.jpg'},
-                      {'url': 'https://commons.wikimedia.org/wiki/File:Dimroth_kuehler.jpg'},
                       {'url': 'https://www.labware-shop.com/product-page/condenser-reflux-removable-hose-connections-4'},
                       {'url': 'https://www.labware-shop.com/product-page/condenser-reflux-removable-hose-connections'},
                       {'url': 'https://www.labware-shop.com/product-page/condenser-reflux-large-cooling-capacity'},
@@ -2768,10 +2780,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
               'page': 'https://www.labware-shop.com/product-page/condenser-reflux-1'},
              {'file': 'dimroth-condenser-6.jpg',
               'source': 'wm:Dimrothkühler.jpg',
-              'credit': 'HaJo88, CC0, via Wikimedia Commons'},
-             {'file': 'dimroth-condenser-7.jpg',
-              'source': 'wm:Dimroth kuehler.jpg',
-              'credit': 'Armin Kübelbeck, CC BY-SA 3.0, via Wikimedia Commons'}]},
+              'credit': 'HaJo88, CC0, via Wikimedia Commons'}]},
  {'slug': 'evaporating-flask',
   'category': 'flasks',
   'name': 'Evaporating flask',
@@ -3790,7 +3799,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'catalog_name': None,
   'description': 'A vertical glass tube that widens towards the top, with a small float inside. '
                  'Gas flowing up lifts the float until it balances; the height on the scale shows '
-                 'the flow rate.',
+                 'the flow rate. It goes on a line of inert gas or of a reagent gas (oxygen, '
+                 'ozone, chlorine) to set the flow and see that it stays put, for example while a '
+                 'gas is bubbled slowly through a reaction.',
   'aliases': ['Gas flowmeter', 'Variable-area flowmeter', 'Float flowmeter'],
   'source_products': [{'url': 'https://commons.wikimedia.org/wiki/File:Flowmeter_float.JPG'},
                       {'url': 'https://commons.wikimedia.org/wiki/File:Rotameter.jpg'},
@@ -4194,9 +4205,9 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'category': 'funnels',
   'name': 'Hot-filtration funnel',
   'catalog_name': None,
-  'description': 'A funnel inside a jacket of hot water or steam, or with an electric heater, so a '
-                 'hot solution can be filtered without crystals forming in the funnel. The stem is '
-                 'short and wide so that it does not block.',
+  'description': 'A funnel inside a jacket of hot water or a high-boiling liquid such as oil, or '
+                 'with an electric heater, so a hot solution can be filtered without crystals '
+                 'forming in the funnel. The stem is short and wide so that it does not block.',
   'aliases': ['Heated funnel', 'Hot-water funnel', 'Jacketed filter funnel'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/funnel-filter-buchner-jacketed'},
                       {'url': 'https://www.labware-shop.com/product-page/funnel-filter-buchner-jacketed-1'}],
