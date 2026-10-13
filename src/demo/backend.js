@@ -65,6 +65,11 @@ const cats = DATA.categories;
 const items = DATA.items;
 const itemBySlug = Object.fromEntries(items.map((i) => [i.slug, i]));
 const itemById = Object.fromEntries(items.map((i) => [i.id, i]));
+// Quizzes store card ids and photo paths, and ids are positions in data.json:
+// when the catalog is rebuilt they can point at other cards. A quiz stamped
+// with another catalog is treated as expired rather than graded wrongly.
+const CATALOG = items.map((i) => `${i.id}:${i.slug}:${i.photos.join(",")}`).join("|");
+const catalogStamp = Array.from(CATALOG).reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0);
 
 const children = (slug) => cats.filter((c) => c.parent === slug).sort((a, b) => a.order - b.order);
 const subtree = (slug) => [slug, ...children(slug).flatMap((c) => subtree(c.slug))];
@@ -169,6 +174,7 @@ function startQuiz({ category_slug, mode, question_count }) {
   });
   const s = {
     token: token(),
+    catalog: catalogStamp,
     mode,
     category_slug: cat?.slug ?? null,
     category_name: cat?.name ?? null,
@@ -186,7 +192,9 @@ function startQuiz({ category_slug, mode, question_count }) {
 }
 
 function getSession(t) {
-  return db().sessions[t] || fail(404, "Quiz not found or expired", "quiz_not_found");
+  const s = db().sessions[t];
+  if (!s || s.catalog !== catalogStamp) fail(404, "Quiz not found or expired", "quiz_not_found");
+  return s;
 }
 
 const counts = (s) => ({
