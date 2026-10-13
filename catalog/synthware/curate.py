@@ -1212,6 +1212,95 @@ NEW_OR_CHANGED.setdefault("water-bath", {})["description"] = (
     "hydrides or anything else that reacts with water."
 )
 
+# Denis, 2026-10-01 (forwarded 10-13): one Dimroth photo is the same as the intensive
+# condenser's. The Commons "Dimroth kuehler" shot has the outer jacket of an intensive
+# condenser and the same author and backdrop as the intensive card's photo.
+PHOTOS["dimroth-condenser"] = [s for s in PHOTOS["dimroth-condenser"] if s != "wm:Dimroth kuehler.jpg"]
+
+# Denis's notes of 2026-10-01 on the card texts (forwarded 10-13). Russian texts are in
+# backend/content_ru.py.
+_DENIS_TEXTS = {
+    "balance": (
+        "An electronic scale for weighing chemicals. A top-loading balance reads to 0.01 g, an "
+        "analytical balance to 0.1 mg, a semi-micro balance to 0.01 mg and a microbalance to 1 µg. "
+        "The precise ones sit inside a glass draught shield, because even air moving across the "
+        "pan would change the reading."
+    ),
+    "rotameter": (
+        "A vertical glass tube that widens towards the top, with a small float inside. Gas flowing "
+        "up lifts the float until it balances; the height on the scale shows the flow rate. It goes "
+        "on a line of inert gas or of a reagent gas (oxygen, ozone, chlorine) to set the flow and "
+        "see that it stays put, for example while a gas is bubbled slowly through a reaction."
+    ),
+    "micropipette": (
+        "A hand-held piston pipette with a dial for the volume and a plastic tip on the end. Press "
+        "the plunger, draw up, press again to dispense: microlitre volumes, quickly and repeatably, "
+        "with a fresh tip for every sample. A good one is out by about 1 % at the top of its range "
+        "and by much more at the bottom, so pick one whose maximum is close to the volume needed. "
+        "It measures aqueous solutions well but not volatile or viscous organic liquids: volatile "
+        "ones drip from the tip, viscous ones stay on the wall. For those, use reverse pipetting or "
+        "a positive-displacement pipette."
+    ),
+    "friedrichs-condenser": (
+        "A cold finger spiralled inside the jacket, so the cooled surface sits in the middle of the "
+        "vapour stream rather than around the outside. A very efficient reflux condenser for "
+        "low-boiling solvents that escape through an ordinary one, such as diethyl ether, "
+        "dichloromethane or pentane."
+    ),
+    "separatory-funnel": (
+        "A pear-shaped funnel with a stopcock, for separating two liquids that do not mix. Shaking "
+        "moves a compound into whichever solvent dissolves it better; the layers settle and the "
+        "lower one is run off through the tap. This extraction is one of the most-used operations "
+        "in organic chemistry. Fill it no more than two-thirds, turn it tap-up and open the tap to "
+        "let the vapour out before shaking hard. The lower layer leaves through the tap and the "
+        "upper one is poured out of the top: drops of the lower layer stay in the tap and stem, and "
+        "the upper layer would pick them up again on the way through."
+    ),
+    "hot-filtration-funnel": (
+        "A funnel inside a jacket of hot water or a high-boiling liquid such as oil, or with an "
+        "electric heater, so a hot solution can be filtered without crystals forming in the funnel. "
+        "The stem is short and wide so that it does not block."
+    ),
+    "vacuum-takeoff-adapter": (
+        "The bend that carries the distillate from the condenser down into the receiving flask, "
+        "with a side port for the vacuum line. Its bore should be at least 5–6 mm wide, or a vacuum "
+        "distillation is held back. In a distillation without vacuum, a calcium chloride tube on "
+        "the side port keeps moist air out."
+    ),
+    "anti-splash-adapter": (
+        "A bulb with a baffle inside, placed between the flask and the condenser. Liquid that bumps "
+        "upwards hits the baffle and falls back instead of contaminating the distillate. It is "
+        "standard on a rotary evaporator, hence its usual name, the rotovap bump trap."
+    ),
+    "fritted-filter-funnel": (
+        "A funnel with a disc of fused glass instead of paper. The frit comes in graded porosities, "
+        "does not tear or react, and can be washed and used again — which matters when the liquid "
+        "would attack paper or must not pick up fibres. Pores of 16–160 µm are the usual ones: "
+        "porosity No. 1–3, or P40 to P160 where the grade gives the largest pore in micrometres. A "
+        "frit is required when strong acids, alkalis or oxidants would destroy paper, and for "
+        "samples meant for analysis."
+    ),
+    "reducing-adapter": (
+        "A short adapter with a large joint at one end and a small one at the other, so pieces with "
+        "different joint sizes can be connected. One with a large cone and a small socket is a "
+        "reducing adapter; one with a small cone and a large socket is an enlarging adapter."
+    ),
+}
+for _slug, _text in _DENIS_TEXTS.items():
+    NEW_OR_CHANGED.setdefault(_slug, {})["description"] = _text
+
+# Denis: the Anschütz and Claisen adapters are named wrongly -- the photos follow English
+# shop usage, which differs from the Russian one. Fedor: drop both cards.
+for _slug in ("anschutz-adapter", "claisen-adapter"):
+    PHOTOS.pop(_slug, None)
+    NEW_OR_CHANGED.pop(_slug, None)
+    DROPPED[_slug] = "named differently in Russian and English usage; the photos did not match the Russian names"
+NEW_OR_CHANGED.setdefault("three-neck-flask", {})["description"] = (
+    "Three openings on one flask: typically a condenser in the middle, a thermometer or inert-gas "
+    "line on one side and an addition funnel on the other. It is the workhorse for reactions that "
+    "have to be stirred, heated and fed at the same time."
+)
+
 # Both gas chromatograph photos showed GC-MS rigs, a right answer to "Find the mass
 # spectrometer" too. These are a GC on its own, two of them with the oven open -- the
 # part that tells a GC apart.
