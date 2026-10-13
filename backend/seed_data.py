@@ -156,8 +156,7 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'description': 'Three openings on one flask: typically a condenser in the middle, a thermometer '
                  'or inert-gas line on one side and an addition funnel on the other. It is the '
                  'workhorse for reactions that have to be stirred, heated and fed at the same '
-                 'time. An Anschütz adapter on one neck adds a fourth opening when a thermometer '
-                 'is needed as well.',
+                 'time.',
   'aliases': ['Three necked flask', '3-neck flask', 'Triple neck flask'],
   'source_products': [{'url': 'https://www.labware-shop.com/product-page/flask-three-neck-vertical-12'},
                       {'url': 'https://www.labware-shop.com/product-page/flask-three-neck-small-angled-11'},
@@ -1214,27 +1213,6 @@ ITEMS = [{'slug': 'round-bottom-flask',
              {'file': 'stopcock-vacuum-adapter-7.jpg',
               'source': 'lw:adapter-straight-outer-joint-glass-stopcock_1',
               'page': 'https://www.labware-shop.com/product-page/adapter-straight-outer-joint-glass-stopcock'}]},
- {'slug': 'claisen-adapter',
-  'category': 'adapters',
-  'name': 'Claisen adapter',
-  'catalog_name': 'ADAPTER, CLAISEN',
-  'description': 'A Y-shaped adapter that turns one flask neck into two. It is the quickest way to '
-                 'give a single-neck flask room for both a condenser and a thermometer, or a '
-                 'stirrer and an addition funnel. In a vacuum distillation one neck carries the '
-                 'boiling capillary and the other the thermometer, and the bend keeps froth from '
-                 'reaching the condenser.',
-  'aliases': ['Claisen head', 'Claisen', 'Claisen connecting adapter'],
-  'source_products': [{'url': 'https://www.labware-shop.com/product-page/adapter-claisen-two-neck'},
-                      {'url': 'https://www.labware-shop.com/product-page/adapter-claisen-three-neck'}],
-  'photos': [{'file': 'claisen-adapter-1.jpg',
-              'source': 'lw:adapter-claisen-two-neck_1',
-              'page': 'https://www.labware-shop.com/product-page/adapter-claisen-two-neck'},
-             {'file': 'claisen-adapter-2.jpg',
-              'source': 'lw:adapter-claisen-two-neck_3',
-              'page': 'https://www.labware-shop.com/product-page/adapter-claisen-two-neck'},
-             {'file': 'claisen-adapter-3.jpg',
-              'source': 'lw:adapter-claisen-three-neck_1',
-              'page': 'https://www.labware-shop.com/product-page/adapter-claisen-three-neck'}]},
  {'slug': 'vacuum-takeoff-adapter',
   'category': 'adapters',
   'name': 'Vacuum take-off adapter',
@@ -3678,24 +3656,6 @@ ITEMS = [{'slug': 'round-bottom-flask',
   'photos': [{'file': 'intensive-condenser-1.jpg',
               'source': 'wm:Intensivkuehler.jpg',
               'credit': 'Armin Kübelbeck, CC BY-SA 3.0, via Wikimedia Commons'}]},
- {'slug': 'anschutz-adapter',
-  'category': 'adapters',
-  'name': 'Anschütz adapter',
-  'catalog_name': None,
-  'description': 'An adapter with two parallel joints on top, fitted into one neck of a flask. On '
-                 'a three-neck flask it gives a fourth opening, so a liquid can be added to a '
-                 'stirred, refluxing mixture while its temperature is measured.',
-  'aliases': ['Anschuetz adapter', 'Anschütz head', 'Two-neck adapter, straight'],
-  'source_products': [{'url': 'https://www.labware-shop.com/product-page/adapter-connecting-y-shaped'}],
-  'photos': [{'file': 'anschutz-adapter-1.jpg',
-              'source': 'lw:adapter-connecting-y-shaped_0',
-              'page': 'https://www.labware-shop.com/product-page/adapter-connecting-y-shaped'},
-             {'file': 'anschutz-adapter-2.jpg',
-              'source': 'lw:adapter-connecting-y-shaped_1',
-              'page': 'https://www.labware-shop.com/product-page/adapter-connecting-y-shaped'},
-             {'file': 'anschutz-adapter-3.jpg',
-              'source': 'lw:adapter-connecting-y-shaped_2',
-              'page': 'https://www.labware-shop.com/product-page/adapter-connecting-y-shaped'}]},
  {'slug': 'three-neck-adapter',
   'category': 'adapters',
   'name': 'Three-neck adapter',
@@ -4668,4 +4628,8 @@ DROPPED = {'distillation-receiver': 'line drawings and posters only',
  'capillary-tube': 'only photo(s) were damaged',
  'check-valve': 'only photo(s) were damaged',
  'cannula': 'only photo(s) were damaged',
- 'ptfe-stopper': 'folded into ptfe-stopcock: the plug alone reads as a PTFE stopcock'}
+ 'ptfe-stopper': 'folded into ptfe-stopcock: the plug alone reads as a PTFE stopcock',
+ 'anschutz-adapter': 'named differently in Russian and English usage; the photos did not match the '
+                     'Russian names',
+ 'claisen-adapter': 'named differently in Russian and English usage; the photos did not match the '
+                    'Russian names'}

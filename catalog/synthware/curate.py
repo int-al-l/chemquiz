@@ -1289,6 +1289,18 @@ _DENIS_TEXTS = {
 for _slug, _text in _DENIS_TEXTS.items():
     NEW_OR_CHANGED.setdefault(_slug, {})["description"] = _text
 
+# Denis: the Anschütz and Claisen adapters are named wrongly -- the photos follow English
+# shop usage, which differs from the Russian one. Fedor: drop both cards.
+for _slug in ("anschutz-adapter", "claisen-adapter"):
+    PHOTOS.pop(_slug, None)
+    NEW_OR_CHANGED.pop(_slug, None)
+    DROPPED[_slug] = "named differently in Russian and English usage; the photos did not match the Russian names"
+NEW_OR_CHANGED.setdefault("three-neck-flask", {})["description"] = (
+    "Three openings on one flask: typically a condenser in the middle, a thermometer or inert-gas "
+    "line on one side and an addition funnel on the other. It is the workhorse for reactions that "
+    "have to be stirred, heated and fed at the same time."
+)
+
 # Both gas chromatograph photos showed GC-MS rigs, a right answer to "Find the mass
 # spectrometer" too. These are a GC on its own, two of them with the oven open -- the
 # part that tells a GC apart.
