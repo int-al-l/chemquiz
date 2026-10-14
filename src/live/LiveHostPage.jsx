@@ -16,7 +16,17 @@ import {
 import { rich, useT } from "../i18n";
 import { LanguageScope } from "../i18n/LanguageProvider";
 import { Countdown, DemoNotice, QrCode, Shape } from "./components";
-import { hostToken, OPTION_STYLES, questionClock, saveHostToken, useLivePoll, useServerNow } from "./game";
+import {
+  boardRows,
+  hostToken,
+  OPTION_STYLES,
+  questionClock,
+  saveBoardRows,
+  saveHostToken,
+  useLivePoll,
+  usePrefetch,
+  useServerNow,
+} from "./game";
 import { formatNumber } from "../quizzes/grade";
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
@@ -60,6 +70,7 @@ function LiveHostPage() {
   );
   const running = state?.phase === "question";
   const now = useServerNow(offset, running);
+  usePrefetch(state?.prefetch);
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState(null);
 
@@ -90,7 +101,7 @@ function LiveHostPage() {
 
   useEffect(() => {
     function onKey(event) {
-      if (event.target.closest?.("input, textarea")) return;
+      if (event.target.closest?.("input, textarea, button")) return;
       if (event.key === " " || event.key === "Enter" || event.key === "ArrowRight") {
         if (!state || state.phase === "finished") return;
         if (state.phase === "lobby" && state.players.length === 0) return;
@@ -438,13 +449,17 @@ function QuestionBoard({ t, state, now, busy, onNext }) {
 
 // --- standings ------------------------------------------------------------------------
 
+const ROW_CHOICES = [5, 10, Infinity];
+
 function Scoreboard({ t, state, busy, onNext }) {
   const last = state.position >= state.question_count;
+  const [rows, setRows] = useState(boardRows);
+  const shown = state.leaderboard.slice(0, rows);
   return (
     <div className="live-scoreboard">
       <h1>{t("live.host.standings")}</h1>
-      <ol className="live-ranks">
-        {state.leaderboard.map((p, i) => (
+      <ol className={`live-ranks ${shown.length > 10 ? "is-compact" : ""}`}>
+        {shown.map((p, i) => (
           <li key={p.id} style={{ animationDelay: `${i * 90}ms` }}>
             <span className="live-rank-n">{i + 1}</span>
             <span className="live-rank-name">{p.name}</span>
@@ -460,12 +475,32 @@ function Scoreboard({ t, state, busy, onNext }) {
           </li>
         ))}
       </ol>
-      <button type="button" className="live-next-button" onClick={onNext} disabled={busy}>
-        {last ? t("live.host.final") : t("live.host.nextQuestion")}
-        <span className="material-symbols-outlined" aria-hidden="true">
-          arrow_forward
-        </span>
-      </button>
+      <div className="live-scoreboard-foot">
+        {state.leaderboard.length > ROW_CHOICES[0] && (
+          <div className="live-rows-pick" role="group" aria-label={t("live.host.rows")}>
+            <span>{t("live.host.rows")}</span>
+            {ROW_CHOICES.map((n) => (
+              <button
+                key={n}
+                type="button"
+                aria-pressed={rows === n}
+                onClick={() => {
+                  setRows(n);
+                  saveBoardRows(n);
+                }}
+              >
+                {n === Infinity ? t("live.host.rowsAll") : n}
+              </button>
+            ))}
+          </div>
+        )}
+        <button type="button" className="live-next-button" onClick={onNext} disabled={busy}>
+          {last ? t("live.host.final") : t("live.host.nextQuestion")}
+          <span className="material-symbols-outlined" aria-hidden="true">
+            arrow_forward
+          </span>
+        </button>
+      </div>
     </div>
   );
 }
@@ -488,6 +523,9 @@ function Podium({ t, state, onNew }) {
               <>
                 <span className="live-step-name">{p.name}</span>
                 <span className="live-step-score">{p.score}</span>
+                <span className="live-step-correct">
+                  {t("live.correctOf", { n: p.correct, total: state.question_count })}
+                </span>
               </>
             )}
             <div className="live-step-block">{place}</div>
@@ -500,6 +538,9 @@ function Podium({ t, state, onNew }) {
             <li key={p.id}>
               <span className="live-rank-n">{i + 4}</span>
               <span className="live-rank-name">{p.name}</span>
+              <span className="live-rank-correct">
+                {t("live.correctOf", { n: p.correct, total: state.question_count })}
+              </span>
               <span className="live-rank-score">{p.score}</span>
             </li>
           ))}

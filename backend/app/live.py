@@ -34,7 +34,7 @@ import secrets
 import time
 from typing import Optional
 
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -64,7 +64,6 @@ NAME_MAX = 20
 ROOM_IDLE_SECONDS = 3 * 60 * 60
 # A player whose phone has not asked for news for this long is shown as away.
 AWAY_SECONDS = 8
-LEADERBOARD_SIZE = 5
 # A poll records that a phone is still there at most this often, so a class of
 # eighty polling every second is not eighty writes a second...
 SEEN_EVERY_SECONDS = 3
@@ -147,6 +146,16 @@ class Room:
 
     def rank_of(self, player: models.LivePlayer) -> int:
         return self.standings().index(player) + 1
+
+    def correct_counts(self) -> dict[int, int]:
+        """player id -> how many questions they got right, over the whole game."""
+        return dict(
+            self.db.execute(
+                select(models.LiveAnswer.player_id, func.count())
+                .where(models.LiveAnswer.game_id == self.game.id, models.LiveAnswer.correct)
+                .group_by(models.LiveAnswer.player_id)
+            ).all()
+        )
 
     def answered_count(self) -> int:
         return sum(1 for p in self.active_players if p.id in self.answers)
@@ -626,6 +635,16 @@ def _reveal(room: Room) -> Optional[dict]:
     }
 
 
+def _prefetch(room: Room) -> list[str]:
+    """Pictures of the next question, so a slow phone has them before the clock starts."""
+    game = room.game
+    if game.phase not in ("lobby", "reveal", "scoreboard") or game.position >= len(game.questions):
+        return []
+    q = game.questions[game.position]  # position is 1-based: this is the next one
+    urls = [q.get("image_url")] + [c.get("image_url") for c in q.get("choices", [])]
+    return [u for u in urls if u]
+
+
 def _clock(room: Room, now: float) -> dict:
     game = room.game
     return {
@@ -639,6 +658,7 @@ def _clock(room: Room, now: float) -> dict:
 def host_view(room: Room, now: float) -> dict:
     game = room.game
     standings = room.standings()
+    correct = room.correct_counts() if game.phase == "finished" else {}
     return {
         "pin": game.pin,
         "lang": game.lang,
@@ -664,9 +684,12 @@ def host_view(room: Room, now: float) -> dict:
         "answered_count": room.answered_count() if game.position else 0,
         "question": _question_public(room.question) if room.question and game.phase != "lobby" else None,
         "reveal": _reveal(room),
+        "prefetch": _prefetch(room),
+        # Everyone: the board decides how many rows to show.
         "leaderboard": [
             {"id": p.id, "name": p.name, "score": p.score, "streak": p.streak}
-            for p in standings[: (len(standings) if game.phase == "finished" else LEADERBOARD_SIZE)]
+            | ({"correct": correct.get(p.id, 0)} if game.phase == "finished" else {})
+            for p in standings
         ],
     }
 
@@ -692,6 +715,8 @@ def player_view(room: Room, player: models.LivePlayer, now: float) -> dict:
             "correct": bool(answer and answer.correct),
             "points": answer.points if answer else 0,
         }
+    if game.phase == "finished":
+        you["correct"] = room.correct_counts().get(player.id, 0)
     return {
         "pin": game.pin,
         "lang": game.lang,
@@ -703,5 +728,6 @@ def player_view(room: Room, player: models.LivePlayer, now: float) -> dict:
         "player_count": len(room.active_players),
         "question": _question_public(q) if q and game.phase == "question" else None,
         "reveal": reveal,
+        "prefetch": _prefetch(room),
         "you": you,
     }
