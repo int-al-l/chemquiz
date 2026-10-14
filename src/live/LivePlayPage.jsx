@@ -8,7 +8,16 @@ import { LanguageScope } from "../i18n/LanguageProvider";
 import { useProgress } from "../progress/context";
 import AnswerInput from "../quizzes/AnswerInput";
 import { DemoNotice, Shape } from "./components";
-import { OPTION_STYLES, ordinal, playerToken, questionClock, savePlayerToken, useLivePoll, useServerNow } from "./game";
+import {
+  OPTION_STYLES,
+  ordinal,
+  playerToken,
+  questionClock,
+  savePlayerToken,
+  useLivePoll,
+  usePrefetch,
+  useServerNow,
+} from "./game";
 
 /**
  * A student's phone during a class game: a controller, not a second board.
@@ -29,6 +38,7 @@ function LivePlayPage() {
     Boolean(token) && !IS_DEMO,
   );
   const now = useServerNow(offset, state?.phase === "question");
+  usePrefetch(state?.prefetch);
   const [picked, setPicked] = useState(null); // {position, id} while the answer is on its way
   const [answerError, setAnswerError] = useState(null);
 
@@ -196,6 +206,7 @@ function PlayScreen({ pin, token, state, error, status, now, picked, answerError
           </span>
           <h1>{t("live.play.finished", { place: ordinal(you.rank, lang) })}</h1>
           <p>{t("live.play.points", { n: you.score })}</p>
+          <p>{t("live.correctOf", { n: you.correct, total: state.question_count })}</p>
           <Link className="primary-button live-inline-button" to="/">
             {t("live.play.done")}
           </Link>

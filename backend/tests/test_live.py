@@ -152,7 +152,10 @@ def test_full_game(client, clock):
     assert view["leaderboard"][0] == {"id": ann["you"]["id"], "name": "Ann", "score": 1000, "streak": 1}
 
     # Question 2: Ann right halfway through, Bob never answers.
-    client.post(f"/api/live/{pin}/next", headers=host(token))  # scoreboard
+    view = client.post(f"/api/live/{pin}/next", headers=host(token)).json()  # scoreboard
+    # Phones fetch question 2's picture now, before its clock starts.
+    me = client.get(f"/api/live/{pin}/me", headers=host(bob["token"])).json()
+    assert me["prefetch"] and me["prefetch"] == view["prefetch"]
     view = client.post(f"/api/live/{pin}/next", headers=host(token)).json()
     assert view["phase"] == "question" and view["position"] == 2
     clock.advance(live.READ_SECONDS + 10)
@@ -180,7 +183,9 @@ def test_full_game(client, clock):
     client.post(f"/api/live/{pin}/next", headers=host(token))
     view = client.post(f"/api/live/{pin}/next", headers=host(token)).json()
     assert view["phase"] == "finished"
-    assert [p["name"] for p in view["leaderboard"]] == ["Ann", "Bob"]
+    assert [(p["name"], p["correct"]) for p in view["leaderboard"]] == [("Ann", 2), ("Bob", 0)]
+    me = client.get(f"/api/live/{pin}/me", headers=host(ann["token"])).json()
+    assert me["you"]["correct"] == 2 and me["prefetch"] == []
 
     assert client.post(f"/api/live/{pin}/join", json={"name": "Late"}).status_code == 409
 

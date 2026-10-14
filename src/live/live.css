@@ -810,9 +810,72 @@
   font-variant-numeric: tabular-nums;
 }
 
-.live-scoreboard .live-next-button {
+.live-scoreboard-foot {
+  width: 100%;
   margin-top: auto;
-  align-self: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.live-scoreboard-foot .live-next-button {
+  margin-left: auto;
+}
+
+.live-rows-pick {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--live-ink-soft);
+  font-size: 15px;
+}
+
+.live-rows-pick span {
+  margin-right: 6px;
+}
+
+.live-rows-pick button {
+  min-width: 44px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.live-rows-pick button[aria-pressed="true"] {
+  background: var(--live-ink);
+  border-color: var(--live-ink);
+  color: #24173F;
+}
+
+/* Everyone in a big class: smaller rows, so more of them fit on the screen. */
+.live-ranks.is-compact {
+  gap: 6px;
+}
+
+.live-ranks.is-compact li {
+  padding: 6px clamp(14px, 1.6vw, 22px);
+  font-size: clamp(16px, 1.6vw, 22px);
+  border-radius: 12px;
+}
+
+.live-rank-correct,
+.live-step-correct {
+  color: var(--live-ink-soft);
+  font-size: 0.75em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.live-step-correct {
+  font-size: clamp(14px, 1.3vw, 20px);
 }
 
 .live-podium {

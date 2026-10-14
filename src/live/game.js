@@ -4,6 +4,8 @@
  */
 import { useEffect, useRef, useState } from "react";
 
+import { imageSrc } from "../api/client";
+
 /**
  * Each option has a colour *and* a shape, so it can be called out across a
  * classroom ("the blue diamond") and told apart by anyone who cannot rely on
@@ -45,6 +47,23 @@ export const hostToken = (pin) => read(HOST_KEY(pin));
 export const saveHostToken = (pin, token) => write(HOST_KEY(pin), token);
 export const playerToken = (pin) => read(PLAYER_KEY(pin));
 export const savePlayerToken = (pin, token) => write(PLAYER_KEY(pin), token);
+
+// How many rows the board's standings show: 5, 10 or Infinity (everyone).
+const ROWS_KEY = "chemquiz.live.boardRows";
+export const boardRows = () => Number(read(ROWS_KEY)) || 5;
+export const saveBoardRows = (n) => write(ROWS_KEY, String(n));
+
+/**
+ * Load the next question's pictures while the class looks at the answer or the
+ * standings, so a phone on slow Wi-Fi is not still loading when the clock starts.
+ */
+export function usePrefetch(urls) {
+  const key = (urls ?? []).join("\n");
+  useEffect(() => {
+    if (!key) return;
+    for (const url of key.split("\n")) new Image().src = imageSrc(url);
+  }, [key]);
+}
 
 // --- keeping up with the server ---------------------------------------------------
 

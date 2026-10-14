@@ -1355,6 +1355,11 @@ textarea {
 
 .live-ranks li:first-child { background: var(--oq-brand-soft); color: var(--oq-brand-text); }
 .live-rank-streak { color: var(--oq-streak); }
+.live-rank-correct,
+.live-step-correct,
+.live-rows-pick { color: var(--oq-text-2); }
+.live-rows-pick button { border-color: var(--oq-input-line); background: var(--oq-surface); color: var(--oq-text); }
+.live-rows-pick button[aria-pressed="true"] { background: var(--oq-brand); border-color: var(--oq-brand); color: #fff; }
 .live-step-block { color: var(--oq-text); }
 .live-step.is-first .live-step-block { background: #F6C945; }
 .live-step.is-second .live-step-block { background: #DCE3DE; }
